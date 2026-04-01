@@ -1184,7 +1184,7 @@ public void setTeacherMap(Map<String, Teacher> teacherMap) {
     <ref bean="studentTwo"></ref>
     <ref bean="studentThree"></ref>
 </util:list>
-<!--map集合类型的bean-->
+<!--map集合类型的bean--> 
 <util:map id="teacherMap">
     <entry>
         <key>

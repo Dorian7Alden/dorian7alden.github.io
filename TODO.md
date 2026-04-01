@@ -8,11 +8,11 @@
 - [ ] 03-30: 外教 assessment
   - week 6 400-500 report analysis
   - week13 国外学习 100-1200 words expository
-- [x] 04-01: 信息安全暴力破解作业
 - [ ] 04-01: 了解实习讯息
 - [ ] 04-01: 中教week pre7
 - [x] 04-01: 结束大创项目
 - [ ] 04-05: 习思想汇报
+- [ ] 04-10: ALS2 (DCP) - Research Summary Assessment
 - [x] 04-12: 蓝桥杯
 - [x] 04-13: 离散期中考试
 - [ ] 04-13: 离散期中作业报告：身边的离散数学
