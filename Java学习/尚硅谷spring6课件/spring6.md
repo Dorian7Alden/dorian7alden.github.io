@@ -987,7 +987,7 @@ public void setClazz(Clazz clazz) {
     <property name="clazz" ref="clazzOne"></property>
     <property name="clazz.clazzId" value="3333"></property>
     <property name="clazz.clazzName" value="最强王者班"></property>
-</bean>
+</bean>	
 ```
 
 
