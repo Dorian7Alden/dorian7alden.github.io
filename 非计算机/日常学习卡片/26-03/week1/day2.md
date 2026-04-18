@@ -151,7 +151,7 @@ String content = "第一行\r\n第二行";
 
 ### 经验分享
 
-- 在 **ide** 中快速编辑多行：长按 alt ，鼠标点击其他行，标记要同时编辑的位置；vscode 中鼠标中间选择，编辑多行
+- 在 **ide** 中快速编辑多行：长按 alt ，鼠标点击其他行，标记要同时编辑的位置；vscode 中鼠标中键选择，编辑多行
 
 - 牛客 prompt 提示词练习：https://www.nowcoder.com/exam/oj/ta?tpId=408&channelPut=pc_jgw
 
