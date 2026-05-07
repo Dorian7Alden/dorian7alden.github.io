@@ -1,0 +1,463 @@
+/* ============================================
+   Dorian's Blog — Design System
+   Indigo Warm Palette · Modern Clean Aesthetic
+   ============================================ */
+
+/* ---- Font Imports ---- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ============================================
+   1. Design Tokens — Light Mode
+   ============================================ */
+:root {
+  /* Brand */
+  --vp-c-brand: #5C6AC4;
+  --vp-c-brand-light: #7C8ADB;
+  --vp-c-brand-lighter: #A5AFF0;
+  --vp-c-brand-dark: #4A55A8;
+  --vp-c-brand-darker: #3A4288;
+
+  /* Semantic aliases */
+  --brand: #5C6AC4;
+  --brand-light: #7C8ADB;
+  --brand-soft: rgba(92, 106, 196, 0.08);
+  --brand-soft-hover: rgba(92, 106, 196, 0.14);
+  --accent: #F59E0B;
+  --accent-soft: rgba(245, 158, 11, 0.1);
+
+  /* Background */
+  --vp-c-bg: #FAF9F7;
+  --vp-c-bg-soft: #F3F2F0;
+  --vp-c-bg-mute: #EDEBE8;
+  --bg-card: #FFFFFF;
+  --bg-elevated: #FFFFFF;
+
+  /* Text */
+  --vp-c-text-1: #1A1A2E;
+  --vp-c-text-2: #5A6070;
+  --vp-c-text-3: #8E94A0;
+  --text-heading: #111127;
+
+  /* Border & Divider */
+  --vp-c-border: #E2E4E9;
+  --vp-c-divider: #EEEDEB;
+  --vp-c-gutter: #E2E4E9;
+
+  /* Surfaces */
+  --vp-c-neutral: #6B7280;
+  --vp-c-neutral-inverse: #FFFFFF;
+
+  /* Typography */
+  --vp-font-family-base: 'Inter', 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', -apple-system, sans-serif;
+  --vp-font-family-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 24px 48px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.06);
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Spacing */
+  --content-width: 680px;
+  --page-width: 1100px;
+
+  /* Transitions */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+}
+
+/* ============================================
+   2. Design Tokens — Dark Mode
+   ============================================ */
+.dark {
+  --vp-c-brand: #8B95E0;
+  --vp-c-brand-light: #A5AFF0;
+  --vp-c-brand-lighter: #BCC3F5;
+  --vp-c-brand-dark: #6C77D0;
+  --vp-c-brand-darker: #5C6AC4;
+
+  --brand: #8B95E0;
+  --brand-light: #A5AFF0;
+  --brand-soft: rgba(139, 149, 224, 0.12);
+  --brand-soft-hover: rgba(139, 149, 224, 0.2);
+
+  --vp-c-bg: #111118;
+  --vp-c-bg-soft: #1A1A24;
+  --vp-c-bg-mute: #242430;
+  --bg-card: #1A1A24;
+  --bg-elevated: #22222E;
+
+  --vp-c-text-1: #E8E8ED;
+  --vp-c-text-2: #A0A4B0;
+  --vp-c-text-3: #6E7280;
+  --text-heading: #F0F0F5;
+
+  --vp-c-border: #2E2E3C;
+  --vp-c-divider: #262632;
+  --vp-c-gutter: #2E2E3C;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 24px 48px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   3. Animation Keyframes
+   ============================================ */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(92, 106, 196, 0.4); }
+  50%      { box-shadow: 0 0 0 8px rgba(92, 106, 196, 0); }
+}
+
+/* Utility classes */
+.animate-fade-in-up {
+  animation: fade-in-up var(--duration-slow) var(--ease-out) both;
+}
+
+/* Stagger delays for lists */
+.stagger-1  { animation-delay: 0.05s; }
+.stagger-2  { animation-delay: 0.10s; }
+.stagger-3  { animation-delay: 0.15s; }
+.stagger-4  { animation-delay: 0.20s; }
+.stagger-5  { animation-delay: 0.25s; }
+
+/* ============================================
+   4. VitePress Navbar Overrides
+   ============================================ */
+.VPNav {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.VPNavBar {
+  background: transparent !important;
+  border-bottom: 1px solid transparent !important;
+}
+
+.VPNavBar.has-sidebar {
+  background: rgba(250, 249, 247, 0.82) !important;
+  border-bottom-color: var(--vp-c-divider) !important;
+}
+
+.dark .VPNavBar.has-sidebar {
+  background: rgba(17, 17, 24, 0.82) !important;
+  border-bottom-color: var(--vp-c-border) !important;
+}
+
+.VPNavBarTitle .title {
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.3px;
+}
+
+.VPNavBarMenuLink {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* ============================================
+   5. VitePress Doc Content Overrides
+   ============================================ */
+.vp-doc {
+  font-size: 16px;
+  line-height: 1.85;
+  letter-spacing: 0.01em;
+}
+
+.vp-doc h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin: 0 0 1rem;
+  color: var(--text-heading);
+}
+
+.vp-doc h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 2.5rem 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--vp-c-divider);
+  color: var(--text-heading);
+}
+
+.vp-doc h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 1.75rem 0 0.5rem;
+  color: var(--text-heading);
+}
+
+/* Paragraph spacing */
+.vp-doc p {
+  margin: 0.85rem 0;
+}
+
+/* Links */
+.vp-doc a:not(.header-anchor) {
+  color: var(--brand);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color var(--duration-fast) var(--ease-out);
+  background: linear-gradient(var(--brand), var(--brand)) left bottom / 0 1.5px no-repeat;
+  transition: background-size var(--duration-normal) var(--ease-out), color var(--duration-fast);
+}
+
+.vp-doc a:not(.header-anchor):hover {
+  background-size: 100% 1.5px;
+}
+
+/* Code blocks */
+.vp-doc div[class*='language-'] {
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  margin: 1.25rem 0;
+}
+
+.vp-doc div[class*='language-'] pre {
+  font-family: var(--vp-font-family-mono);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* Inline code */
+.vp-doc :not(pre) > code {
+  font-family: var(--vp-font-family-mono);
+  font-size: 0.875em;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--vp-c-bg-soft);
+  color: var(--brand-dark);
+  border: 1px solid var(--vp-c-divider);
+}
+
+/* Tables */
+.vp-doc table {
+  width: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+  border: 1px solid var(--vp-c-border);
+}
+
+.vp-doc th {
+  background: var(--vp-c-bg-soft);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 16px;
+  text-align: left;
+}
+
+.vp-doc td {
+  padding: 10px 16px;
+  font-size: 14px;
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+/* Blockquote */
+.vp-doc blockquote {
+  border-left: 3px solid var(--brand);
+  background: var(--brand-soft);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 1rem 1.25rem;
+  margin: 1.25rem 0;
+  color: var(--vp-c-text-2);
+}
+
+.vp-doc blockquote p {
+  margin: 0;
+}
+
+/* Images */
+.vp-doc img {
+  border-radius: var(--radius-md);
+  max-width: 100%;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Horizontal rule */
+.vp-doc hr {
+  border: none;
+  height: 1px;
+  background: var(--vp-c-divider);
+  margin: 2.5rem 0;
+}
+
+/* List spacing */
+.vp-doc ul, .vp-doc ol {
+  padding-left: 1.25rem;
+  margin: 0.75rem 0;
+}
+
+.vp-doc li {
+  margin: 0.35rem 0;
+}
+
+/* Header anchor */
+.vp-doc .header-anchor {
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-out);
+  color: var(--brand-light);
+  margin-left: 4px;
+}
+
+.vp-doc h1:hover .header-anchor,
+.vp-doc h2:hover .header-anchor,
+.vp-doc h3:hover .header-anchor {
+  opacity: 1;
+}
+
+/* ============================================
+   6. VitePress Sidebar Overrides
+   ============================================ */
+.VPSidebar {
+  background: transparent !important;
+}
+
+.VPSidebarItem .link.active {
+  background: var(--brand-soft) !important;
+  color: var(--brand) !important;
+  border-radius: var(--radius-sm);
+}
+
+/* ============================================
+   7. VitePress Footer Overrides
+   ============================================ */
+.VPFooter {
+  border-top: 2px solid var(--vp-c-divider) !important;
+  padding: 2rem 0 !important;
+  background: var(--vp-c-bg-soft) !important;
+}
+
+/* ============================================
+   8. Scrollbar Styling
+   ============================================ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--vp-c-text-3);
+  border-radius: var(--radius-full);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--vp-c-text-2);
+  background-clip: content-box;
+}
+
+/* ============================================
+   9. Home Page Layout
+   ============================================ */
+.home-layout {
+  display: flex;
+  gap: 40px;
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: 0 24px 48px;
+}
+
+.home-layout .main {
+  flex: 1;
+  min-width: 0;
+}
+
+.home-layout .sidebar {
+  width: 280px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .home-layout {
+    flex-direction: column;
+    gap: 32px;
+    padding: 0 16px 32px;
+  }
+
+  .home-layout .sidebar {
+    width: 100%;
+    order: -1;
+  }
+}
+
+/* ============================================
+   10. Page Transition
+   ============================================ */
+.VPContent {
+  animation: fade-in 0.3s var(--ease-out);
+}
+
+/* ============================================
+   11. Selection Styling
+   ============================================ */
+::selection {
+  background: var(--brand-soft);
+  color: var(--brand-dark);
+}
+
+.dark ::selection {
+  background: rgba(139, 149, 224, 0.25);
+  color: #FFFFFF;
+}
+
+/* ============================================
+   12. Focus Visible
+   ============================================ */
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 3px;
+}

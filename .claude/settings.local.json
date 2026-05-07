@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-Item \"D:\\\\repositories\\\\Dorian-Alden-Dai-Personal-Notes.lnk\" -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object -Property FullName, TargetPath)",
+      "PowerShell($shell = New-Object -ComObject WScript.Shell; $shortcut = $shell.CreateShortcut\\(\"D:\\\\repositories\\\\Dorian-Alden-Dai-Personal-Notes.lnk\"\\); Write-Output $shortcut.TargetPath)",
+      "PowerShell($shortcut = \\(New-Object -ComObject WScript.Shell\\).CreateShortcut\\(\"D:\\\\repositories\\\\Dorian-Alden-Dai-Personal-Notes.lnk\"\\); Write-Output \"TargetPath: $\\($shortcut.TargetPath\\)\")",
+      "Bash(Get-ChildItem -Recurse -Depth 0 \"D:\\\\notes\\\\Dorian-Alden-Dai-Personal-Notes\")",
+      "Bash(Select-Object Mode, Length, Name)",
+      "Bash(Format-Table -AutoSize)",
+      "WebSearch",
+      "Bash(git *)",
+      "PowerShell(pnpm *)",
+      "PowerShell(npm *)",
+      "PowerShell(npx tsx scripts/sync.ts)",
+      "PowerShell(Invoke-WebRequest -Uri \"http://localhost:5173/\" -UseBasicParsing | Select-Object StatusCode, Content | Format-List)",
+      "Bash(awk 'NR==996' \"D:/repositories/Dorian-Blog/content/学习/Java学习/尚硅谷spring6课件/spring6.md\")",
+      "Bash(grep -n '```' \"D:/notes/Dorian-Alden-Dai-Personal-Notes/学习/Java学习/尚硅谷spring6课件/spring6.md\")",
+      "Bash(grep *)",
+      "Bash(awk 'BEGIN{inFence=0} /^```/{inFence=!inFence; next} !inFence && /^</' \"D:/notes/Dorian-Alden-Dai-Personal-Notes/学习/Java学习/尚硅谷spring6课件/spring6.md\")",
+      "Bash(node -e \"require\\('js-yaml'\\)\")",
+      "PowerShell(npx vitepress build)",
+      "Bash(node *)"
+    ]
+  }
+}
