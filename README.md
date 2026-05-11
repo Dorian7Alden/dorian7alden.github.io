@@ -1,7 +1,6 @@
-<h1>Kualk 的个人学习笔记</h1>
+# Personal notes repository
 
+Author: Dorian Alden Dai
 
-
-
-
+Time: 2026-05-06 03:57
 
