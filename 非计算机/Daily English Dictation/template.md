@@ -1,13 +1,4 @@
----
-create-time: 2026-05-13
-update-time: 2026-05-13
----
-
-
-
-
-
-## Daily English Dictation 56 - 2026/05/13 - intermedia
+## Daily English Dictation 56 - 2026/05/11 - advanced
 
 
 
@@ -26,8 +17,6 @@ update-time: 2026-05-13
 ```
 
 ```
-
-
 
 **Pronunciation**:
 
