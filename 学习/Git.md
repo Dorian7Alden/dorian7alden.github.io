@@ -12,7 +12,7 @@
 
 ```plain
 export LANG="zh_CN.UTF-8"
- export LC_ALL="zh_CN.UTF-8"
+export LC_ALL="zh_CN.UTF-8"
 ```
 
 
@@ -193,7 +193,7 @@ git branch -D branch_name 		# 强制删除一个分支
     - `<font style="color:rgb(51, 51, 51);background-color:rgb(243, 244, 244);">-f</font>`<font style="color:rgb(51, 51, 51);"> 强制覆盖</font>
     - `<font style="color:rgb(51, 51, 51);background-color:rgb(243, 244, 244);">--set-upstream</font>`<font style="color:rgb(51, 51, 51);"> 推送到远端的同时并且建立起和远端分支的关联关系（以后就可以直接git push直接推送，绑定分支）</font>
     - <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2025/png/59811981/1762670851016-2b331e93-4304-4224-8b72-a75a00ae6f1d.png)
+      ![](https://cdn.nlark.com/yuque/0/2025/png/59811981/1762670851016-2b331e93-4304-4224-8b72-a75a00ae6f1d.png)
         * <font style="color:rgb(51, 51, 51);">如果当前分支已经和远端分支关联，则可以省略分支名和远端名。（初始化过后）</font>
         * `<font style="color:rgb(51, 51, 51);background-color:rgb(243, 244, 244);">git push</font>`<font style="color:rgb(51, 51, 51);"> 将master分支推送到已关联的远端分支</font>
 
@@ -230,7 +230,7 @@ git branch -D branch_name 		# 强制删除一个分支
 + <font style="color:rgb(51, 51, 51);">当代码没有pull而直接push时，可能造成分支冲突，此时可能需要解决代码冲突，解决冲突之后再重新push一次即可</font>
 
   
- 
+
 
 
 

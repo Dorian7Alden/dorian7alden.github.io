@@ -1,4 +1,11 @@
-## Daily English Dictation 56 - 2026/05/11 - advanced
+---
+create-time: 2026-05-13
+update-time: 2026-05-13
+---
+
+
+
+## Daily English Dictation 56 - advanced
 
 
 
