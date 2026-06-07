@@ -1,11 +1,11 @@
 ---
-create-time: 2026-05-13
-update-time: 2026-05-13
+create-time: 2026-06-00
+update-time: 2026-06-00
 ---
 
 
 
-## Daily English Dictation 56 - advanced
+## Daily English Dictation 60 - advanced
 
 
 
@@ -30,5 +30,4 @@ update-time: 2026-05-13
 
 
 ### 📖 Accumulation
-
 
