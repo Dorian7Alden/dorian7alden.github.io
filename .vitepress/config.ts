@@ -31,7 +31,7 @@ export default defineConfig({
       { text: '关于', link: '/about' },
     ],
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/Seniorsy' },
+      { icon: 'github', link: 'https://github.com/Dorian7Alden' },
     ],
     search: {
       provider: 'local',
