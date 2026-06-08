@@ -16,7 +16,6 @@ const props = defineProps<{
 }>()
 
 const readingTime = computed(() => {
-  // Estimate ~300 chars/min for Chinese
   return Math.max(1, Math.round(props.post.title.length / 6))
 })
 
@@ -25,140 +24,172 @@ const formattedDate = computed(() => {
   return d.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })
 })
 
-// Category color map for accent stripe
 const categoryColors: Record<string, string> = {
-  '卡片': '#5C6AC4',
-  '开发规范': '#06B6D4',
+  '卡片': '#4F6DF5',
+  '开发规范': '#12B8A6',
+  'AI学习': '#8B5CF6',
+  'Java学习': '#F97316',
+  '小林coding': '#06B6D4',
   '未分类': '#8E94A0',
 }
 
-const accentColor = computed(() => categoryColors[props.post.category] || '#5C6AC4')
+const accentColor = computed(() => categoryColors[props.post.category] || '#4F6DF5')
 </script>
 
 <template>
   <article
     class="post-card animate-fade-in-up"
     :class="`stagger-${Math.min(index + 1, 5)}`"
+    :style="{ '--accent-color': accentColor }"
   >
-    <div class="card-accent" :style="{ background: accentColor }"></div>
-    <div class="card-body">
-      <h2 class="card-title">
-        <a :href="withBase(post.url)">{{ post.title }}</a>
-      </h2>
-      <div class="card-meta">
-        <span class="meta-item meta-date">
-          <svg class="meta-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 1v3M11 1v3M2 6h12" stroke="currentColor" stroke-width="1.3"/></svg>
-          {{ formattedDate }}
-        </span>
-        <a :href="`/categories?cat=${encodeURIComponent(post.category)}`" class="meta-item meta-category">
-          <svg class="meta-icon" viewBox="0 0 16 16" fill="none"><path d="M2 4.5A1.5 1.5 0 013.5 3h3l2 2h4A1.5 1.5 0 0114 6.5v5A1.5 1.5 0 0112.5 13h-9A1.5 1.5 0 012 11.5v-7z" stroke="currentColor" stroke-width="1.3"/></svg>
-          {{ post.category }}
-        </a>
-        <span class="meta-item meta-read">
+    <a class="card-link" :href="withBase(post.url)" aria-label="阅读文章">
+      <div class="card-topline">
+        <span class="category-chip">{{ post.category }}</span>
+        <span class="date-chip">{{ formattedDate }}</span>
+      </div>
+
+      <h2 class="card-title">{{ post.title }}</h2>
+
+      <div class="card-footer">
+        <span class="read-time">
           <svg class="meta-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.3"/><path d="M8 4.5V8l2.5 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-          ~{{ readingTime }} 分钟
+          {{ readingTime }} 分钟阅读
+        </span>
+        <span class="arrow-pill">
+          阅读
+          <svg viewBox="0 0 16 16" fill="none"><path d="M5.5 3.5L10 8l-4.5 4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </span>
       </div>
-    </div>
+    </a>
   </article>
 </template>
 
 <style scoped>
 .post-card {
+  --accent-color: var(--brand);
   position: relative;
-  display: flex;
-  background: var(--bg-card);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xs);
+  border-radius: var(--radius-xl);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--bg-card) 96%, transparent), color-mix(in srgb, var(--bg-card) 82%, transparent)),
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--accent-color) 14%, transparent), transparent 40%);
   border: 1px solid var(--vp-c-divider);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
-  transition: all var(--duration-normal) var(--ease-out);
+  transition: transform var(--duration-normal) var(--ease-out), box-shadow var(--duration-normal) var(--ease-out), border-color var(--duration-normal) var(--ease-out);
+}
+
+.post-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: linear-gradient(180deg, var(--accent-color), color-mix(in srgb, var(--accent-color) 35%, transparent));
+  opacity: 0.9;
 }
 
 .post-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-md);
-  border-color: transparent;
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: color-mix(in srgb, var(--accent-color) 32%, var(--vp-c-border));
 }
 
-.card-accent {
-  width: 4px;
-  flex-shrink: 0;
-  transition: width var(--duration-normal) var(--ease-out);
-  border-radius: 4px 0 0 4px;
+.card-link {
+  display: block;
+  padding: 22px 24px 22px 28px;
+  color: inherit;
+  text-decoration: none;
 }
 
-.post-card:hover .card-accent {
-  width: 6px;
+.card-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
 }
 
-.card-body {
-  flex: 1;
-  padding: 20px 24px;
-  min-width: 0;
+.category-chip,
+.date-chip,
+.read-time,
+.arrow-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.category-chip {
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+  color: var(--accent-color);
+  background: color-mix(in srgb, var(--accent-color) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent-color) 18%, transparent);
+}
+
+.date-chip {
+  color: var(--vp-c-text-3);
+  white-space: nowrap;
 }
 
 .card-title {
-  margin: 0 0 10px;
-  font-size: 1.1rem;
-  font-weight: 650;
-  line-height: 1.45;
-}
-
-.card-title a {
+  margin: 0;
   color: var(--text-heading);
-  text-decoration: none;
+  font-size: 1.18rem;
+  line-height: 1.5;
+  letter-spacing: -0.025em;
+  font-weight: 820;
   transition: color var(--duration-fast) var(--ease-out);
 }
 
-.card-title a:hover {
-  color: var(--brand);
+.post-card:hover .card-title {
+  color: var(--accent-color);
 }
 
-.card-meta {
+.card-footer {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 6px 16px;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--vp-c-divider);
 }
 
-.meta-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 0.83rem;
+.read-time {
   color: var(--vp-c-text-3);
-  text-decoration: none;
 }
 
-.meta-icon {
+.meta-icon,
+.arrow-pill svg {
   width: 14px;
   height: 14px;
   flex-shrink: 0;
-  opacity: 0.7;
 }
 
-.meta-category {
-  color: var(--brand);
-  font-weight: 500;
-  transition: opacity var(--duration-fast);
+.arrow-pill {
+  color: var(--vp-c-text-2);
+  transition: color var(--duration-fast), transform var(--duration-fast);
 }
 
-.meta-category:hover {
-  opacity: 0.75;
+.post-card:hover .arrow-pill {
+  color: var(--accent-color);
+  transform: translateX(3px);
 }
 
 @media (max-width: 600px) {
-  .card-body {
-    padding: 16px 18px;
+  .card-link {
+    padding: 18px 18px 18px 22px;
+  }
+
+  .card-topline,
+  .card-footer {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .card-title {
-    font-size: 1rem;
-  }
-
-  .card-meta {
-    gap: 4px 12px;
+    font-size: 1.04rem;
   }
 }
 </style>

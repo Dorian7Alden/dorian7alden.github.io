@@ -49,27 +49,28 @@ const posts = computed(() => {
 
 <style scoped>
 .post-list {
-  max-width: 780px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 .posts-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  display: grid;
+  gap: 16px;
 }
 
 .empty {
   text-align: center;
-  padding: 64px 0;
+  padding: 70px 24px;
   color: var(--vp-c-text-3);
+  border: 1px dashed var(--vp-c-divider);
+  border-radius: var(--radius-xl);
+  background: var(--bg-card);
 }
 
 .empty-icon {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   margin: 0 auto 12px;
-  opacity: 0.4;
+  opacity: 0.42;
 }
 
 .empty p {
