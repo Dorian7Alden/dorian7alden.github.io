@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { withBase } from 'vitepress'
 
 interface Category {
   name: string
@@ -60,8 +61,8 @@ onMounted(() => {
         </div>
       </div>
       <div class="hero-actions">
-        <a href="/about" class="btn btn-primary">关于我</a>
-        <a href="/categories" class="btn btn-ghost">浏览分类</a>
+        <a :href="withBase('/about')" class="btn btn-primary">关于我</a>
+        <a :href="withBase('/categories')" class="btn btn-ghost">浏览分类</a>
       </div>
     </div>
   </section>

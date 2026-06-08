@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { withBase } from 'vitepress'
 import PostList from './PostList.vue'
 
 interface Category {
@@ -38,7 +39,7 @@ function getIcon(name: string): string {
 
       <div class="category-grid">
         <div v-for="cat in categories" :key="cat.name" class="cat-card">
-          <a :href="`?cat=${encodeURIComponent(cat.name)}`" class="cat-link">
+          <a :href="withBase(`/categories?cat=${encodeURIComponent(cat.name)}`)" class="cat-link">
             <span class="cat-icon">{{ getIcon(cat.name) }}</span>
             <div class="cat-info">
               <span class="cat-name">{{ cat.name }}</span>
@@ -53,7 +54,7 @@ function getIcon(name: string): string {
     </div>
 
     <div v-else class="category-posts">
-      <a href="/categories" class="back-link">
+      <a :href="withBase('/categories')" class="back-link">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
           <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>

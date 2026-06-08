@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { withBase } from 'vitepress'
 
 interface Post {
   title: string
@@ -42,7 +43,7 @@ const accentColor = computed(() => categoryColors[props.post.category] || '#5C6A
     <div class="card-accent" :style="{ background: accentColor }"></div>
     <div class="card-body">
       <h2 class="card-title">
-        <a :href="post.url">{{ post.title }}</a>
+        <a :href="withBase(post.url)">{{ post.title }}</a>
       </h2>
       <div class="card-meta">
         <span class="meta-item meta-date">

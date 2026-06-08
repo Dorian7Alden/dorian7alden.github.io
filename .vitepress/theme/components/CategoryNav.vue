@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { withBase } from 'vitepress'
 interface Category {
   name: string
   count: number
@@ -28,7 +29,7 @@ function getIcon(name: string): string {
     </div>
     <ul class="nav-list">
       <li v-for="cat in categories" :key="cat.name" class="nav-item">
-        <a :href="`/categories?cat=${encodeURIComponent(cat.name)}`" class="nav-link">
+        <a :href="withBase(`/categories?cat=${encodeURIComponent(cat.name)}`)" class="nav-link">
           <span class="nav-icon">{{ getIcon(cat.name) }}</span>
           <span class="nav-name">{{ cat.name }}</span>
           <span class="nav-count">{{ cat.count }}</span>
