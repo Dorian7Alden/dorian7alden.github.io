@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
+  base: '/Dorian-Blog/',
   title: "Dorian's Blog",
   description: '技术学习笔记与经验分享 — Dorian Alden Dai',
   lang: 'zh-CN',
