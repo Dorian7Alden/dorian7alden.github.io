@@ -18,8 +18,8 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const data = import.meta.glob('/content/categories.json', { eager: true })
-const jsonData = (data['/content/categories.json'] as { default: { posts: Post[] } }).default
+const data = import.meta.glob('/generated/notes/categories.json', { eager: true })
+const jsonData = (data['/generated/notes/categories.json'] as { default: { posts: Post[] } }).default
 const allPosts = jsonData.posts
 
 const posts = computed(() => {

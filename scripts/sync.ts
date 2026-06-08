@@ -7,6 +7,7 @@ import {
   rmSync,
   statSync,
   writeFileSync,
+  copyFileSync,
 } from 'node:fs';
 import { basename, dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -16,8 +17,10 @@ import yaml from 'js-yaml';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 
-const NOTES_REPO = 'D:/notes/Dorian-Alden-Dai-Personal-Notes';
-const CONTENT_DIR = join(ROOT, 'content');
+const NOTES_REPO = process.env.NOTES_REPO || 'D:/notes/kualk-learn-notes';
+const CONTENT_DIR = process.env.CONTENT_DIR
+  ? join(ROOT, process.env.CONTENT_DIR)
+  : join(ROOT, 'generated', 'notes');
 
 interface PostMeta {
   title: string;
@@ -65,6 +68,68 @@ function toDateString(val: string): string {
   return val.split('T')[0];
 }
 
+function copyAssets(dir: string, outDir: string): void {
+  for (const entry of readdirSync(dir)) {
+    if (isHidden(entry) || entry.endsWith('.md')) continue;
+
+    const source = join(dir, entry);
+    const target = join(outDir, entry);
+    const stat = statSync(source);
+
+    if (stat.isDirectory()) {
+      copyAssets(source, target);
+    } else if (stat.isFile()) {
+      mkdirSync(dirname(target), { recursive: true });
+      copyFileSync(source, target);
+    }
+  }
+}
+
+function escapeVueHtml(raw: string): string {
+  return raw.replace(/<(?!\/?(?:script|style|template)(?=\s|>|$))/gi, '&lt;');
+}
+
+function toPosixPath(path: string): string {
+  return path.replace(/\\/g, '/');
+}
+
+function sanitizeMarkdownImages(filePath: string, raw: string): string {
+  return raw.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt: string, src: string) => {
+    const trimmedSrc = src.trim();
+
+    if (/^(https?:|data:|\/)/i.test(trimmedSrc)) {
+      return match;
+    }
+
+    if (/^[A-Za-z]:\\/.test(trimmedSrc)) {
+      return `*[图片缺失：${alt}]*`;
+    }
+
+    const normalizedSrc = trimmedSrc.replace(/\\/g, '/');
+    const sourceDir = dirname(filePath);
+    const directTarget = join(sourceDir, normalizedSrc);
+
+    if (existsSync(directTarget)) {
+      return `![${alt}](${normalizedSrc})`;
+    }
+
+    let currentDir = sourceDir;
+    while (currentDir.startsWith(NOTES_REPO)) {
+      const candidate = join(currentDir, normalizedSrc);
+      if (existsSync(candidate)) {
+        const fixedSrc = toPosixPath(relative(sourceDir, candidate));
+        return `![${alt}](${fixedSrc})`;
+      }
+
+      const parentDir = dirname(currentDir);
+      if (parentDir === currentDir) break;
+      currentDir = parentDir;
+    }
+
+    return `*[图片缺失：${alt}]*`;
+  });
+}
+
 function processFile(filePath: string, category: string): PostMeta | null {
   const filename = basename(filePath);
   if (isHidden(filename) || !filename.endsWith('.md')) return null;
@@ -100,7 +165,7 @@ function processFile(filePath: string, category: string): PostMeta | null {
   // Escape HTML-comment-like patterns inside fenced code blocks.
   // Vue's SFC parser interprets --> as closing HTML comments,
   // which breaks when Java code has strings like "Logger-->前置通知".
-  let safeContent = parsed.content;
+  let safeContent = sanitizeMarkdownImages(filePath, escapeVueHtml(parsed.content));
   safeContent = safeContent.replace(
     /(`{3,}[\s\S]*?`{3,})/g,
     (fence: string) => fence.replace(/-->/g, '-​->')
@@ -165,6 +230,7 @@ function main(): void {
     rmSync(CONTENT_DIR, { recursive: true, force: true });
   }
   mkdirSync(CONTENT_DIR, { recursive: true });
+  copyAssets(NOTES_REPO, CONTENT_DIR);
 
   const posts: PostMeta[] = [];
 
@@ -197,7 +263,7 @@ function main(): void {
       order: p.order,
       slug: p.slug,
       file: p.file,
-      url: `/content/${p.file.replace(/\\/g, '/').replace(/\.md$/, '')}`,
+      url: `/generated/notes/${p.file.replace(/\\/g, '/').replace(/\.md$/, '')}`,
     })),
   };
 

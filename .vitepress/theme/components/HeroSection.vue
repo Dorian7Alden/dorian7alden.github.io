@@ -6,8 +6,8 @@ interface Category {
   count: number
 }
 
-const modules = import.meta.glob('/content/categories.json', { eager: true })
-const jsonModule = modules['/content/categories.json'] as { default: { total: number; categories: Category[] } }
+const modules = import.meta.glob('/generated/notes/categories.json', { eager: true })
+const jsonModule = modules['/generated/notes/categories.json'] as { default: { total: number; categories: Category[] } }
 const totalPosts = jsonModule.default.total
 const totalCategories = jsonModule.default.categories.length
 

@@ -14,8 +14,8 @@ interface CategoriesData {
 const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null
 const activeCat = ref(params?.get('cat') || '')
 
-const modules = import.meta.glob('/content/categories.json', { eager: true })
-const jsonModule = modules['/content/categories.json'] as { default: CategoriesData }
+const modules = import.meta.glob('/generated/notes/categories.json', { eager: true })
+const jsonModule = modules['/generated/notes/categories.json'] as { default: CategoriesData }
 const data: CategoriesData = jsonModule.default
 const categories = data.categories
 

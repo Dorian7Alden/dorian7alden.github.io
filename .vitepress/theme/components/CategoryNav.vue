@@ -4,8 +4,8 @@ interface Category {
   count: number
 }
 
-const data = import.meta.glob('/content/categories.json', { eager: true })
-const jsonData = (data['/content/categories.json'] as { default: { categories: Category[] } }).default
+const data = import.meta.glob('/generated/notes/categories.json', { eager: true })
+const jsonData = (data['/generated/notes/categories.json'] as { default: { categories: Category[] } }).default
 const categories: Category[] = jsonData.categories
 
 // Icon mapping for categories
