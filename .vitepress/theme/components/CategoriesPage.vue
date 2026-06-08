@@ -37,15 +37,17 @@ function getIcon(name: string): string {
 </script>
 
 <template>
+  <NoteTreePanel mode="page" />
+
   <div class="categories-page">
-    <div v-if="!activeCat">
+    <div class="categories-main">
       <header class="page-hero">
         <span class="page-kicker">Knowledge Map</span>
         <h1 class="page-title">文章分类</h1>
-        <p class="page-desc">共 {{ total }} 篇文章，按主题快速进入对应知识区。</p>
+        <p class="page-desc">共 {{ total }} 篇文章，按主题快速进入对应知识区。文件夹层级会作为目录大纲来展示。</p>
       </header>
 
-      <div class="category-grid">
+      <div v-if="!activeCat" class="category-grid">
         <article v-for="cat in categories" :key="cat.name" class="cat-card">
           <a :href="withBase(`/categories?cat=${encodeURIComponent(cat.name)}`)" class="cat-link">
             <span class="cat-icon">{{ getIcon(cat.name) }}</span>
@@ -62,23 +64,23 @@ function getIcon(name: string): string {
           </a>
         </article>
       </div>
-    </div>
 
-    <div v-else class="category-posts">
-      <a :href="withBase('/categories')" class="back-link">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        返回全部分类
-      </a>
+      <div v-else class="category-posts">
+        <a :href="withBase('/categories')" class="back-link">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          返回全部分类
+        </a>
 
-      <header class="page-hero compact">
-        <span class="page-kicker">Category</span>
-        <h1 class="page-title">{{ activeCat }}</h1>
-        <p class="page-desc">共 {{ categories.find(c => c.name === activeCat)?.count || 0 }} 篇文章</p>
-      </header>
+        <header class="page-hero compact">
+          <span class="page-kicker">Category</span>
+          <h1 class="page-title">{{ activeCat }}</h1>
+          <p class="page-desc">共 {{ categories.find(c => c.name === activeCat)?.count || 0 }} 篇文章</p>
+        </header>
 
-      <PostList :category="activeCat" />
+        <PostList :category="activeCat" />
+      </div>
     </div>
   </div>
 </template>
@@ -88,6 +90,11 @@ function getIcon(name: string): string {
   max-width: 1040px;
   margin: 0 auto;
   padding: 10px 24px 64px;
+}
+
+.categories-main {
+  position: relative;
+  z-index: 1;
 }
 
 .page-hero {

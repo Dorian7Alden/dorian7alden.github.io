@@ -15,6 +15,6 @@ layout: page
   </main>
 
   <aside class="sidebar">
-    <CategoryNav />
+    <NoteTreePanel mode="home" />
   </aside>
 </div>

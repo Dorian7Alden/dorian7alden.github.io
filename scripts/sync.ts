@@ -31,13 +31,30 @@ interface PostMeta {
   order: number;
   slug: string;
   file: string;
+  pathSegments: string[];
   hasFrontmatter: boolean;
+}
+
+interface PostSummary extends PostMeta {
+  url: string;
 }
 
 interface CategoryInfo {
   name: string;
   count: number;
-  posts: PostMeta[];
+  posts: PostSummary[];
+}
+
+interface NoteTreeNode {
+  name: string;
+  type: 'directory' | 'file';
+  path: string;
+  count: number;
+  title?: string;
+  url?: string;
+  date?: string;
+  order?: number;
+  children?: NoteTreeNode[];
 }
 
 function isHidden(name: string): boolean {
@@ -66,8 +83,11 @@ function parseFilename(filename: string): { order: number; rawTitle: string } {
 }
 
 function toDateString(val: string): string {
-  // Normalize to YYYY-MM-DD
   return val.split('T')[0];
+}
+
+function toPosixPath(path: string): string {
+  return path.replace(/\\/g, '/');
 }
 
 function copyAssets(dir: string, outDir: string): void {
@@ -89,10 +109,6 @@ function copyAssets(dir: string, outDir: string): void {
 
 function escapeVueHtml(raw: string): string {
   return raw.replace(/<(?!\/?(?:script|style|template)(?=\s|>|$))/gi, '&lt;');
-}
-
-function toPosixPath(path: string): string {
-  return path.replace(/\\/g, '/');
 }
 
 function sanitizeMarkdownImages(filePath: string, raw: string): string {
@@ -132,7 +148,11 @@ function sanitizeMarkdownImages(filePath: string, raw: string): string {
   });
 }
 
-function processFile(filePath: string, category: string): PostMeta | null {
+function getPostUrl(file: string): string {
+  return `/generated/notes/${toPosixPath(file).replace(/\.md$/, '')}`;
+}
+
+function processFile(filePath: string, pathSegments: string[]): PostMeta | null {
   const filename = basename(filePath);
   if (isHidden(filename) || !filename.endsWith('.md')) return null;
 
@@ -156,12 +176,14 @@ function processFile(filePath: string, category: string): PostMeta | null {
     .replace(/-+/g, '-').replace(/^-|-$/g, '').toLowerCase() || 'untitled';
 
   const relPath = relative(NOTES_REPO, filePath);
+  const category = pathSegments[0] || '未分类';
 
   // Build new frontmatter, preserving any existing fields
   const newFrontmatter: Record<string, unknown> = { ...parsed.data };
   newFrontmatter.title = title;
   newFrontmatter.date = toDateString(String(newFrontmatter.date || date));
   newFrontmatter.category = category;
+  newFrontmatter.path = pathSegments.join('/');
   newFrontmatter.order = newFrontmatter.order ?? order;
 
   // Escape HTML-comment-like patterns inside fenced code blocks.
@@ -188,11 +210,12 @@ function processFile(filePath: string, category: string): PostMeta | null {
     order: Number(newFrontmatter.order),
     slug,
     file: relPath,
+    pathSegments,
     hasFrontmatter: !!hasFrontmatter,
   };
 }
 
-function walkDir(dir: string, category: string, posts: PostMeta[]): void {
+function walkDir(dir: string, pathSegments: string[], posts: PostMeta[]): void {
   const entries = readdirSync(dir);
 
   for (const entry of entries) {
@@ -201,16 +224,24 @@ function walkDir(dir: string, category: string, posts: PostMeta[]): void {
     const stat = statSync(fullPath);
 
     if (stat.isDirectory()) {
-      walkDir(fullPath, entry, posts);
+      walkDir(fullPath, [...pathSegments, entry], posts);
     } else if (stat.isFile() && entry.endsWith('.md')) {
-      const post = processFile(fullPath, category);
+      const post = processFile(fullPath, pathSegments);
       if (post) posts.push(post);
     }
   }
 }
 
-function generateCategories(posts: PostMeta[]): CategoryInfo[] {
-  const map = new Map<string, PostMeta[]>();
+function toPostSummary(post: PostMeta): PostSummary {
+  return {
+    ...post,
+    file: toPosixPath(post.file),
+    url: getPostUrl(post.file),
+  };
+}
+
+function generateCategories(posts: PostSummary[]): CategoryInfo[] {
+  const map = new Map<string, PostSummary[]>();
   for (const post of posts) {
     const list = map.get(post.category) || [];
     list.push(post);
@@ -219,10 +250,59 @@ function generateCategories(posts: PostMeta[]): CategoryInfo[] {
 
   const categories: CategoryInfo[] = [];
   for (const [name, catPosts] of map) {
-    catPosts.sort((a, b) => a.order - b.order);
+    catPosts.sort((a, b) => a.order - b.order || a.title.localeCompare(b.title, 'zh-CN'));
     categories.push({ name, count: catPosts.length, posts: catPosts });
   }
-  return categories;
+  return categories.sort((a, b) => a.name.localeCompare(b.name, 'zh-CN'));
+}
+
+function sortTree(nodes: NoteTreeNode[]): NoteTreeNode[] {
+  return nodes.sort((a, b) => {
+    if (a.type !== b.type) return a.type === 'directory' ? -1 : 1;
+    return (a.order ?? 0) - (b.order ?? 0) || a.name.localeCompare(b.name, 'zh-CN');
+  }).map((node) => ({
+    ...node,
+    children: node.children ? sortTree(node.children) : undefined,
+  }));
+}
+
+function generateNoteTree(posts: PostSummary[]): NoteTreeNode[] {
+  const root: NoteTreeNode[] = [];
+
+  for (const post of posts) {
+    let level = root;
+    let currentPath = '';
+
+    for (const segment of post.pathSegments) {
+      currentPath = currentPath ? `${currentPath}/${segment}` : segment;
+      let dirNode = level.find((node) => node.type === 'directory' && node.name === segment);
+      if (!dirNode) {
+        dirNode = {
+          name: segment,
+          type: 'directory',
+          path: currentPath,
+          count: 0,
+          children: [],
+        };
+        level.push(dirNode);
+      }
+      dirNode.count += 1;
+      level = dirNode.children || [];
+    }
+
+    level.push({
+      name: basename(post.file).replace(/\.md$/, ''),
+      title: post.title,
+      type: 'file',
+      path: toPosixPath(post.file),
+      count: 1,
+      url: post.url,
+      date: post.date,
+      order: post.order,
+    });
+  }
+
+  return sortTree(root);
 }
 
 function main(): void {
@@ -244,9 +324,9 @@ function main(): void {
     const stat = statSync(fullPath);
 
     if (stat.isDirectory()) {
-      walkDir(fullPath, entry, posts);
+      walkDir(fullPath, [entry], posts);
     } else if (stat.isFile() && entry.endsWith('.md') && entry !== 'README.md') {
-      const post = processFile(fullPath, '未分类');
+      const post = processFile(fullPath, []);
       if (post) posts.push(post);
     }
   }
@@ -254,19 +334,14 @@ function main(): void {
   // Sort by date (newest first), then by order
   posts.sort((a, b) => b.date.localeCompare(a.date) || a.order - b.order);
 
-  const categories = generateCategories(posts);
+  const postSummaries = posts.map(toPostSummary);
+  const categories = generateCategories(postSummaries);
+  const tree = generateNoteTree(postSummaries);
   const summary = {
-    total: posts.length,
+    total: postSummaries.length,
     categories,
-    posts: posts.map((p) => ({
-      title: p.title,
-      date: p.date,
-      category: p.category,
-      order: p.order,
-      slug: p.slug,
-      file: p.file,
-      url: `/generated/notes/${p.file.replace(/\\/g, '/').replace(/\.md$/, '')}`,
-    })),
+    tree,
+    posts: postSummaries,
   };
 
   writeFileSync(
@@ -275,10 +350,10 @@ function main(): void {
     'utf-8'
   );
 
-  console.log(`Total posts: ${posts.length}`);
-  console.log('Categories:');
-  for (const cat of categories) {
-    console.log(`  ${cat.name}: ${cat.count} posts`);
+  console.log(`Total posts: ${postSummaries.length}`);
+  console.log('Directories:');
+  for (const node of tree) {
+    console.log(`  ${node.name}: ${node.count} posts`);
   }
   console.log('\nSync complete.');
 }
