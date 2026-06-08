@@ -47,7 +47,7 @@ jobs:
       - name: Sync notes
         working-directory: blog
         env:
-          NOTES_REPO: ../notes-source
+          NOTES_REPO: ${{ github.workspace }}/notes-source
           CONTENT_DIR: generated/notes
         run: npm run sync
 

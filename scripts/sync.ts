@@ -17,7 +17,9 @@ import yaml from 'js-yaml';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 
-const NOTES_REPO = process.env.NOTES_REPO || 'D:/notes/kualk-learn-notes';
+const notesRepoFromEnv = process.env.NOTES_REPO;
+const siblingNotesRepo = join(ROOT, '..', 'notes-source');
+const NOTES_REPO = notesRepoFromEnv || (existsSync(siblingNotesRepo) ? siblingNotesRepo : 'D:/notes/kualk-learn-notes');
 const CONTENT_DIR = process.env.CONTENT_DIR
   ? join(ROOT, process.env.CONTENT_DIR)
   : join(ROOT, 'generated', 'notes');
