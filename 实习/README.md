@@ -33,20 +33,20 @@
 - `05-普通数组.md` ~ `17-技巧.md` — 待填充占位
 
 #### 开发规范/
-- `后端 Controller 开发规范说明书.md` — JavaEE Controller/Validator/Response 规范
+- `后端Controller开发规范说明书.md` — JavaEE Controller/Validator/Response 规范
 - `变量配置注入规范.md` — 属性注入约定
 
 #### 面试题/
-- `prompt` — Java 后端日常实习面试教练提示词
+- `面试教练提示词.md` — Java 后端日常实习面试教练提示词
 
 #### 计划与反思/
 - `第一次实习能力要求.md` — Java 后端实习技能清单
 - `第一次的准备.md` — OOP/继承/封装/多态学习笔记
-- `Java 多线程学习手册.md` — 多线程系统学习
+- `Java多线程学习手册.md` — 多线程系统学习
 - `个人思考.md` — Claude Code 工作流定制思考
 - `我遇到的BUG坑.md` — 实习中的调试记录
 - `项目中的工作.md` — OSS 工具类开发
-- `问题整理/` — AI 整理的 Q&A（数据库、Git）
+- `问题整理/01-tinyint存储与数据库知识链.md`、`02-Git分支与版本管理.md` — AI 整理的 Q&A
 
 #### 算法题/
 - `蓝桥.md` — 蓝桥杯竞赛经验
