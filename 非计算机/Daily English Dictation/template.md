@@ -1,11 +1,11 @@
 ---
-create-time: 2026-06-00
-update-time: 2026-06-00
+create-time: 2026-06-1
+update-time: 2026-06-1
 ---
 
 
 
-## Daily English Dictation 60 - advanced
+## Daily English Dictation 7 - 
 
 
 
