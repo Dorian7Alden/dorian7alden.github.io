@@ -27,10 +27,7 @@
 - `0-levels.md` — 难度等级对照表
 - `1-blue-beginner.md` ~ `4-red-expert.md` — 各级别说明（颜色标签）
 
-**命名待修复**：
-- `Dictation-XXX.md` → `XXX-level.md`（统一去掉 Dictation- 前缀）
-- `-hard-hard` → `-hard`，`advance` → `advanced`
-- 缺失编号：016-019
+**命名说明**：文件名经历了三个阶段的自然演变——早期无分级标记（`Dictation-001.md`），中期加入难度后缀（`Dictation-009-hard.md`），后期统一为 `NNN-level.md` 格式。这是实际使用过程中的自然演进，保留了历史真实性，不强制统一。
 
 ### 文件关键词索引
 
