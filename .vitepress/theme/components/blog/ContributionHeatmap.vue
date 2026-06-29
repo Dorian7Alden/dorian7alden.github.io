@@ -13,6 +13,9 @@ const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'S
 function generateMockData(): DayCell[][] {
   const now = new Date()
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const todayStr = today.toISOString().slice(0, 10)
+  const seed = todayStr.split('-').reduce((acc, n) => acc + parseInt(n, 10), 0)
+  const random = seededRandom(seed)
   // Start from 52 weeks ago, aligned to Sunday
   const startDate = new Date(today)
   startDate.setDate(today.getDate() - today.getDay() - 51 * 7)
@@ -34,19 +37,19 @@ function generateMockData(): DayCell[][] {
       if (current > today) {
         week.push({ date: dateStr, level: 0, count: 0 })
       } else {
-        const rand = Math.random()
+        const rand = random()
         let level: 0 | 1 | 2 | 3 | 4
         let count: number
         if (rand < 1 - baseProbability) {
           level = 0; count = 0
         } else if (rand < baseProbability + 0.18) {
-          level = 1; count = Math.floor(Math.random() * 4) + 1
+          level = 1; count = Math.floor(random() * 4) + 1
         } else if (rand < baseProbability + 0.30) {
-          level = 2; count = Math.floor(Math.random() * 6) + 5
+          level = 2; count = Math.floor(random() * 6) + 5
         } else if (rand < baseProbability + 0.39) {
-          level = 3; count = Math.floor(Math.random() * 10) + 11
+          level = 3; count = Math.floor(random() * 10) + 11
         } else {
-          level = 4; count = Math.floor(Math.random() * 10) + 21
+          level = 4; count = Math.floor(random() * 10) + 21
         }
         week.push({ date: dateStr, level, count })
       }
@@ -55,6 +58,11 @@ function generateMockData(): DayCell[][] {
     weeks.push(week)
   }
   return weeks
+}
+
+function seededRandom(seed: number): () => number {
+  let s = seed
+  return () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646 }
 }
 
 const weeks = generateMockData()
@@ -108,7 +116,6 @@ function getLevelColor(level: number): string {
                 v-for="(day, di) in week"
                 :key="di"
                 class="heatmap-cell"
-                :class="{ 'heatmap-cell-empty': day.level === 0 }"
                 :style="{ backgroundColor: getLevelColor(day.level) }"
                 :title="`${day.date}: ${day.count} contributions`"
               ></div>
