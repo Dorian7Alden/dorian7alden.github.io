@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { withBase } from 'vitepress'
+import { withBase, useData } from 'vitepress'
 
 interface Category {
   name: string
   count: number
 }
+
+const { theme } = useData()
+const blog = theme.value.blog
+const hero = blog.hero
+const author = blog.author
 
 const modules = import.meta.glob('/generated/notes/categories.json', { eager: true })
 const jsonModule = modules['/generated/notes/categories.json'] as { default: { total: number; categories: Category[] } }
@@ -45,15 +50,15 @@ onMounted(() => {
       <div class="hero-copy">
         <div class="hero-kicker">
           <span class="kicker-dot"></span>
-          Dorian7Alden · Tech Notes
+          {{ hero.kicker }}
         </div>
 
         <h1 class="hero-name">
-          记录工程实践，沉淀技术成长
+          {{ hero.title }}
         </h1>
 
         <p class="hero-tagline">
-          这里整理 Java、后端工程、AI 工具和学习实践中的真实笔记，把零散经验沉淀成可复用的知识卡片。
+          {{ hero.tagline }}
         </p>
 
         <div class="hero-actions">
@@ -67,10 +72,10 @@ onMounted(() => {
 
       <div class="hero-panel">
         <div class="avatar-ring">
-          <img :src="withBase('/avatar.jpg')" alt="Dorian7Alden 头像" />
+          <img :src="withBase(author.avatar)" :alt="author.name + ' 头像'" />
         </div>
-        <div class="panel-name">Dorian Alden Dai</div>
-        <div class="panel-desc">软件工程学生 · 后端开发 · 持续学习中</div>
+        <div class="panel-name">{{ author.name }}</div>
+        <div class="panel-desc">{{ author.bio }}</div>
 
         <div class="hero-stats">
           <div class="stat">
@@ -85,10 +90,7 @@ onMounted(() => {
         </div>
 
         <div class="topic-pills">
-          <span>Java</span>
-          <span>Spring</span>
-          <span>AI Tools</span>
-          <span>Git</span>
+          <span v-for="topic in hero.topics" :key="topic">{{ topic }}</span>
         </div>
       </div>
     </div>

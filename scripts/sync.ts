@@ -17,12 +17,16 @@ import yaml from 'js-yaml';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 
-const notesRepoFromEnv = process.env.NOTES_REPO;
+const configPath = join(ROOT, 'blog.config.yml');
+const cfg = yaml.load(readFileSync(configPath, 'utf-8')) as any;
+
 const siblingNotesRepo = join(ROOT, '..', 'notes-source');
-const NOTES_REPO = notesRepoFromEnv || (existsSync(siblingNotesRepo) ? siblingNotesRepo : 'D:/notes/kualk-learn-notes');
+const defaultNotesRepo = cfg.sync?.notesRepo || siblingNotesRepo;
+const NOTES_REPO = process.env.NOTES_REPO || (existsSync(siblingNotesRepo) ? siblingNotesRepo : defaultNotesRepo);
+const contentDirFromCfg = cfg.sync?.contentDir || 'generated/notes';
 const CONTENT_DIR = process.env.CONTENT_DIR
   ? join(ROOT, process.env.CONTENT_DIR)
-  : join(ROOT, 'generated', 'notes');
+  : join(ROOT, contentDirFromCfg);
 
 interface PostMeta {
   title: string;

@@ -3,3 +3,4 @@ node_modules/
 .vitepress/cache/
 generated/
 content/
+.vscode/

@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { withBase } from 'vitepress'
+import { withBase, useData } from 'vitepress'
+
+const { theme } = useData()
+const { author, about } = theme.value.blog
 </script>
 
 <template>
@@ -7,15 +10,15 @@ import { withBase } from 'vitepress'
     <section class="profile-card">
       <div class="profile-bg"></div>
       <div class="about-avatar">
-        <img :src="withBase('/avatar.jpg')" alt="Dorian7Alden 头像" />
+        <img :src="withBase(author.avatar)" :alt="author.name + ' 头像'" />
       </div>
       <span class="profile-kicker">About Me</span>
-      <h1 class="about-name">Dorian Alden Dai</h1>
-      <p class="about-bio">软件工程专业学生，关注后端工程、AI 工具与持续学习实践。</p>
+      <h1 class="about-name">{{ author.name }}</h1>
+      <p class="about-bio">{{ author.bio }}</p>
       <div class="profile-actions">
-        <a href="https://github.com/Dorian7Alden" target="_blank" rel="noopener" class="contact-link primary">
+        <a :href="`https://github.com/${author.github}`" target="_blank" rel="noopener" class="contact-link primary">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-          GitHub · Dorian7Alden
+          GitHub · {{ author.github }}
         </a>
       </div>
     </section>
@@ -23,26 +26,15 @@ import { withBase } from 'vitepress'
     <section class="about-grid">
       <article class="about-section intro-card">
         <span class="section-kicker">Blog</span>
-        <h2>关于本站</h2>
-        <p>这个博客记录我的技术学习笔记、遇到的问题和排查过程。内容源自我在学习和实践中沉淀的原始笔记，通过 VitePress 自动构建成静态网站。</p>
-        <p>我希望这里不只是文章列表，而是一套持续更新的个人知识库：保留真实问题、复盘路径和可复用经验。</p>
+        <h2>{{ about.blogTitle }}</h2>
+        <p v-for="(desc, i) in about.blogDescription" :key="i">{{ desc }}</p>
       </article>
 
       <article class="about-section">
         <span class="section-kicker">Focus</span>
-        <h2>技术方向</h2>
+        <h2>{{ about.focusTitle }}</h2>
         <div class="skill-tags">
-          <span class="tag">Java</span>
-          <span class="tag">Spring Boot</span>
-          <span class="tag">Spring Cloud</span>
-          <span class="tag">MySQL</span>
-          <span class="tag">Redis</span>
-          <span class="tag">Git</span>
-          <span class="tag">Docker</span>
-          <span class="tag">CI/CD</span>
-          <span class="tag">Vue 3</span>
-          <span class="tag">VitePress</span>
-          <span class="tag">AI Tools</span>
+          <span class="tag" v-for="skill in about.skills" :key="skill">{{ skill }}</span>
         </div>
       </article>
     </section>

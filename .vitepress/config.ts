@@ -1,56 +1,72 @@
+import { readFileSync } from 'node:fs'
+import { join, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vitepress'
+import yaml from 'js-yaml'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const configPath = join(__dirname, '..', 'blog.config.yml')
+const cfg = yaml.load(readFileSync(configPath, 'utf-8')) as any
 
 export default defineConfig({
-  base: '/',
-  title: "Dorian's Blog",
-  description: '技术学习笔记与经验分享 — Dorian Alden Dai',
-  lang: 'zh-CN',
+  base: cfg.site.base,
+  title: cfg.site.title,
+  description: cfg.site.description,
+  lang: cfg.site.lang,
   cleanUrls: true,
   ignoreDeadLinks: true,
 
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
-    ['meta', { name: 'theme-color', content: '#5C6AC4' }],
+    ['meta', { name: 'theme-color', content: cfg.site.themeColor }],
     ['meta', { name: 'og:type', content: 'website' }],
-    ['meta', { name: 'og:title', content: "Dorian's Blog" }],
-    ['meta', { name: 'og:description', content: '技术学习笔记与经验分享' }],
+    ['meta', { name: 'og:title', content: cfg.site.title }],
+    ['meta', { name: 'og:description', content: cfg.site.description }],
   ],
 
   markdown: {
     theme: {
-      light: 'github-light',
-      dark: 'github-dark',
+      light: cfg.markdown.lightTheme,
+      dark: cfg.markdown.darkTheme,
     },
-    lineNumbers: true,
+    lineNumbers: cfg.markdown.lineNumbers,
   },
 
   themeConfig: {
-    nav: [
-      { text: '首页', link: '/' },
-      { text: '分类', link: '/categories' },
-      { text: '关于', link: '/about' },
-    ],
+    blog: {
+      author: cfg.author,
+      hero: cfg.hero,
+      about: cfg.about,
+    },
+
+    nav: cfg.nav,
+
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/Dorian7Alden' },
+      { icon: 'github', link: `https://github.com/${cfg.author.github}` },
     ],
+
     search: {
       provider: 'local',
     },
+
     footer: {
-      message: '记录学习，分享技术',
-      copyright: 'Copyright © 2026 Dorian Alden Dai',
+      message: cfg.footer.message,
+      copyright: cfg.footer.copyright,
     },
+
     sidebar: {},
+
     outline: {
       level: [2, 3],
       label: '目录',
     },
+
     docFooter: {
-      prev: '上一篇',
-      next: '下一篇',
+      prev: cfg.labels.docFooter.prev,
+      next: cfg.labels.docFooter.next,
     },
-    darkModeSwitchLabel: '深色模式',
-    sidebarMenuLabel: '菜单',
-    returnToTopLabel: '返回顶部',
+    darkModeSwitchLabel: cfg.labels.darkModeSwitch,
+    sidebarMenuLabel: cfg.labels.sidebarMenu,
+    returnToTopLabel: cfg.labels.returnToTop,
   },
 })
