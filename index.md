@@ -2,7 +2,8 @@
 layout: page
 ---
 
-<HeroSection />
+<PersonalCard />
+<FloatingSidebar />
 
 <div class="home-layout">
   <main class="main home-panel">
