@@ -8,9 +8,7 @@
         <div class="col-inner">
           <slot name="left" />
 
-          <div class="sidebar-card">
-            个人卡片<br/><br/><br/><br/>
-          </div>
+          <ProfileCard />
 
           <div class="sidebar-card">
             目录<br/><br/><br/><br/>
@@ -52,6 +50,7 @@
 <script setup>
 import Header from '../components/Header.vue'
 import Footer from '../components/Footer.vue'
+import ProfileCard from '../components/index/ProfileCard.vue'
 </script>
 
 <style>
