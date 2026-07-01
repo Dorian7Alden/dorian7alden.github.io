@@ -1,0 +1,36 @@
+/* === reset === */
+*,
+*::before,
+*::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #app { height: 100%; }
+
+/* === tokens === */
+:root {
+  --color-bg:       #eaeff5;
+  --color-surface:  #ffffff;
+  --color-intro:    #eef1ff;
+  --color-text:     #111827;
+  --color-muted:    #6b7280;
+  --color-border:   #e5e7eb;
+  --color-accent:   #4f46e5;
+  --radius:         16px;
+  --font-sans:      system-ui, -apple-system, "Segoe UI", "Noto Sans SC", sans-serif;
+  --font-mono:      "JetBrains Mono", "Fira Code", monospace;
+}
+
+:root[data-theme="dark"] {
+  --color-bg:       #0b1120;
+  --color-surface:  #1a2332;
+  --color-intro:    #1e2940;
+  --color-text:     #e2e8f0;
+  --color-muted:    #7c8aa0;
+  --color-border:   #2d3a4f;
+  --color-accent:   #8b9cf7;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}

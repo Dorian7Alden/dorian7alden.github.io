@@ -1,0 +1,139 @@
+/* === header layout === */
+.header {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  gap: 32px;
+}
+
+/* === left: identity === */
+.header-left {
+  flex-shrink: 0;
+}
+
+.home-link {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+  color: var(--color-text);
+  padding: 14px 20px;
+  border-radius: 10px;
+  transition: background 0.15s;
+}
+.home-link:hover {
+  background: var(--color-bg);
+}
+
+.home-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.site-name {
+  font-size: 1.05rem;
+  font-weight: 620;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+/* === center: nav === */
+.header-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  font-weight: 480;
+  color: var(--color-muted);
+  text-decoration: none;
+  padding: 14px 16px;
+  border-radius: 10px;
+  transition: background 0.15s;
+}
+.nav-icon {
+  flex-shrink: 0;
+}
+.nav-link:hover {
+  background: var(--color-bg);
+}
+
+/* === right: search + theme toggle === */
+.header-right {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+/* search */
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 42px;
+  padding: 0 14px;
+  border-radius: 10px;
+  background: var(--color-bg);
+  border: 1.5px solid transparent;
+  cursor: text;
+  width: 192px;
+  transition: width 0.3s;
+}
+.search-box:focus-within {
+  width: 280px;
+}
+
+.search-icon {
+  width: 17px;
+  height: 17px;
+  color: var(--color-muted);
+  flex-shrink: 0;
+}
+
+.search-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.875rem;
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  width: 100%;
+  min-width: 0;
+}
+.search-input::placeholder {
+  color: var(--color-muted);
+}
+
+/* theme toggle */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--color-muted);
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  background: var(--color-bg);
+}
+
+.toggle-icon {
+  width: 18px;
+  height: 18px;
+}
