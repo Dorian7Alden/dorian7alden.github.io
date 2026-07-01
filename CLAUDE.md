@@ -10,6 +10,7 @@
 - 分模块开发，按页面分组分文件夹
 - 每个 Markdown 文件必须包含 frontmatter：`create-time: YYYY-MM-DD` 和 `update-time: YYYY-MM-DD`
 - Vue 组件导入必须带 `.vue` 扩展名
+- 组件按页面归属分目录：独属于某页面的组件放 `components/<页面名>/`，跨页面共享的组件放 `components/` 根目录
 
 # 风格
 - 不引入不必要的抽象和过度设计

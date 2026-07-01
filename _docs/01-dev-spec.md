@@ -6,3 +6,5 @@
 - create-time: xxxx-xx-xx
 - update-time: xxxx-xx-xx
 
+图标禁止使用svg，要么使用图标库风格统一的图标，要么使用本地的图片资源
+
