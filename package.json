@@ -4,12 +4,15 @@
   "description": "Dorian Alden Dai 的技术博客",
   "type": "module",
   "scripts": {
-    "sync": "tsx scripts/sync.ts",
-    "dev": "npm run sync && vitepress dev",
-    "build": "npm run sync && vitepress build",
+    "dev": "vitepress dev",
+    "build": "vitepress build",
     "preview": "vitepress preview"
   },
-  "keywords": ["blog", "tech", "vitepress"],
+  "keywords": [
+    "blog",
+    "tech",
+    "vitepress"
+  ],
   "author": "Dorian Alden Dai",
   "license": "ISC",
   "devDependencies": {
@@ -20,5 +23,8 @@
     "typescript": "^6.0.3",
     "vitepress": "^1.6.4",
     "vue": "^3.5.34"
+  },
+  "dependencies": {
+    "@lucide/vue": "^1.22.0"
   }
 }
