@@ -26,6 +26,14 @@
   },
   "dependencies": {
     "@iconify/vue": "^5.0.1",
-    "@lucide/vue": "^1.22.0"
+    "@lucide/vue": "^1.22.0",
+    "markdown-it-emoji": "^3.0.0",
+    "markdown-it-footnote": "^4.0.0",
+    "markdown-it-mark": "^4.0.0",
+    "markdown-it-mathjax3": "^4.3.2",
+    "markdown-it-sub": "^2.0.0",
+    "markdown-it-sup": "^2.0.0",
+    "markdown-it-task-lists": "^2.1.1",
+    "markdown-it-toc-done-right": "^4.2.0"
   }
 }
