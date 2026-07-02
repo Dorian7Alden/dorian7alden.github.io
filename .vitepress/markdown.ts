@@ -54,28 +54,37 @@ function enhanceFence(md: MarkdownIt) {
     const token = tokens[idx]
     cbCounter++
 
-    // 提取语言名
     const langName = token.info.trim().split(/\s+/)[0] || ''
     const langLabel = langName || 'text'
+    const uid = `cb-${cbCounter}`
 
-    // 调用 VitePress 原始 fence 渲染（含 Shiki 高亮 + .lang + .copy）
+    // Mermaid：输出原始预文本，交给客户端 Mermaid.js 渲染为 SVG
+    if (langName === 'mermaid') {
+      return `
+        <div class="code-block code-block-mermaid language-mermaid">
+          <input type="checkbox" id="${uid}" class="code-block-toggle" checked hidden>
+          <div class="code-block-header">
+            <span class="code-block-title">MERMAID</span>
+          </div>
+          <div class="code-block-body">
+            <pre class="mermaid">${md.utils.escapeHtml(token.content)}</pre>
+          </div>
+        </div>`
+    }
+
+    // 普通代码块：Shiki 高亮
     const defaultHtml = defaultFence(tokens, idx, options, env, slf)
-
-    // 从默认输出中提取 <pre> 块
     const preMatch = defaultHtml.match(/<pre[\s\S]*?<\/pre>/i)
     const preBlock = preMatch ? preMatch[0] : `<pre><code>${md.utils.escapeHtml(token.content)}</code></pre>`
-
-    const uid = `cb-${cbCounter}`
 
     return `
       <div class="code-block language-${langName}">
         <input type="checkbox" id="${uid}" class="code-block-toggle" checked hidden>
         <div class="code-block-header">
-          <label for="${uid}" class="code-block-toggle-btn" aria-label="折叠代码"></label>
           <span class="code-block-title">${langLabel.toUpperCase()}</span>
+          <span class="code-block-lang">${langLabel.toUpperCase()}</span>
+          <button class="copy code-block-copy" title="复制代码">${COPY_ICON}</button>
         </div>
-        <button class="copy code-block-copy" title="复制代码">${COPY_ICON}</button>
-        <span class="code-block-lang">${langLabel.toUpperCase()}</span>
         <div class="code-block-body">
           ${preBlock}
         </div>
