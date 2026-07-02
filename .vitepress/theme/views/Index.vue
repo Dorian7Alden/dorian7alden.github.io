@@ -54,5 +54,5 @@ import ProfileCard from '../components/index/ProfileCard.vue'
 </script>
 
 <style>
-@import '../styles/index.css';
+@import '../styles/index/index.css';
 </style>
