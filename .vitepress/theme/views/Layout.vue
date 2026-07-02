@@ -12,7 +12,7 @@
 
       <section class="col col-center">
         <div class="col-inner">
-          <Content />
+          <slot />
           <Footer />
         </div>
       </section>
@@ -28,7 +28,6 @@
 </template>
 
 <script setup>
-import { Content } from 'vitepress'
 import Header from '../components/Header.vue'
 import Footer from '../components/Footer.vue'
 </script>
