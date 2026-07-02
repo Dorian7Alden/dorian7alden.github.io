@@ -242,7 +242,19 @@ html[data-theme="dark"] .vp-code span {
   white-space: pre-wrap;
 }
 
-/* ---- 无语言标注的代码块（缩进代码块等） ---- */
+/* ---- Mermaid 图表 ---- */
+.code-block-mermaid .code-block-body pre {
+  padding: 1.5em;
+  text-align: center;
+  background: transparent;
+}
+
+.code-block-mermaid .code-block-body pre svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* 无语言标注的代码块（缩进代码块等） */
 pre:not(.code-block pre) {
   margin: 1em 0;
   padding: 1em 1.5em;
