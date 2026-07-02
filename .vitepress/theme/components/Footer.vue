@@ -9,5 +9,5 @@ const year = new Date().getFullYear()
 </script>
 
 <style>
-@import '../styles/footer.css';
+@import '../styles/base/footer.css';
 </style>

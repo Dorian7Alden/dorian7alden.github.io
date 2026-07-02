@@ -70,5 +70,5 @@ onMounted(() => {
 </script>
 
 <style>
-@import '../styles/header.css';
+@import '../styles/base/header.css';
 </style>

@@ -1,10 +1,14 @@
 <template>
-  <Layout>
+  <Layout v-if="frontmatter.layout !== false">
     <Content />
   </Layout>
+  <Content v-else />
 </template>
 
 <script setup>
+import { useData } from 'vitepress'
 import { Content } from 'vitepress/dist/client/app/components/Content.js'
 import Layout from './Layout.vue'
+
+const { frontmatter } = useData()
 </script>

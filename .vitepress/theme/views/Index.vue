@@ -25,6 +25,6 @@
 </template>
 
 <script setup>
-import Layout from '../views/Layout.vue'
+import Layout from '../Layout.vue'
 import ProfileCard from '../components/index/ProfileCard.vue'
 </script>
