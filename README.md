@@ -46,15 +46,6 @@ dorian7alden.github.io/
 ├── CLAUDE.md                    # Claude Code 项目指令
 ```
 
-## 开发规范
-
-- 分模块开发，按页面分组分文件夹
-- 每个 Markdown 文件必须包含 frontmatter 元数据：
-  - `create-time: YYYY-MM-DD`
-  - `update-time: YYYY-MM-DD`
-
-详见 `_docs/01-dev-spec.md`。
-
 ## 技术栈
 
 - [VitePress](https://vitepress.dev/) — 静态站点生成器
