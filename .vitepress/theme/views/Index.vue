@@ -1,58 +1,30 @@
 <template>
-  <div class="page">
-    <Header class="page-header" />
+  <Layout>
+    <template #left>
+      <ProfileCard />
 
-    <main class="body">
+      <div class="sidebar-card">
+        目录<br/><br/><br/><br/>
+      </div>
 
-      <aside class="col col-left">
-        <div class="col-inner">
-          <slot name="left" />
+      <div class="sidebar-card">
+        其他信息<br/><br/><br/><br/>
+      </div>
+    </template>
 
-          <ProfileCard />
+    <template #right>
+      <div class="sidebar-card">
+        统计<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+      </div>
 
-          <div class="sidebar-card">
-            目录<br/><br/><br/><br/>
-          </div>
-
-          <div class="sidebar-card">
-            其他信息<br/><br/><br/><br/>
-          </div>
-
-        </div>
-      </aside>
-
-      <section class="col col-center">
-        <div class="col-inner">
-          <slot />
-          <Footer />
-        </div>
-      </section>
-
-      <aside class="col col-right">
-        <div class="col-inner">
-          <slot name="right" />
-
-          <div class="sidebar-card">
-            统计<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-          </div>
-
-          <div class="sidebar-card">
-            推荐<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-          </div>
-
-        </div>
-      </aside>
-
-    </main>
-  </div>
+      <div class="sidebar-card">
+        推荐<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+      </div>
+    </template>
+  </Layout>
 </template>
 
 <script setup>
-import Header from '../components/Header.vue'
-import Footer from '../components/Footer.vue'
+import Layout from '../views/Layout.vue'
 import ProfileCard from '../components/index/ProfileCard.vue'
 </script>
-
-<style>
-@import '../styles/index/index.css';
-</style>
