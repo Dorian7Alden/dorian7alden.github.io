@@ -10,10 +10,10 @@
     <nav class="header-center">
       <a href="/" class="nav-link"><Home class="nav-icon" :size="16" /><span>首页</span></a>
       <a href="/notes/" class="nav-link"><NotebookPen class="nav-icon" :size="16" /><span>笔记</span></a>
-      <a href="/tools/" class="nav-link"><Wrench class="nav-icon" :size="16" /><span>工具</span></a>
-      <a href="/resources/" class="nav-link"><FolderOpen class="nav-icon" :size="16" /><span>资源</span></a>
-      <a href="/recommendations/" class="nav-link"><Sparkles class="nav-icon" :size="16" /><span>推荐</span></a>
-      <a href="/about" class="nav-link"><User class="nav-icon" :size="16" /><span>关于</span></a>
+      <a href="/resources/" class="nav-link"><BookHeart class="nav-icon" :size="16" /><span>资源</span></a>
+      <a href="/recommendations/" class="nav-link"><ThumbsUp class="nav-icon" :size="16" /><span>推荐</span></a>
+      <a href="/projects/" class="nav-link"><CodeXmlIcon class="nav-icon" :size="16" /><span>项目</span></a>
+      <a href="/aboutme" class="nav-link"><User class="nav-icon" :size="16" /><span>关于</span></a>
     </nav>
 
     <div class="header-right">
@@ -43,7 +43,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { Home, NotebookPen, Wrench, FolderOpen, Sparkles, User, Search, Sun, Moon } from '@lucide/vue'
+import { Home, NotebookPen, Wrench, FolderOpen, Sparkles, User, Search, Sun, Moon, BookHeart, ThumbsUp, CodeIcon, CodeXmlIcon } from '@lucide/vue'
 
 const isDark = ref(false)
 
