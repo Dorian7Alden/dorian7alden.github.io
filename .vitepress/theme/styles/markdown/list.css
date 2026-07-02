@@ -1,0 +1,27 @@
+/* === 列表 === */
+ul, ol {
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+  line-height: 1.6;
+}
+
+li {
+  margin: 0.15em 0;
+}
+
+li > ul,
+li > ol {
+  margin: 0;
+}
+
+/* === 任务列表 === */
+.task-list-item {
+  list-style: none;
+  margin-left: -1.5em;
+}
+
+.task-list-item input[type="checkbox"] {
+  margin-right: 0.5em;
+  accent-color: var(--color-accent);
+  cursor: default;
+}

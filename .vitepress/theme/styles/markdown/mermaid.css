@@ -1,0 +1,11 @@
+/* === Mermaid 图表 === */
+.code-block-mermaid .code-block-body pre {
+  padding: 1.5em;
+  text-align: center;
+  background: transparent;
+}
+
+.code-block-mermaid .code-block-body pre svg {
+  max-width: 100%;
+  height: auto;
+}

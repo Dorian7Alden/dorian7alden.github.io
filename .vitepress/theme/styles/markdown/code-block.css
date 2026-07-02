@@ -1,37 +1,3 @@
-/* === 空行渲染 === */
-p.blank-line {
-  height: 1em;
-  margin: 0;
-}
-
-/* === 列表 === */
-ul, ol {
-  padding-left: 1.5em;
-  margin: 0.5em 0;
-  line-height: 1.6;
-}
-
-li {
-  margin: 0.15em 0;
-}
-
-li > ul,
-li > ol {
-  margin: 0;
-}
-
-/* === 任务列表 === */
-.task-list-item {
-  list-style: none;
-  margin-left: -1.5em;
-}
-
-.task-list-item input[type="checkbox"] {
-  margin-right: 0.5em;
-  accent-color: var(--color-accent);
-  cursor: default;
-}
-
 /* === Shiki 语法高亮颜色映射 === */
 .vp-code span {
   color: var(--shiki-light, inherit);
@@ -242,19 +208,7 @@ html[data-theme="dark"] .vp-code span {
   white-space: pre-wrap;
 }
 
-/* ---- Mermaid 图表 ---- */
-.code-block-mermaid .code-block-body pre {
-  padding: 1.5em;
-  text-align: center;
-  background: transparent;
-}
-
-.code-block-mermaid .code-block-body pre svg {
-  max-width: 100%;
-  height: auto;
-}
-
-/* 无语言标注的代码块（缩进代码块等） */
+/* === 无语言标注的代码块（缩进代码块等） === */
 pre:not(.code-block pre) {
   margin: 1em 0;
   padding: 1em 1.5em;
