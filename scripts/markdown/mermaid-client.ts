@@ -2,6 +2,8 @@ import mermaid from 'mermaid'
 import { useRouter } from 'vitepress'
 import { onMounted, watch, nextTick } from 'vue'
 
+// === 运行时：Vue composable ===
+
 mermaid.initialize({
   startOnLoad: false,
   theme: 'default',

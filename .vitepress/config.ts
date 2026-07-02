@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitepress'
-import { configureMarkdown } from './markdown'
+import { configureMarkdown } from '../scripts/markdown'
 
 export default defineConfig({
   title: '双遥学长的个人博客',
