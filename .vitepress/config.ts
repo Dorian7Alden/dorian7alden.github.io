@@ -1,9 +1,14 @@
 import { defineConfig } from 'vitepress'
+import { configureMarkdown } from './markdown'
 
 export default defineConfig({
   title: '双遥学长的个人博客',
   lang: 'zh-CN',
   base: '/',
+  markdown: {
+    mermaid: true,
+    config: (md) => configureMarkdown(md),
+  },
   head: [
     ['meta', { name: 'referrer', content: 'no-referrer' }],
     ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
