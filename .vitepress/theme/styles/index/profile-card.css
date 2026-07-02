@@ -46,3 +46,8 @@
   background: #7ab8f5;
   color: #fff;
 }
+
+.card-profile-links svg {
+  width: 20px;
+  height: 20px;
+}
