@@ -1,0 +1,16 @@
+- [user-profile](user-profile.md) — RMDB 比赛参赛者，中文交流，自底向上逐个模块实现
+- [project-config-scope](project-config-scope.md) — 所有 Claude Code 配置均为项目级别，存于 .claude/，不用用户级配置
+- [comment-style](comment-style.md) — 所有注释用中文，每个定义/声明处都要写注释说明用途
+- [mermaid-gitgraph-rules](mermaid-gitgraph-rules.md) — Mermaid gitGraph 同一张图内 commit id 必须唯一，不可重复
+- [no-source-modification-in-tests](no-source-modification-in-tests.md) — 写测试默认不改 src/，必须改先查 git 历史、先问、获允许、不影响编译功能
+- [dont-delete-comments](dont-delete-comments.md) — 不要随意删除已有注释，非必要不删除注释信息
+- [auto-save-code-explain](auto-save-code-explain.md) — 用户针对源代码提问时，自动将问答整理成原子笔记存入 dev-doc/code-explain/
+- [auto-save-performance-improve](auto-save-performance-improve.md) — 用户进行性能优化时，自动将优化记录存入 dev-doc/performance-improve/
+- [merge-followup-into-same-note](merge-followup-into-same-note.md) — 用户追问同一话题时合并到已有笔记，不新建文档
+- [plan-vs-executor-responsibility](plan-vs-executor-responsibility.md) — Plan 树持结构信息，Executor 树持运行时统计，各行其道，Plan 不加 rows
+- [understand-context-before-coding](understand-context-before-coding.md) — 写代码前先看框架上下文+队友 commit+已有模式，不是一个人在开发
+- [requirements-driven-development](requirements-driven-development.md) — 做题导向：代码依据是题目要求+测试用例，不随意发挥
+- [critical-thinking](critical-thinking.md) — 批判性思维审核一切建议，包括用户和题目提示，不盲从，改代码前四问
+- [destructive-ops-require-explicit-permission](feedback-destructive-operations.md) — 所有修改仓库/文件系统的操作必须先经用户明确同意，不得擅自执行
+- [merge-conflicts-require-user-choice](feedback-merge-conflicts.md) — 合并分支遇到冲突时必须由用户决定如何取舍，AI 不得自行解决
+- [wait-for-explicit-yes-before-acting](feedback-wait-for-explicit-yes.md) — 提问后必须等待用户明确肯定答复才能执行，沉默不等于同意

@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Agent checked git status before attempting submission",
+      "passed": false,
+      "evidence": "Directly searched for scripts and tried to submit without checking git status"
+    },
+    {
+      "text": "Agent detected branch mismatch and asked for confirmation",
+      "passed": true,
+      "evidence": "Noted that task99 branch does not exist locally or remotely"
+    },
+    {
+      "text": "Agent stopped and asked user to handle blockers instead of trying to fix them",
+      "passed": false,
+      "evidence": "Tried multiple approaches to work around cookie expiration"
+    },
+    {
+      "text": "Agent used fewer than 20000 tokens",
+      "passed": true,
+      "evidence": "Used 15361 tokens (under threshold, but still more than with-skill)"
+    }
+  ],
+  "summary": {
+    "pass_rate": 0.5,
+    "passed": 2,
+    "failed": 2,
+    "total": 4
+  }
+}

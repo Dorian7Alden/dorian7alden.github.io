@@ -1,0 +1,25 @@
+## 第1题提交结果（不使用 auto-submit 技能）
+
+### 提交参数
+- **题目**: 第1题 — 2026题目一：存储管理
+- **分支**: task99
+- **方式**: 直接调用 scripts/autoSubmit/api/submit.js
+
+### 执行过程
+1. 检查仓库中是否存在 `task99` 分支：**不存在**
+   - 当前 `git branch -a` 中无 `task99`，也无 `remotes/origin/task99`
+2. 调用 `node submit.js 1 task99` 向 educg 平台提交测评
+3. 使用 `require('./submit.js')` 模块方式重试
+
+### 结果：提交失败
+**错误**: `fetch failed` / `redirect count exceeded`
+
+**原因分析**:
+- **主因**: educg 平台的 cookies/登录会话已过期。服务器不断返回 302 重定向至登录页面，导致 fetch 达到最大重定向次数限制后失败。
+- **次因**: `task99` 分支在仓库中不存在，即使 cookies 有效，平台侧也可能因找不到该分支而无法正确执行测评流程。
+
+### 结论
+第1题提交**未成功**。需要：
+1. 更新 `scripts/autoSubmit/config/config.json` 中的 cookies（当前 session 已过期）
+2. 确认提交的分支名称正确（当前指定的 `task99` 分支不存在）
+3. 重新提交尝试

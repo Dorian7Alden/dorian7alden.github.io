@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "Agent checked git status before attempting submission",
+      "passed": false,
+      "evidence": "Did not run git status first, went directly to trying submit.js"
+    },
+    {
+      "text": "Agent stopped and asked user to handle blockers instead of trying to fix them",
+      "passed": false,
+      "evidence": "Tried curl, fetch, https module, and even Playwright to fix cookie issues"
+    },
+    {
+      "text": "Agent used fewer than 20000 tokens",
+      "passed": false,
+      "evidence": "Used 49456 tokens - 5x the with-skill version"
+    }
+  ],
+  "summary": {
+    "pass_rate": 0.0,
+    "passed": 0,
+    "failed": 3,
+    "total": 3
+  }
+}

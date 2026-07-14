@@ -1,0 +1,34 @@
+第5题 测评结果
+====================
+
+【状态】无法完成在线测评提交
+
+【原因】educg 平台的登录 cookies 已过期，需要用户手动刷新后重新尝试提交。
+
+详细说明：
+1. 调用了 submit.js 脚本提交第5题（分支 main-zero），但服务器返回 302 重定向到登录页，
+   说明当前存储的 session cookie 无效。
+2. 尝试通过 curl、Node.js https 模块等多种方式提交均失败，确认 cookies 已过期。
+3. 登录页面需要输入学号、密码和验证码，无法以编程方式绕过。
+
+【当前代码状态（main-zero 分支）】
+- 第5题（聚合函数与分组统计）的代码尚未实现。
+- 查看 AST（src/parser/ast.h），SelectStmt 结构中缺少 group_by、having、聚合函数等字段。
+- 执行器中缺少 executor_aggregate.h、executor_filter.h、executor_limit.h 等聚合相关组件。
+- 而参考分支（task05Aggregate / task06Union）中已包含完整的聚合实现：
+  - src/common/aggregate_defs.h（聚合类型定义）
+  - src/execution/executor_aggregate.h（聚合执行器）
+  - src/execution/executor_filter.h（HAVING 过滤执行器）
+  - src/execution/executor_limit.h（LIMIT 执行器）
+- 即使 cookies 正常，当前代码也无法通过第5题的测评，因为聚合功能尚未集成。
+
+【项目构建状态】
+- 项目构建成功（cmake .. && make -j$(nproc) 通过，编译出 bin/rmdb 和单元测试）。
+
+【后续步骤建议】
+1. 请提供 educg 平台的登录凭据或更新 cookies：
+   - 在浏览器中登录 https://course.educg.net
+   - 按 F12 打开开发者工具，查看 Application -> Cookies
+   - 将新的 cookies 值更新到 scripts/autoSubmit/config/config.json
+2. 将第5题的聚合功能集成到 main-zero 分支（可参考 task05Aggregate 或 task06Union 分支的差异）
+3. 重新运行 node api/submit.js 5 main-zero 提交测评

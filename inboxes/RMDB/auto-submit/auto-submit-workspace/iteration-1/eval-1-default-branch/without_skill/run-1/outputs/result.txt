@@ -1,0 +1,49 @@
+## 第3题提交结果（不使用 auto-submit 技能）
+
+### 提交参数
+- **题目**: 第3题 — 2026题目三：唯一索引
+- **分支**: main-zero（当前分支）
+- **方式**: 直接调用 scripts/autoSubmit 目录下的 submit.js 脚本
+
+### 执行过程
+
+1. **确认分支**: 当前在 `main-zero` 分支（`git rev-parse --abbrev-ref HEAD` 确认）
+2. **检查与满分分支的差异**: `origin/task03UniqueIndex` 存在（远程分支），提交历史包含 5 个 fix 提交
+3. **提交测评凭证检查**:
+   - 检查 config/config.json 中的 cookies 配置
+   - skill 目录与 scripts 目录下的 config.json 均包含 cookies
+4. **调用 submit.js 提交**:
+   ```bash
+   cd scripts/autoSubmit && node api/submit.js 3 main-zero
+   ```
+   - 结果: `fetch failed` / `redirect count exceeded`
+
+### 结果：提交失败
+
+**错误**: 网络请求重定向次数过多（`redirect count exceeded`）
+
+**原因分析**:
+- **主因**: educg 平台的登录会话（`educg_session` cookie）已过期
+  - 配置中的 `educg_session` 值为旧 session token，平台已不识别
+  - 服务端不断返回 302 重定向（至登录页面），导致 fetch 达到最大重定向限制
+- **次因**: main-zero 分支尚未集成第3题（唯一索引）的代码
+  - 当前 main-zero 仅包含初始项目导入、文档整理和提交脚本的提交
+  - 与满分分支 `origin/task03UniqueIndex` 有大量差异需要集成
+
+**验证细节**:
+| 检查项 | 结果 |
+|-------|------|
+| 使用 curl 直接 POST 提交 | 302 重定向（session 过期） |
+| 使用 node https 模块（redirect: manual） | 302 重定向 |
+| 手动 GET 提交后的重定向目标 | HTTP 200 但内容为空 |
+| 查询 status JSON 接口 | HTTP 200 但内容为空 |
+| fetch-problems 获取题目列表 | 返回空数组 `[]` |
+| 全部确认 | cookies 过期，无法通过平台认证 |
+
+### 结论
+
+第3题提交**未成功**。需要以下操作才能完成：
+
+1. **更新 cookies**：手动在浏览器中登录 educg 平台（course.educg.net），从开发者工具中复制新的 `educg_session` 值，更新到 `config/config.json`
+2. **集成第3题代码**：将 `origin/task03UniqueIndex` 分支中的唯一索引实现代码集成到 `main-zero` 分支
+3. **重新提交**：刷新 cookies 并集成代码后，重新运行 `node api/submit.js 3 main-zero`

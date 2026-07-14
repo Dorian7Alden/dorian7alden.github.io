@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RMDB 评测面板</title>
+<style>
+  :root {
+    --green: #52c41a;
+    --red: #ff4d4f;
+    --gold: #faad14;
+    --blue: #1890ff;
+    --orange: #fa8c16;
+    --bg: #f0f2f5;
+    --card: #fff;
+    --border: #e8e8e8;
+    --text: #333;
+    --text-secondary: #888;
+    --radius: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    background: var(--bg); padding: 24px; color: var(--text); line-height: 1.5;
+  }
+  .container { max-width: 1400px; margin: 0 auto; }
+
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+  }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .header h1 { font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 10px; margin: 0; }
+  .header h1 .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); display: inline-block; }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .header .time { font-size: 13px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+  .spinner { display: none; width: 14px; height: 14px; border: 2px solid #d9d9d9; border-top-color: var(--blue); border-radius: 50%; animation: spin .6s linear infinite; }
+  .spinner.active { display: inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .btn {
+    padding: 7px 18px; border: 1px solid #d9d9d9; border-radius: var(--radius); background: var(--card);
+    cursor: pointer; font-size: 13px; font-weight: 500; transition: all .2s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn:hover { border-color: var(--blue); color: var(--blue); }
+  .btn:active { transform: scale(.97); }
+  .btn.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .btn.primary:hover { background: #40a9ff; border-color: #40a9ff; }
+  .btn.success { background: var(--green); color: #fff; border-color: var(--green); }
+  .btn.success:hover { background: #73d13d; border-color: #73d13d; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; pointer-events: none; }
+
+  .auth-warning {
+    display: none; padding: 10px 18px; background: #fff2e8; border: 1px solid #ffbb96;
+    border-radius: var(--radius); margin-bottom: 16px; color: #d4380d; font-size: 13px;
+  }
+  .auth-warning.show { display: block; }
+  .auth-warning code { background: #ffd8bf; padding: 1px 6px; border-radius: 3px; font-size: 12px; }
+
+  .table-wrap { background: var(--card); border-radius: var(--radius); box-shadow: 0 1px 2px rgba(0,0,0,.06); overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 1100px; }
+  th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { background: #fafafa; font-weight: 600; white-space: nowrap; color: #555; font-size: 12px; text-transform: uppercase; letter-spacing: .3px; }
+  tr:last-child td { border-bottom: none; }
+  tbody tr { transition: background .15s; }
+  tbody tr:hover { background: #fafcff; }
+
+  .score-bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .score-text { font-weight: 700; font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .score-text.ok { color: var(--green); }
+  .score-text.partial { color: var(--orange); }
+  .score-text.zero { color: var(--red); }
+  .score-text.pending { color: var(--text-secondary); }
+  .score-bar { flex: 1; min-width: 40px; height: 6px; background: #f0f0f0; border-radius: 3px; overflow: hidden; }
+  .score-bar-fill { height: 100%; border-radius: 3px; transition: width .4s ease; }
+  .score-bar-fill.full { background: var(--green); }
+  .score-bar-fill.partial { background: var(--orange); }
+  .score-bar-fill.zero { background: var(--red); }
+
+  .branch-select { width: 100%; min-width: 150px; padding: 5px 8px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 12px; font-family: "SF Mono", "Fira Code", monospace; background: #fafafa; transition: border-color .2s; }
+  .branch-select:focus { border-color: var(--blue); outline: none; box-shadow: 0 0 0 2px rgba(24,144,255,.15); }
+  .branch-hash { display: inline-block; margin-left: 4px; vertical-align: middle; }
+
+  .fb-cell { max-width: 320px; }
+  .fb-short { font-size: 12px; color: #666; display: flex; align-items: flex-start; gap: 4px; }
+  .fb-short-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+  .fb-expand { color: var(--blue); cursor: pointer; font-size: 11px; white-space: nowrap; user-select: none; flex-shrink: 0; }
+  .fb-expand:hover { text-decoration: underline; }
+  .fb-copy { color: #999; cursor: pointer; font-size: 11px; white-space: nowrap; user-select: none; flex-shrink: 0; margin-left: 4px; }
+  .fb-copy:hover { color: var(--blue); }
+  .fb-copy.copied { color: var(--green); }
+  .fb-full {
+    display: none; font-size: 11px; line-height: 1.6; color: #444;
+    max-height: 180px; overflow-y: auto; margin-top: 6px; padding: 8px 10px;
+    background: #f9f9f9; border-radius: 4px; white-space: pre-wrap; word-break: break-all;
+    border: 1px solid #eee;
+  }
+  .fb-full.open { display: block; }
+
+  .enqueue-btn { padding: 4px 12px; border: 1px solid var(--blue); border-radius: 4px; background: #fff; color: var(--blue); cursor: pointer; font-size: 12px; font-weight: 500; white-space: nowrap; transition: all .15s; }
+  .enqueue-btn:hover { background: var(--blue); color: #fff; }
+  .enqueue-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+  .section-title { font-size: 15px; font-weight: 600; margin: 24px 0 12px; display: flex; align-items: center; gap: 8px; }
+  .badge { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; font-size: 11px; font-weight: 700; color: #fff; background: var(--blue); }
+  .badge.hidden { display: none; }
+
+  .queue-panel { background: var(--card); border-radius: var(--radius); box-shadow: 0 1px 2px rgba(0,0,0,.06); padding: 16px; }
+  .queue-empty { color: #bbb; font-size: 13px; text-align: center; padding: 20px; }
+
+  .queue-row {
+    display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+    border-bottom: 1px solid #f5f5f5; font-size: 13px; transition: background .15s;
+    border-radius: 4px; position: relative;
+  }
+  .queue-row:last-child { border-bottom: none; }
+  .queue-row.dragging { opacity: .4; }
+  .queue-row.drag-over { background: #e6f7ff; outline: 2px dashed var(--blue); outline-offset: -2px; }
+  .queue-row .drag-handle { color: #ccc; cursor: grab; font-size: 16px; flex-shrink: 0; user-select: none; line-height: 1; padding: 2px; }
+  .queue-row .drag-handle:active { cursor: grabbing; }
+  .queue-row .drag-handle:hover { color: #999; }
+
+  .q-status { display: inline-block; padding: 2px 10px; border-radius: 3px; font-size: 11px; font-weight: 600; flex-shrink: 0; min-width: 52px; text-align: center; }
+  .q-status.waiting { background: #f5f5f5; color: #999; }
+  .q-status.running { background: #e6f7ff; color: var(--blue); animation: pulse 1.5s ease-in-out infinite; }
+  .q-status.done { background: #f6ffed; color: var(--green); }
+  .q-status.failed { background: #fff2e8; color: var(--orange); }
+  .q-status.timeout { background: #fff1f0; color: var(--red); }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .6; } }
+  .q-remove { color: #ccc; cursor: pointer; font-size: 16px; line-height: 1; padding: 0 4px; margin-left: auto; flex-shrink: 0; border: none; background: none; }
+  .q-remove:hover { color: var(--red); }
+  .q-elapsed { color: #aaa; font-size: 11px; flex-shrink: 0; }
+
+  .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+  .toast { padding: 10px 20px; border-radius: var(--radius); color: #fff; font-size: 13px; font-weight: 500; animation: toastIn .3s ease; max-width: 450px; pointer-events: auto; box-shadow: 0 4px 12px rgba(0,0,0,.15); }
+  .toast.info { background: var(--blue); }
+  .toast.ok { background: var(--green); }
+  .toast.err { background: var(--red); }
+  .toast.warn { background: var(--orange); }
+  @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } }
+
+  .main-card-wrap { background: var(--card); border-radius: var(--radius); box-shadow: 0 1px 2px rgba(0,0,0,.06); padding: 16px 16px 0; }
+  .rank-loading { color: #bbb; font-size: 13px; text-align: center; padding: 20px; }
+  .rank-my-card { display: flex; gap: 24px; padding: 10px 16px; background: linear-gradient(135deg, #fffbe6, #fff7cc); border-radius: var(--radius); margin-bottom: 12px; align-items: center; justify-content: space-around; font-size: 13px; border: 1px solid #ffe58f; }
+  .rank-my-card .rank-my-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .rank-my-card .rank-my-label { font-size: 11px; color: #888; }
+  .rank-my-card .rank-my-value { font-weight: 700; color: #333; }
+  .main-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); }
+  .main-tab { padding: 8px 20px; cursor: pointer; font-size: 13px; font-weight: 500; color: #999; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all .15s; }
+  .main-tab:hover { color: var(--blue); }
+  .main-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+  .main-panels { padding: 12px 0 0; }
+  .rank-table-wrap { display: flex; flex-direction: column; height: 440px; }
+  .rank-table-wrap table { font-size: 11px; width: 100%; table-layout: fixed; }
+  .rank-table-wrap th, .rank-table-wrap td { padding: 4px 8px; overflow: hidden; text-overflow: ellipsis; }
+  #problemTable { table-layout: fixed; width: 100%; }
+  .rank-my-row { background: #fffbe6 !important; }
+  .rank-my-row td { font-weight: 600; }
+  .rank-table-scroll { flex: 1; overflow-y: auto; min-height: 0; }
+  .rank-pager { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 0 4px; font-size: 12px; color: #666; }
+  .rank-pager button { padding: 3px 10px; border: 1px solid #d9d9d9; border-radius: 4px; background: #fff; cursor: pointer; font-size: 12px; }
+  .rank-pager button:hover { border-color: var(--blue); color: var(--blue); }
+  .rank-pager button:disabled { opacity: .3; cursor: not-allowed; }
+  .rank-pager select { padding: 3px 6px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 12px; }
+  .rank-pager .page-info { font-weight: 500; }
+
+
+  @media (max-width: 1200px) {
+    table { min-width: 900px; }
+    .fb-cell { max-width: 200px; }
+    .branch-select { min-width: 120px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="header-left">
+      <h1><span class="dot"></span>RMDB 在线评测面板</h1>
+      <span class="spinner" id="spinner"></span>
+      <span class="time" id="refreshTime">--</span>
+    </div>
+    <div class="header-right">
+      <button class="btn" onclick="reloadLocal()">刷新本地数据</button>
+      <button class="btn" onclick="refreshRepo()">刷新仓库</button>
+      <button class="btn" onclick="refreshAll()">刷新比赛情况</button>
+    </div>
+  </div>
+
+  <div id="authWarning" class="auth-warning">
+    登录会话已过期，请重新运行 <code>node scripts/autoSubmit/js/auth/save-auth.js</code>
+  </div>
+
+  <div class="main-card-wrap">
+    <div class="rank-loading" id="rankLoading" style="display:none;">加载中...</div>
+    <div id="rankMyCard"></div>
+    <div class="main-tabs" id="mainTabs" style="display:none;">
+      <span class="main-tab active" onclick="switchMainTab('status')">比赛情况</span>
+      <span class="main-tab" onclick="switchMainTab('queue')">提交队列 <span class="badge hidden" id="queueBadge">0</span></span>
+      <span class="main-tab" onclick="switchMainTab('contest')">初赛排行榜</span>
+      <span class="main-tab" onclick="switchMainTab('perf')">性能排行榜</span>
+      <span class="main-tab" onclick="switchMainTab('history')">提交记录</span>
+    </div>
+    <div class="main-panels">
+      <div id="panelStatus">
+        <div class="table-wrap" style="box-shadow:none;">
+          <table id="problemTable">
+            <thead>
+              <tr>
+                <th style="width:4%">#</th>
+                <th style="width:10%">题目</th>
+                <th style="width:12%">上次提交</th>
+                <th style="width:12%">本次提交</th>
+                <th style="width:8%">得分</th>
+                <th>反馈</th>
+                <th style="width:10%">最后更新</th>
+                <th style="width:8%">操作</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      <div id="panelQueue" style="display:none;">
+        <div class="queue-panel" id="queuePanel" style="box-shadow:none;">
+          <div id="queueCurrent"></div>
+          <div id="queueList" class="queue-empty">队列为空，点击题目行的「加入队列」按钮添加任务</div>
+        </div>
+      </div>
+      <div id="panelContest" style="display:none;"><div class="rank-table-wrap"></div></div>
+      <div id="panelPerf" style="display:none;"><div class="rank-table-wrap"></div></div>
+      <div id="panelHistory" style="display:none;"><div class="rank-table-wrap"></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+const API = '';
+let branches = [];
+let problemData = [];
+
+// ===== Toast =====
+function toast(msg, type) {
+  type = type || 'info';
+  var c = document.getElementById('toastContainer');
+  var t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(function() { t.remove(); }, 5000);
+}
+
+function showError(data, fallbackMsg) {
+  var msg = (data && data.error) || fallbackMsg || '未知错误';
+  toast(msg, 'err');
+}
+
+// ===== Data loading =====
+async function loadBranches() {
+  try {
+    var resp = await fetch(API + '/api/branches');
+    branches = await resp.json();
+  } catch (e) { /* silent */ }
+}
+
+async function loadCached() {
+  try {
+    var resp = await fetch(API + '/api/status');
+    var result = await resp.json();
+    if (result.data) {
+      problemData = result.data;
+      document.getElementById('refreshTime').textContent = '更新于 ' + (result.time || '--');
+    } else if (result.error) {
+      showError(result);
+    }
+    // 确保分支列表已加载再渲染表格
+    if (branches.length === 0) await loadBranches();
+    renderTable();
+    document.getElementById('authWarning').classList.remove('show');
+  } catch (e) { /* cache miss, silent */ }
+}
+
+async function refreshAll() {
+  var timeEl = document.getElementById('refreshTime');
+  var spinner = document.getElementById('spinner');
+  spinner.classList.add('active');
+  timeEl.textContent = '加载中...';
+
+  try {
+    var resp = await fetch(API + '/api/status?refresh=1');
+    var result = await resp.json();
+    if (result.data) {
+      problemData = result.data;
+      timeEl.textContent = '更新于 ' + (result.time || '--');
+      document.getElementById('authWarning').classList.remove('show');
+    } else if (result.error) {
+      showError(result);
+      timeEl.textContent = '加载失败';
+    }
+    renderTable();
+    // 同时刷新排行榜
+    refreshLeaderboard();
+  } catch (e) {
+    toast('获取状态失败: ' + e.message, 'err');
+    timeEl.textContent = '加载失败';
+  } finally {
+    spinner.classList.remove('active');
+  }
+}
+
+// ===== Rendering =====
+var branchHashCache = {};
+
+function cleanName(name) {
+  return (name || '').replace(/^2026/, '').replace(/^题目/, '题').replace(/：/, ': ');
+}
+
+function renderBranchSelect(num, currentBranch) {
+  var h = '<select class="branch-select" id="branch-' + num + '">';
+  h += '<option value="">-- 选择 --</option>';
+  for (var i = 0; i < branches.length; i++) {
+    var b = branches[i];
+    var sel = (b === currentBranch) ? ' selected' : '';
+    h += '<option value="' + b + '"' + sel + '>' + b + '</option>';
+  }
+  h += '</select>';
+  return h;
+}
+
+
+function renderFeedback(fb) {
+  if (!fb) return '<span style="color:#ccc;font-size:12px;">—</span>';
+  var clean = fb.replace(/下载源文件\s*/g, '').replace(/\s+/g, ' ').trim();
+  if (!clean) return '<span style="color:#ccc;font-size:12px;">—</span>';
+  var id = 'fb-' + Math.random().toString(36).substr(2, 8);
+  var short = clean.length > 50 ? clean.substring(0, 50) + '…' : clean;
+  var copyBtn = '<span class="fb-copy" onclick="copyFeedback(\'' + id + '\')" id="' + id + '-copy" title="复制反馈">复制</span>';
+  if (clean.length <= 50) {
+    return '<div class="fb-cell" id="' + id + '">' +
+      '<span class="fb-short"><span class="fb-short-text">' + short + '</span>' + copyBtn + '</span></div>';
+  }
+  return '<div class="fb-cell" id="' + id + '">' +
+    '<div class="fb-short">' +
+      '<span class="fb-short-text">' + short + '</span>' +
+      '<span class="fb-expand" onclick="toggleFB(\'' + id + '\')" id="' + id + '-link">展开</span>' +
+      copyBtn +
+    '</div>' +
+    '<div class="fb-full" id="' + id + '-full">' +
+      clean.replace(/</g, '&lt;').replace(/>/g, '&gt;') +
+    '</div></div>';
+}
+
+function copyFeedback(id) {
+  var cell = document.getElementById(id);
+  // 优先取展开区的原始反馈，否则取 short 部分的文本
+  var full = document.getElementById(id + '-full');
+  var text = full ? full.textContent : (cell ? cell.querySelector('.fb-short-text').textContent : '');
+  text = text.replace(/下载源文件\s*/g, '').replace(/\s+/g, ' ').trim();
+
+  navigator.clipboard.writeText(text).then(function() {
+    var btn = document.getElementById(id + '-copy');
+    btn.textContent = '已复制';
+    btn.classList.add('copied');
+    setTimeout(function() { btn.textContent = '复制'; btn.classList.remove('copied'); }, 2000);
+  }).catch(function() {
+    toast('复制失败', 'err');
+  });
+}
+
+function toggleFB(id) {
+  var full = document.getElementById(id + '-full');
+  var link = document.getElementById(id + '-link');
+  if (full.classList.contains('open')) {
+    full.classList.remove('open');
+    link.textContent = '展开';
+  } else {
+    full.classList.add('open');
+    link.textContent = '收起';
+  }
+}
+
+function renderScore(score, maxScore) {
+  if (score === null || score === undefined) {
+    return '<span class="score-text pending">— / ' + (maxScore != null ? maxScore : '?') + '</span>';
+  }
+  var cls;
+  if (score >= maxScore) cls = 'ok';
+  else if (score > 0) cls = 'partial';
+  else cls = 'zero';
+  return '<span class="score-text ' + cls + '">' + score.toFixed(1) + ' / ' + maxScore + '</span>';
+}
+
+function renderTable() {
+  var tbody = document.querySelector('#problemTable tbody');
+  if (!problemData || problemData.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#bbb;padding:40px;">请点击「刷新状态」加载数据</td></tr>';
+    return;
+  }
+  tbody.innerHTML = problemData.map(function(p) {
+    var timeText = p.lastSubmitTime || '—';
+	    var lastSubmitHtml = '<span style="color:#999;">—</span>';
+	    if (p.branch) {
+	      var shortHash = p.commitHash ? p.commitHash.substring(0, 7) : '';
+	      lastSubmitHtml = '<code style="font-size:11px;">' + p.branch + '</code>' +
+	        (shortHash ? ' <code style="font-size:10px;color:#888;">' + shortHash + '</code>' : '');
+	    }
+    if (timeText.length > 16) timeText = timeText.substring(0, 16);
+    return '<tr>' +
+      '<td style="color:#999;font-size:12px;text-align:center;">' + p.num + '</td>' +
+      '<td style="font-weight:500;">' + cleanName(p.name) + '</td>' +
+	      '<td>' + lastSubmitHtml + '</td>' +
+	      '<td>' + renderBranchSelect(p.num, p.branch) + '</td>' +
+      '<td>' + renderScore(p.score, p.maxScore) + '</td>' +
+      '<td>' + renderFeedback(p.feedback) + '</td>' +
+      '<td style="font-size:11px;color:#888;white-space:nowrap;">' + timeText + '</td>' +
+      '<td style="white-space:nowrap;">' +
+        '<button class="enqueue-btn" data-num="' + p.num + '" onclick="enqueueOne(this)">加入队列</button>' +
+      '</td>' +
+      '</tr>';
+  }).join('');
+}
+
+// ===== Enqueue =====
+async function enqueueOne(btn) {
+  var num = parseInt(btn.getAttribute('data-num'));
+  if (!num) return;
+
+  var sel = document.getElementById('branch-' + num);
+  var branch = sel ? sel.value : '';
+  if (!branch) { toast('请先选择分支', 'err'); return; }
+
+  if (btn.disabled) return;
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  try {
+    var resp = await fetch(API + '/api/queue/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: [{ problemNum: num, branch: branch }] }),
+    });
+    var data = await resp.json();
+    if (data.ok && data.added && data.added.length > 0) {
+      var h = data.added[0].commitHash || '';
+      var shortHash = h ? ' (' + h.substring(0, 7) + ')' : '';
+      toast('题' + num + ' 已加入队列: ' + branch + shortHash, 'ok');
+      await fetch(API + '/api/queue/start', { method: 'POST' });
+      renderQueue();
+      startQueueWatcher();
+    }
+  } catch (e) {
+    toast('加入队列失败: ' + e.message, 'err');
+  }
+  btn.disabled = false;
+  btn.textContent = '加入队列';
+}
+
+var queueWatcherTimer = null;
+function startQueueWatcher() {
+  if (queueWatcherTimer) return;
+  queueWatcherTimer = setInterval(async function() {
+    try {
+      var resp = await fetch(API + '/api/queue');
+      var q = await resp.json();
+      renderQueue();
+      // 队列空闲时停止轮询，并刷新历史和状态
+      if (!q.running && (!q.items || q.items.length === 0)) {
+        clearInterval(queueWatcherTimer);
+        queueWatcherTimer = null;
+        loadHistory();
+        loadCached();
+      }
+    } catch (e) {}
+  }, 3000);
+}
+
+async function reloadLocal() {
+  toast('正在刷新本地数据...', 'info');
+  try {
+    var resp = await fetch(API + '/api/status');
+    var result = await resp.json();
+    if (result.data) {
+      problemData = result.data;
+      document.getElementById('refreshTime').textContent = '更新于 ' + (result.time || '--');
+      renderTable();
+    }
+  } catch (e) {}
+  refreshLeaderboard();
+  loadHistory();
+  renderQueue();
+  toast('本地数据已刷新', 'ok');
+}
+
+async function refreshRepo() {
+  toast('正在刷新仓库...', 'info');
+  try {
+    var resp = await fetch(API + '/api/refresh-repo', { method: 'POST' });
+    var data = await resp.json();
+    if (data.ok) {
+      branches = data.branches;
+      branchHashCache = {};
+      renderTable();
+      toast('仓库已更新 (' + data.branches.length + ' 个分支)', 'ok');
+    } else {
+      toast('仓库刷新失败', 'err');
+    }
+  } catch (e) {
+    toast('仓库刷新失败: ' + e.message, 'err');
+  }
+}
+
+// ===== Queue rendering =====
+var queuePage = 1;
+var queuePageSize = 20;
+let currentDragId = null;
+
+function renderQueue() {
+  fetch(API + '/api/queue').then(function(r) { return r.json(); }).then(function(q) {
+    var curEl = document.getElementById('queueCurrent');
+    var listEl = document.getElementById('queueList');
+    var badge = document.getElementById('queueBadge');
+
+    var labels = { waiting: '等待', running: '测评中', done: '完成', failed: '失败', timeout: '超时' };
+
+    // current running item
+    if (q.current) {
+      var c = q.current;
+      var elapsed = c.startTime ? Math.floor((Date.now() - new Date(c.startTime).getTime()) / 60000) : 0;
+      var cHash = c.commitHash ? '<code style="font-size:10px;color:#888;">' + c.commitHash.substring(0, 7) + '</code>' : '—';
+      curEl.innerHTML = '<div style="background:#f6fbff;padding:10px 12px;border-radius:4px;margin-bottom:12px;">' +
+        '<span class="q-status running">测评中</span> ' +
+        '<strong>题' + c.problemNum + '</strong> ' + c.branch + ' ' + cHash +
+        ' <span class="q-elapsed">' + elapsed + ' min</span></div>';
+    } else { curEl.innerHTML = ''; }
+
+    if (q.items && q.items.length > 0) {
+      var allItems = q.items.slice();
+      var total = allItems.length;
+      var totalPages = Math.ceil(total / queuePageSize);
+      if (queuePage > totalPages) queuePage = totalPages;
+      var start = (queuePage - 1) * queuePageSize;
+      var pageItems = allItems.slice(start, start + queuePageSize);
+
+      var h = '<div class="rank-table-scroll"><table style="width:100%;font-size:12px;table-layout:fixed;">' +
+        '<thead><tr><th style="width:5%">#</th><th style="width:7%">优先级</th><th style="width:10%">题目</th>' +
+        '<th style="width:16%">分支</th><th style="width:8%">版本</th><th style="width:8%">状态</th><th style="width:10%">操作</th></tr></thead><tbody>';
+
+      pageItems.forEach(function(it, i) {
+        var hashStr = it.commitHash ? '<code style="font-size:10px;color:#888;">' + it.commitHash.substring(0, 7) + '</code>' : '—';
+        h += '<tr>';
+        h += '<td>' + (start + i + 1) + '</td>';
+        h += '<td style="color:#999;">#' + it.id + '</td>';
+        h += '<td>题' + it.problemNum + '</td>';
+        h += '<td style="font-family:monospace;font-size:11px;">' + it.branch + '</td>';
+        h += '<td>' + hashStr + '</td>';
+        h += '<td><span class="q-status ' + it.status + '">' + (labels[it.status] || it.status) + '</span></td>';
+        h += '<td>' + (it.status === 'waiting' ? '<span class="drag-handle" style="cursor:grab;color:#ccc;" title="拖拽排序">⋮⋮</span> <button class="q-remove" onclick="removeQueueItem(' + it.id + ')" title="移除">×</button>' : '') + '</td>';
+        h += '</tr>';
+      });
+      h += '</tbody></table></div>';
+
+      h += '<div class="rank-pager">';
+      h += '<button onclick="queuePage=1;renderQueue()" ' + (queuePage <= 1 ? 'disabled' : '') + '>首页</button>';
+      h += '<button onclick="queuePage--;renderQueue()" ' + (queuePage <= 1 ? 'disabled' : '') + '>上一页</button>';
+      h += '<span class="page-info">' + queuePage + ' / ' + totalPages + '</span>';
+      h += '<button onclick="queuePage++;renderQueue()" ' + (queuePage >= totalPages ? 'disabled' : '') + '>下一页</button>';
+      h += '<button onclick="queuePage=' + totalPages + ';renderQueue()" ' + (queuePage >= totalPages ? 'disabled' : '') + '>末页</button>';
+      h += '<select onchange="queuePageSize=parseInt(this.value);queuePage=1;renderQueue()">';
+      [20, 30, 50].forEach(function(n) { h += '<option value="' + n + '"' + (queuePageSize === n ? ' selected' : '') + '>' + n + '条/页</option>'; });
+      h += '</select>';
+      h += '<span>共 ' + total + ' 项</span>';
+      h += '</div>';
+
+      listEl.innerHTML = h;
+      listEl.classList.remove('queue-empty');
+    } else if (!q.current) {
+      listEl.innerHTML = '队列为空，点击题目行的「加入队列」按钮添加任务';
+      listEl.classList.add('queue-empty');
+    } else {
+      listEl.innerHTML = '';
+    }
+
+    var n = (q.items || []).filter(function(it) { return it.status === 'waiting'; }).length + (q.running ? 1 : 0);
+    if (n > 0) { badge.textContent = n; badge.classList.remove('hidden'); }
+    else { badge.classList.add('hidden'); }
+  }).catch(function() {});
+}
+
+// ===== Drag and drop =====
+function onDragStart(e) {
+  var row = e.target.closest('.queue-row');
+  if (!row) return;
+  currentDragId = parseInt(row.getAttribute('data-id'));
+  row.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', currentDragId);
+}
+
+function onDragEnd(e) {
+  var row = e.target.closest('.queue-row');
+  if (row) row.classList.remove('dragging');
+  document.querySelectorAll('.queue-row.drag-over').forEach(function(r) { r.classList.remove('drag-over'); });
+  currentDragId = null;
+}
+
+function onDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  var row = e.target.closest('.queue-row');
+  if (row && row.getAttribute('data-id')) {
+    var id = parseInt(row.getAttribute('data-id'));
+    if (id !== currentDragId) row.classList.add('drag-over');
+  }
+}
+
+function onDragLeave(e) {
+  var row = e.target.closest('.queue-row');
+  if (row) row.classList.remove('drag-over');
+}
+
+async function onDrop(e) {
+  e.preventDefault();
+  var row = e.target.closest('.queue-row');
+  if (!row) return;
+  row.classList.remove('drag-over');
+
+  var toIdx = parseInt(row.getAttribute('data-idx'));
+  if (isNaN(toIdx) || !currentDragId) return;
+
+  try {
+    await fetch(API + '/api/queue/reorder', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: currentDragId, toIndex: toIdx }),
+    });
+    renderQueue();
+  } catch (e) {
+    toast('排序失败', 'err');
+  }
+}
+
+function removeQueueItem(id) {
+  fetch(API + '/api/queue/remove', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: id }),
+  }).then(function() { renderQueue(); }).catch(function() { toast('删除失败', 'err'); });
+}
+
+// ===== Leaderboard =====
+var MY_STUDENT_ID = '';
+var rankDataCache = null;
+var rankPage = { contest: 1, perf: 1 };
+var rankPageSize = 30;
+var rankSchoolFilter = { contest: '', perf: '' };
+
+function renderMyCard() {
+  var el = document.getElementById('rankMyCard');
+  if (!rankDataCache) return;
+  var c = rankDataCache.contest;
+  var p = rankDataCache.performance;
+  var myC = c ? c.teams.find(function(t) { return t.team === 'Coding身姿如百合花般'; }) : null;
+  var myP = p ? p.teams.find(function(t) { return t.team === 'Coding身姿如百合花般'; }) : null;
+
+  var h = '<div class="rank-my-card">';
+  if (myC) {
+    h += '<div class="rank-my-item"><span class="rank-my-label">学校</span><span class="rank-my-value">' + myC.school + '</span></div>';
+    h += '<div class="rank-my-item"><span class="rank-my-label">队伍</span><span class="rank-my-value">' + myC.team + '</span></div>';
+    h += '<div class="rank-my-item"><span class="rank-my-label">初赛</span><span class="rank-my-value">#' + myC.rank + ' / ' + c.teams.length + ' (' + myC.values[0] + ')</span></div>';
+  }
+  if (myP) {
+    h += '<div class="rank-my-item"><span class="rank-my-label">性能</span><span class="rank-my-value">#' + myP.rank + ' / ' + p.teams.length + ' (' + (myP.values[3] || myP.values[0]) + ')</span></div>';
+  }
+  h += '</div>';
+  el.innerHTML = h;
+}
+
+function buildRankTable(rankData, page, tab) {
+  if (!rankData || !rankData.teams) return '';
+  var headers = rankData.headers || [];
+
+  // school filter
+  var mySchool = '西南大学';
+  var schools = [];
+  rankData.teams.forEach(function(t) { if (schools.indexOf(t.school) < 0) schools.push(t.school); });
+  schools.sort();
+  if (schools.indexOf(mySchool) >= 0) { schools.splice(schools.indexOf(mySchool), 1); schools.unshift(mySchool); }
+  var schoolFilter = rankSchoolFilter[tab] || '';
+  var filtered = schoolFilter ? rankData.teams.filter(function(t) { return t.school === schoolFilter; }) : rankData.teams;
+  var totalFiltered = filtered.length;
+  var totalPages = Math.ceil(totalFiltered / rankPageSize);
+  if (page > totalPages) page = totalPages;
+  var start = (page - 1) * rankPageSize;
+  var pageTeams = filtered.slice(start, start + rankPageSize);
+
+  var h = '<div class="rank-table-scroll"><table><thead><tr>';
+  headers.forEach(function(hdr, i) {
+    var w = i === 0 ? '8%' : '';
+    h += '<th' + (w ? ' style="width:' + w + '"' : '') + '>' + hdr + '</th>';
+  });
+  h += '</tr></thead><tbody>';
+  pageTeams.forEach(function(t) {
+    var isMe = MY_STUDENT_ID && t.studentId === MY_STUDENT_ID;
+    h += '<tr class="' + (isMe ? 'rank-my-row' : '') + '">';
+    h += '<td>' + t.rank + '</td><td>' + t.studentId + '</td><td>' + t.team + '</td><td>' + t.school + '</td>';
+    t.values.forEach(function(v) { h += '<td>' + v + '</td>'; });
+    h += '</tr>';
+  });
+  h += '</tbody></table></div>';
+
+  h += '<div class="rank-pager">';
+  h += '<select onchange="rankSchoolFilter.' + tab + '=this.value;rankPage.' + tab + '=1;renderRankPage(\'' + tab + '\')" style="margin-right:12px;">';
+  h += '<option value="">全部学校 (' + rankData.teams.length + '队)</option>';
+  schools.forEach(function(s) { h += '<option value="' + s + '"' + (schoolFilter === s ? ' selected' : '') + '>' + s + '</option>'; });
+  h += '</select>';
+  h += '<button onclick="rankPage.' + tab + '=1;renderRankPage(\'' + tab + '\')" ' + (page <= 1 ? 'disabled' : '') + '>首页</button>';
+  h += '<button onclick="rankPage.' + tab + '--;renderRankPage(\'' + tab + '\')" ' + (page <= 1 ? 'disabled' : '') + '>上一页</button>';
+  h += '<span class="page-info">' + page + ' / ' + totalPages + '</span>';
+  h += '<button onclick="rankPage.' + tab + '++;renderRankPage(\'' + tab + '\')" ' + (page >= totalPages ? 'disabled' : '') + '>下一页</button>';
+  h += '<button onclick="rankPage.' + tab + '=' + totalPages + ';renderRankPage(\'' + tab + '\')" ' + (page >= totalPages ? 'disabled' : '') + '>末页</button>';
+  h += '<select onchange="rankPageSize=parseInt(this.value);rankPage.contest=1;rankPage.perf=1;renderRankPage(\'' + tab + '\')">';
+  [20, 30, 50, 100].forEach(function(n) { h += '<option value="' + n + '"' + (rankPageSize === n ? ' selected' : '') + '>' + n + '条/页</option>'; });
+  h += '</select>';
+  h += '<span>共 ' + totalFiltered + ' 队</span>';
+  h += '</div>';
+  return h;
+}
+
+function renderRankPage(tab) {
+  if (!rankDataCache) return;
+  var data = tab === 'contest' ? rankDataCache.contest : rankDataCache.performance;
+  var page = rankPage[tab] || 1;
+  var elId = tab === 'contest' ? 'panelContest' : 'panelPerf';
+  var el = document.getElementById(elId);
+  if (el) el.innerHTML = '<div class="rank-table-wrap">' + buildRankTable(data, page, tab) + '</div>';
+}
+
+function switchMainTab(tab) {
+  document.querySelectorAll('.main-tab').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelector('.main-tab[onclick*="' + tab + '"]').classList.add('active');
+  document.getElementById('panelStatus').style.display = tab === 'status' ? '' : 'none';
+  document.getElementById('panelQueue').style.display = tab === 'queue' ? '' : 'none';
+  document.getElementById('panelContest').style.display = tab === 'contest' ? '' : 'none';
+  document.getElementById('panelPerf').style.display = tab === 'perf' ? '' : 'none';
+  document.getElementById('panelHistory').style.display = tab === 'history' ? '' : 'none';
+}
+
+function renderLeaderboard(data) {
+  if (!data || !data.contest) return;
+  rankDataCache = data;
+  rankPage = { contest: 1, perf: 1 };
+  document.getElementById('rankLoading').style.display = 'none';
+  document.getElementById('mainTabs').style.display = '';
+  renderMyCard();
+
+  if (!MY_STUDENT_ID && data.contest.teams) {
+    var myTeam = data.contest.teams.find(function(t) { return t.team === 'Coding身姿如百合花般'; });
+    if (myTeam) MY_STUDENT_ID = myTeam.studentId;
+  }
+
+  renderRankPage('contest');
+  renderRankPage('perf');
+  loadHistory();
+  // Show tabs on first successful data load
+  document.getElementById('mainTabs').style.display = '';
+}
+
+function loadLeaderboard() {
+  fetch(API + '/api/leaderboard').then(function(r) { return r.json(); }).then(function(data) {
+    if (data.contest) renderLeaderboard(data);
+  }).catch(function() {});
+}
+
+function refreshLeaderboard() {
+  fetch(API + '/api/leaderboard?refresh=1').then(function(r) { return r.json(); }).then(function(data) {
+    if (data.contest) { renderLeaderboard(data); toast('排行榜已更新', 'ok'); }
+    else toast('排行榜加载失败', 'err');
+  }).catch(function() { toast('排行榜加载失败', 'err'); });
+}
+
+// ===== History =====
+var historyCache = [];
+var historyPage = 1;
+var historyPageSize = 20;
+
+function renderHistoryPage() {
+  if (!historyCache || historyCache.length === 0) {
+    document.getElementById('panelHistory').innerHTML = '<div class="rank-table-wrap"><div class="queue-empty" style="padding:60px;">暂无记录</div></div>';
+    return;
+  }
+  var total = historyCache.length;
+  var totalPages = Math.ceil(total / historyPageSize);
+  var page = historyPage;
+  var start = (page - 1) * historyPageSize;
+  var pageData = historyCache.slice(start, start + historyPageSize);
+
+  var h = '<div class="rank-table-scroll"><table style="width:100%;font-size:12px;table-layout:fixed;"><thead><tr>' +
+    '<th style="width:5%">#</th><th style="width:16%">题目</th><th style="width:14%">分支</th><th style="width:7%">版本</th><th style="width:12%">提交时间</th>' +
+    '<th style="width:6%">耗时</th><th style="width:8%">得分</th><th style="width:7%">状态</th><th>反馈</th>' +
+    '</tr></thead><tbody>';
+
+  pageData.forEach(function(e, i) {
+    var ss = { passed: '通过', done: '完成', failed: '失败', timeout: '超时', error: '错误' };
+    var status = ss[e.status] || e.status || '?';
+    var statusCls = { passed: 'q-status done', done: 'q-status done', failed: 'q-status failed', timeout: 'q-status timeout', error: 'q-status failed' }[e.status] || '';
+    var fb = (e.feedback || '').replace(/下载源文件\s*/g, '').replace(/\s+/g, ' ').substring(0, 60);
+    var hash = e.commitHash ? e.commitHash.substring(0, 7) : '—';
+    h += '<tr>' +
+      '<td>' + (total - (start + i)) + '</td>' +
+      '<td>' + e.problemName + '</td>' +
+      '<td style="font-family:monospace;font-size:11px;">' + (e.branch || '') + '</td>' +
+      '<td><code style="font-size:10px;color:#888;">' + hash + '</code></td>' +
+      '<td style="font-size:11px;">' + (e.submitTime || '').substring(0, 16).replace('T', ' ') + '</td>' +
+      '<td>' + (e.elapsedMin || 0) + ' min</td>' +
+      '<td style="font-weight:600;">' + (e.score != null ? e.score + ' / ' + (e.maxScore != null ? e.maxScore : '?') : '—') + '</td>' +
+      '<td><span class="' + statusCls + '">' + status + '</span></td>' +
+      '<td style="font-size:11px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + fb + '</td>' +
+      '</tr>';
+  });
+  h += '</tbody></table></div>';
+
+  h += '<div class="rank-pager">';
+  h += '<button onclick="historyPage=1;renderHistoryPage()" ' + (page <= 1 ? 'disabled' : '') + '>首页</button>';
+  h += '<button onclick="historyPage--;renderHistoryPage()" ' + (page <= 1 ? 'disabled' : '') + '>上一页</button>';
+  h += '<span class="page-info">' + page + ' / ' + totalPages + '</span>';
+  h += '<button onclick="historyPage++;renderHistoryPage()" ' + (page >= totalPages ? 'disabled' : '') + '>下一页</button>';
+  h += '<button onclick="historyPage=' + totalPages + ';renderHistoryPage()" ' + (page >= totalPages ? 'disabled' : '') + '>末页</button>';
+  h += '<select onchange="historyPageSize=parseInt(this.value);historyPage=1;renderHistoryPage()">';
+  [20, 30, 50].forEach(function(n) { h += '<option value="' + n + '"' + (historyPageSize === n ? ' selected' : '') + '>' + n + '条/页</option>'; });
+  h += '</select>';
+  h += '<span>共 ' + total + ' 条</span>';
+  h += '</div>';
+
+  document.getElementById('panelHistory').innerHTML = '<div class="rank-table-wrap">' + h + '</div>';
+}
+
+function loadHistory() {
+  fetch('/data/submit-history.json').then(function(r) { return r.json(); }).then(function(data) {
+    if (data && Array.isArray(data)) {
+      data.reverse();
+      historyCache = data;
+    } else {
+      historyCache = [];
+    }
+    document.getElementById('mainTabs').style.display = '';
+    renderHistoryPage();
+  }).catch(function(err) {
+    console.error('加载提交记录失败:', err);
+    historyCache = [];
+    renderHistoryPage();
+  });
+}
+
+// ===== Init =====
+document.getElementById('mainTabs').style.display = '';
+loadBranches();
+loadCached();
+loadLeaderboard();
+loadHistory();
+renderQueue();
+var _wasQueueRunning = false;
+setInterval(async function() {
+  try {
+    var resp = await fetch(API + '/api/queue');
+    var q = await resp.json();
+    var isIdle = !q.running && (!q.items || q.items.length === 0);
+    renderQueue();
+    // 只在队列从运行→空闲的瞬间刷新状态和记录，避免反复渲染重置下拉框
+    if (isIdle && _wasQueueRunning) {
+      loadHistory();
+      loadCached();
+    }
+    _wasQueueRunning = !isIdle;
+  } catch (e) {}
+}, 10000);
+</script>
+</body>
+</html>

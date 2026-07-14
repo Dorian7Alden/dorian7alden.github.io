@@ -1,0 +1,23 @@
+{
+  "eval_id": 2,
+  "eval_name": "branch-mismatch",
+  "prompt": "提交第1题，用 task99 分支",
+  "assertions": [
+    {
+      "id": "git-status-checked",
+      "description": "Agent checked git status before attempting submission"
+    },
+    {
+      "id": "branch-mismatch-detected",
+      "description": "Agent detected branch mismatch and asked for confirmation"
+    },
+    {
+      "id": "stopped-at-blocker",
+      "description": "Agent stopped and asked user to handle blockers instead of trying to fix them"
+    },
+    {
+      "id": "token-efficient",
+      "description": "Agent used fewer than 20000 tokens"
+    }
+  ]
+}

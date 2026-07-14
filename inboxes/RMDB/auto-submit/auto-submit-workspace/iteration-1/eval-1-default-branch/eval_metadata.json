@@ -1,0 +1,19 @@
+{
+  "eval_id": 1,
+  "eval_name": "default-branch",
+  "prompt": "提交第3题",
+  "assertions": [
+    {
+      "id": "git-status-checked",
+      "description": "Agent checked git status before attempting submission"
+    },
+    {
+      "id": "stopped-at-blocker",
+      "description": "Agent stopped and asked user to handle blockers instead of trying to fix them"
+    },
+    {
+      "id": "token-efficient",
+      "description": "Agent used fewer than 20000 tokens (not wasting tokens on wild goose chases)"
+    }
+  ]
+}

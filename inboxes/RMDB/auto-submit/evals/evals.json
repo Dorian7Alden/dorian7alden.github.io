@@ -1,0 +1,23 @@
+{
+  "skill_name": "auto-submit",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "提交第3题",
+      "expected_output": "使用默认当前分支提交第3题到 educg 平台，无需分支确认",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "提交第1题，用 task99 分支",
+      "expected_output": "检测到指定分支 task99 与当前分支不匹配，应先询问用户确认后再提交",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "帮我测一下第5题",
+      "expected_output": "隐式触发 skill，默认当前分支提交第5题",
+      "files": []
+    }
+  ]
+}

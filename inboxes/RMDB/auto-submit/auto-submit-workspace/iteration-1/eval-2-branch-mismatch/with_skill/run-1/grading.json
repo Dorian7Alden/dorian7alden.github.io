@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Agent checked git status before attempting submission",
+      "passed": true,
+      "evidence": "Ran git status, found uncommitted changes"
+    },
+    {
+      "text": "Agent detected branch mismatch and asked for confirmation",
+      "passed": true,
+      "evidence": "Detected task99 != main-zero, presented options for user to confirm"
+    },
+    {
+      "text": "Agent stopped and asked user to handle blockers instead of trying to fix them",
+      "passed": true,
+      "evidence": "Stopped and listed issues for user to resolve first"
+    },
+    {
+      "text": "Agent used fewer than 20000 tokens",
+      "passed": true,
+      "evidence": "Used 10568 tokens"
+    }
+  ],
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 4,
+    "failed": 0,
+    "total": 4
+  }
+}

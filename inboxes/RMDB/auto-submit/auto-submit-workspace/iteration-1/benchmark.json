@@ -1,0 +1,283 @@
+{
+  "metadata": {
+    "skill_name": "auto-submit",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-06-30T03:38:23Z",
+    "evals_run": [
+      1,
+      2,
+      3
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 7.5,
+        "tokens": 10493,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Agent checked git status before attempting submission",
+          "passed": true,
+          "evidence": "Ran git status, found .TODO.md with uncommitted changes"
+        },
+        {
+          "text": "Agent stopped and asked user to handle blockers instead of trying to fix them",
+          "passed": true,
+          "evidence": "Stopped workflow, told user to commit and push first"
+        },
+        {
+          "text": "Agent used fewer than 20000 tokens",
+          "passed": true,
+          "evidence": "Used 10493 tokens"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 9.6,
+        "tokens": 10568,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Agent checked git status before attempting submission",
+          "passed": true,
+          "evidence": "Ran git status, found uncommitted changes"
+        },
+        {
+          "text": "Agent detected branch mismatch and asked for confirmation",
+          "passed": true,
+          "evidence": "Detected task99 != main-zero, presented options for user to confirm"
+        },
+        {
+          "text": "Agent stopped and asked user to handle blockers instead of trying to fix them",
+          "passed": true,
+          "evidence": "Stopped and listed issues for user to resolve first"
+        },
+        {
+          "text": "Agent used fewer than 20000 tokens",
+          "passed": true,
+          "evidence": "Used 10568 tokens"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 6.8,
+        "tokens": 10597,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Agent correctly understood natural language prompt as submit request",
+          "passed": true,
+          "evidence": "Understood '\u5e2e\u6211\u6d4b\u4e00\u4e0b\u7b2c5\u9898' as a submit request for problem 5"
+        },
+        {
+          "text": "Agent checked git status before attempting submission",
+          "passed": true,
+          "evidence": "Ran git status, found .TODO.md with uncommitted changes"
+        },
+        {
+          "text": "Agent stopped and asked user to handle blockers instead of trying to fix them",
+          "passed": true,
+          "evidence": "Stopped and told user to commit changes first"
+        },
+        {
+          "text": "Agent used fewer than 20000 tokens",
+          "passed": true,
+          "evidence": "Used 10597 tokens"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.0,
+        "passed": 0,
+        "failed": 3,
+        "total": 3,
+        "time_seconds": 215.2,
+        "tokens": 49456,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Agent checked git status before attempting submission",
+          "passed": false,
+          "evidence": "Did not run git status first, went directly to trying submit.js"
+        },
+        {
+          "text": "Agent stopped and asked user to handle blockers instead of trying to fix them",
+          "passed": false,
+          "evidence": "Tried curl, fetch, https module, and even Playwright to fix cookie issues"
+        },
+        {
+          "text": "Agent used fewer than 20000 tokens",
+          "passed": false,
+          "evidence": "Used 49456 tokens - 5x the with-skill version"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 2,
+        "failed": 2,
+        "total": 4,
+        "time_seconds": 30.0,
+        "tokens": 15361,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Agent checked git status before attempting submission",
+          "passed": false,
+          "evidence": "Directly searched for scripts and tried to submit without checking git status"
+        },
+        {
+          "text": "Agent detected branch mismatch and asked for confirmation",
+          "passed": true,
+          "evidence": "Noted that task99 branch does not exist locally or remotely"
+        },
+        {
+          "text": "Agent stopped and asked user to handle blockers instead of trying to fix them",
+          "passed": false,
+          "evidence": "Tried multiple approaches to work around cookie expiration"
+        },
+        {
+          "text": "Agent used fewer than 20000 tokens",
+          "passed": true,
+          "evidence": "Used 15361 tokens (under threshold, but still more than with-skill)"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.25,
+        "passed": 1,
+        "failed": 3,
+        "total": 4,
+        "time_seconds": 250.2,
+        "tokens": 60128,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Agent correctly understood natural language prompt as submit request",
+          "passed": true,
+          "evidence": "Understood the task was about submitting problem 5 for evaluation"
+        },
+        {
+          "text": "Agent checked git status before attempting submission",
+          "passed": false,
+          "evidence": "Went straight to analyzing code and trying to fix things without checking git status"
+        },
+        {
+          "text": "Agent stopped and asked user to handle blockers instead of trying to fix them",
+          "passed": false,
+          "evidence": "Analyzed code, built the project, tried multiple cookie workaround approaches"
+        },
+        {
+          "text": "Agent used fewer than 20000 tokens",
+          "passed": false,
+          "evidence": "Used 60128 tokens - 6x the with-skill version"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 7.9667,
+        "stddev": 1.4572,
+        "min": 6.8,
+        "max": 9.6
+      },
+      "tokens": {
+        "mean": 10552.6667,
+        "stddev": 53.6687,
+        "min": 10493,
+        "max": 10597
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.25,
+        "stddev": 0.25,
+        "min": 0.0,
+        "max": 0.5
+      },
+      "time_seconds": {
+        "mean": 165.1333,
+        "stddev": 118.3301,
+        "min": 30.0,
+        "max": 250.2
+      },
+      "tokens": {
+        "mean": 41648.3333,
+        "stddev": 23382.4895,
+        "min": 15361,
+        "max": 60128
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.75",
+      "time_seconds": "-157.2",
+      "tokens": "-31096"
+    }
+  },
+  "notes": []
+}

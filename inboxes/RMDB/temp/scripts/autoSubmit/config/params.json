@@ -1,0 +1,79 @@
+[
+  {
+    "number": 1,
+    "title": "2026题目一：存储管理",
+    "assignID": "46965",
+    "proNum": "1",
+    "problemID": "3187424"
+  },
+  {
+    "number": 2,
+    "title": "2026题目二：查询执行",
+    "assignID": "46965",
+    "proNum": "2",
+    "problemID": "3187424"
+  },
+  {
+    "number": 3,
+    "title": "2026题目三：唯一索引",
+    "assignID": "46965",
+    "proNum": "3",
+    "problemID": "3187424"
+  },
+  {
+    "number": 4,
+    "title": "2026题目四：查询优化与执行",
+    "assignID": "46965",
+    "proNum": "4",
+    "problemID": "3187424"
+  },
+  {
+    "number": 5,
+    "title": "2026题目五：聚合函数与分组统计",
+    "assignID": "46965",
+    "proNum": "5",
+    "problemID": "3187424"
+  },
+  {
+    "number": 6,
+    "title": "2026题目六：Union 集合算子",
+    "assignID": "46965",
+    "proNum": "6",
+    "problemID": "3187424"
+  },
+  {
+    "number": 7,
+    "title": "2026题目七：嵌套循环连接及其优化",
+    "assignID": "46965",
+    "proNum": "7",
+    "problemID": "3187424"
+  },
+  {
+    "number": 8,
+    "title": "2026题目八：事务控制语句",
+    "assignID": "46965",
+    "proNum": "8",
+    "problemID": "3187424"
+  },
+  {
+    "number": 9,
+    "title": "2026题目九：可配置的快照隔离与可串行化隔离级别",
+    "assignID": "46965",
+    "proNum": "9",
+    "problemID": "3187424"
+  },
+  {
+    "number": 10,
+    "title": "2026题目十：基于静态检查点的故障恢复",
+    "assignID": "46965",
+    "proNum": "10",
+    "problemID": "3187424"
+  },
+  {
+    "number": 11,
+    "title": "2026初赛题目：性能测试",
+    "assignID": "47932",
+    "proNum": "1",
+    "problemID": "3206227"
+  }
+]

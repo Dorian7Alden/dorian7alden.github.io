@@ -1,0 +1,495 @@
+<div class="cgcode_description__2b0C">
+  <div class="cgcode_css-m6wrkg-Container" style="margin: 16px 0 0">
+    <h4 class="cgcode_css-tt3ivf-Title">6. 2026题目六：Union 集合算子</h4>
+  </div>
+  <div class="cgcode_content__1Y2H">
+    <div class="cgcode_notranslate">
+      <div
+        class="cgProblemContentClass"
+        id="cgmdassignProContent3187423"
+        style=""
+      >
+        <div
+          class="cherry clearfix theme__default cherry--no-toolbar"
+          data-toolbar-theme="dark"
+          data-inline-code-theme="red"
+          data-code-block-theme="default"
+        >
+          <div
+            class="cherry-previewer cherry-markdown theme__default cherry-preview--full"
+            style="width: 100%"
+          >
+            <p
+              data-sign="b532b938dfd50a21e7c2369d427183a31"
+              data-type="p"
+              data-lines="1"
+            >
+              <strong>前置题目</strong
+              >：存储管理、B+树索引、查询执行、聚合函数与分组统计
+            </p>
+            <p
+              data-sign="d0bfe9b31000d3b775aa987e6e7bf31c2"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>题目种类</strong>：基础功能
+            </p>
+            <p
+              data-sign="4d960f6bf3e6f79be5f16b7ddf2910882"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>推荐知识点</strong>：Union 集合算子
+            </p>
+            <p
+              data-sign="693f268f2a2d5996680aa9981ef043452"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>大赛框架</strong>：<a
+                href="https://gitlab.eduxiji.net/csc1/csc-db/db2026/-/tree/main/rmdb"
+                title="https://gitlab.eduxiji.net/csc1/csc-db/db2026/-/tree/main/rmdb"
+                >https://gitlab.eduxiji.net/csc1/csc-db/db2026/-/tree/main/rmdb</a
+              >
+            </p>
+            <hr data-sign="hr2" data-lines="2" />
+            <h2
+              id="1-%E8%B5%9B%E9%A2%98%E8%83%8C%E6%99%AF"
+              data-sign="53fd1ba88f87f70ce19a97ebadd5e7a9"
+              data-lines="1"
+            >
+              <a
+                class="anchor"
+                href="#1-%E8%B5%9B%E9%A2%98%E8%83%8C%E6%99%AF"
+              ></a
+              >1 赛题背景
+            </h2>
+            <p
+              data-sign="b0544c80324be2cd327b7d98417f89c02"
+              data-type="p"
+              data-lines="2"
+            >
+              集合操作是 SQL 语言的核心功能之一。Union
+              算子用于合并多个分支查询的元组集合并去除重复元组，是大数据分析、多源数据融合等场景的关键算子。本赛题要求支持
+              Union 操作，并对结果集排序。
+            </p>
+            <hr data-sign="hr2" data-lines="2" />
+            <h2
+              id="2-%E9%A2%98%E7%9B%AE%E6%80%BB%E8%A7%88"
+              data-sign="184caa4218be4212341d6c00235b4b14"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#2-%E9%A2%98%E7%9B%AE%E6%80%BB%E8%A7%88"
+              ></a
+              >2 题目总览
+            </h2>
+            <p
+              data-sign="9fd4232b6a779ed78dde840233f733d72"
+              data-type="p"
+              data-lines="2"
+            >
+              本题要求参赛者在 RMDB 中实现 Union
+              算子，并针对查询间数据模式一致性、数据类型转换等场景完善健壮性保证机制，同时支持对
+              Union 的输出执行 ORDER BY 整体排序。
+            </p>
+            <hr data-sign="hr2" data-lines="2" />
+            <h2
+              id="3-%E9%A2%98%E7%9B%AE-61%EF%BC%9Aunion-%E7%AE%97%E5%AD%90%E5%AE%9E%E7%8E%B0%E4%B8%8E-order-by-%E6%94%AF%E6%8C%81"
+              data-sign="0d94c129efb23787771523599838d944"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#3-%E9%A2%98%E7%9B%AE-61%EF%BC%9Aunion-%E7%AE%97%E5%AD%90%E5%AE%9E%E7%8E%B0%E4%B8%8E-order-by-%E6%94%AF%E6%8C%81"
+              ></a
+              >3 题目 6.1：Union 算子实现与 ORDER BY 支持
+            </h2>
+            <h3
+              id="31-%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0"
+              data-sign="75a0516d4d1c0b371d3821fcf3b8115b"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#31-%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0"
+              ></a
+              >3.1 题目描述
+            </h3>
+            <p
+              data-sign="868837b0dac3fd5cf5607e04f6a337bf2"
+              data-type="p"
+              data-lines="2"
+            >
+              本小题要求实现 Union 算子，并支持对 Union 结果进行整体排序。
+            </p>
+            <p
+              data-sign="51e0e5249663aca49598549d2e1cc1182"
+              data-type="p"
+              data-lines="2"
+            >
+              记该物理算子为 U，U 包含了 n 个子节点构成的列表 {R1, R2, ...,
+              Rn}（其中 n ≥ 2）。U
+              遍历所有子节点，收集全部元组后去除重复元组（所有对应列的值均相等），最终返回去重后的元组集合。
+            </p>
+            <p
+              data-sign="f4569d593ab9eed63ecd773ed4c906f92"
+              data-type="p"
+              data-lines="2"
+            >
+              ORDER BY 子句作用于 Union 算子的最终输出，需支持多列排序与
+              ASC/DESC 指定。排序键限定在 Union
+              输出列的子集（默认引用第一个子节点的列名）。
+            </p>
+            <p
+              data-sign="d0bb316eb5912958a6684609cd1198b22"
+              data-type="p"
+              data-lines="2"
+            >
+              测试用例会将 Union 结果作为 FROM 子句中的派生表使用，形式如下：
+            </p>
+            <div
+              data-sign="a9bfe25b994a6278f1fc216b79e611bd"
+              data-type="codeBlock"
+              data-lines="5"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="sql"
+            >
+              <pre
+                class="language-sql"
+              ><code class="language-sql wrap"><span class="code-line"><span class="token keyword">SELECT</span> <span class="token operator">*</span> <span class="token keyword">FROM</span> <span class="token punctuation">(</span><span class="token operator">&lt;</span>select_stmt<span class="token operator">&gt;</span> <span class="token keyword">UNION</span> <span class="token operator">&lt;</span>select_stmt<span class="token operator">&gt;</span> <span class="token punctuation">[</span><span class="token keyword">UNION</span> <span class="token operator">&lt;</span>select_stmt<span class="token operator">&gt;</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token keyword">AS</span> alias</span>
+<span class="code-line"><span class="token keyword">ORDER</span> <span class="token keyword">BY</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span></span></code></pre>
+            </div>
+            <p
+              data-sign="81f1402af307146014ee561f0877308c2"
+              data-type="p"
+              data-lines="2"
+            >
+              参赛者需支持上述派生表语法，至少覆盖 Union 结果作为外层
+              <code>SELECT *</code> 数据源的场景；当外层带有
+              <code>ORDER BY</code> 时，排序作用于 Union 的整体输出，列名按照
+              Union 输出列解析。
+            </p>
+            <h3
+              id="32-%E6%8F%90%E7%A4%BA"
+              data-sign="dae7ba2c31f5f8d0d5fe012a1d4245b8"
+              data-lines="2"
+            >
+              <a class="anchor" href="#32-%E6%8F%90%E7%A4%BA"></a>3.2 提示
+            </h3>
+            <ul
+              data-lines="5"
+              data-sign="0cd7f54e3d64af6947d70516a94db335"
+              class="cherry-list__default"
+            >
+              <li class="cherry-list-item">
+                <p>
+                  可将 U 视作多叉树结构进行处理，也可以将 U
+                  转换为左深、右深结构处理。
+                </p>
+              </li>
+              <li class="cherry-list-item">
+                <p>去重可基于哈希表实现，也可基于排序实现。</p>
+              </li>
+              <li class="cherry-list-item">
+                <p>Union 的输出列名默认继承自第一个子节点 R1 的列名。</p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  对于多列排序，需按排序键列表顺序依次比较；未显式指定时默认按
+                  ASC 处理。
+                </p>
+              </li>
+            </ul>
+            <h3
+              id="33-%E6%B5%8B%E8%AF%95%E7%A4%BA%E4%BE%8B"
+              data-sign="ef063594b0cbd1deb6094f94c6e83859"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#33-%E6%B5%8B%E8%AF%95%E7%A4%BA%E4%BE%8B"
+              ></a
+              >3.3 测试示例
+            </h3>
+            <div
+              data-sign="53485707b05390f84a018858ef19df05"
+              data-type="codeBlock"
+              data-lines="39"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="sql"
+            >
+              <pre
+                class="language-sql"
+              ><code class="language-sql wrap"><span class="code-line"><span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> orders1 <span class="token punctuation">(</span></span>
+<span class="code-line">    order_id <span class="token keyword">INT</span><span class="token punctuation">,</span></span>
+<span class="code-line">    amount <span class="token keyword">FLOAT</span><span class="token punctuation">,</span></span>
+<span class="code-line">    region <span class="token keyword">CHAR</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span></span>
+<span class="code-line"><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> orders2 <span class="token punctuation">(</span></span>
+<span class="code-line">    order_id <span class="token keyword">INT</span><span class="token punctuation">,</span></span>
+<span class="code-line">    amount <span class="token keyword">FLOAT</span><span class="token punctuation">,</span></span>
+<span class="code-line">    region <span class="token keyword">CHAR</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span></span>
+<span class="code-line"><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> orders3 <span class="token punctuation">(</span></span>
+<span class="code-line">    order_id <span class="token keyword">INT</span><span class="token punctuation">,</span></span>
+<span class="code-line">    amount <span class="token keyword">FLOAT</span><span class="token punctuation">,</span></span>
+<span class="code-line">    region <span class="token keyword">CHAR</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span></span>
+<span class="code-line"><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> orders1 <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">150.0</span><span class="token punctuation">,</span> <span class="token string">'Beijing'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> orders1 <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">230.5</span><span class="token punctuation">,</span> <span class="token string">'Shanghai'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> orders1 <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">89.99</span><span class="token punctuation">,</span> <span class="token string">'Guangzhou'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> orders2 <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">150.0</span><span class="token punctuation">,</span> <span class="token string">'Beijing'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> orders2 <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">120.0</span><span class="token punctuation">,</span> <span class="token string">'Shenzhen'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> orders2 <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">560.0</span><span class="token punctuation">,</span> <span class="token string">'Chengdu'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> orders3 <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">150.0</span><span class="token punctuation">,</span> <span class="token string">'Beijing'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> orders3 <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">6</span><span class="token punctuation">,</span> <span class="token number">199.99</span><span class="token punctuation">,</span> <span class="token string">'Wuhan'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">SELECT</span> <span class="token operator">*</span> <span class="token keyword">FROM</span></span>
+<span class="code-line">    <span class="token punctuation">(</span><span class="token keyword">SELECT</span> <span class="token operator">*</span> <span class="token keyword">FROM</span> orders1</span>
+<span class="code-line">     <span class="token keyword">UNION</span></span>
+<span class="code-line">     <span class="token keyword">SELECT</span> <span class="token operator">*</span> <span class="token keyword">FROM</span> orders2</span>
+<span class="code-line">     <span class="token keyword">UNION</span></span>
+<span class="code-line">     <span class="token keyword">SELECT</span> <span class="token operator">*</span> <span class="token keyword">FROM</span> orders3<span class="token punctuation">)</span> <span class="token keyword">AS</span> all_orders</span>
+<span class="code-line"><span class="token keyword">ORDER</span> <span class="token keyword">BY</span> amount <span class="token keyword">DESC</span><span class="token punctuation">;</span></span></code></pre>
+            </div>
+            <p
+              data-sign="5e283748777854af021a2d7fb17fb23b2"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>预期结果：</strong>
+            </p>
+            <div
+              data-sign="a1b869e2074adc6c2d2bb4bf105b1680"
+              data-type="codeBlock"
+              data-lines="9"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="text"
+            >
+              <pre
+                class="language-text"
+              ><code class="language-text wrap"><span class="code-line">| order_id | amount | region |</span>
+<span class="code-line">| 5 | 560 | Chengdu |</span>
+<span class="code-line">| 2 | 230.5 | Shanghai |</span>
+<span class="code-line">| 6 | 199.99 | Wuhan |</span>
+<span class="code-line">| 1 | 150 | Beijing |</span>
+<span class="code-line">| 4 | 120 | Shenzhen |</span>
+<span class="code-line">| 3 | 89.99 | Guangzhou |</span></code></pre>
+            </div>
+            <hr data-sign="hr1" data-lines="1" />
+            <h2
+              id="4-%E9%A2%98%E7%9B%AE-62%EF%BC%9A%E7%B1%BB%E5%9E%8B%E7%B3%BB%E7%BB%9F%E5%85%BC%E5%AE%B9%E6%80%A7%E4%B8%8E%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86"
+              data-sign="68f959327e699c2f3c9b9f3b31c865b0"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#4-%E9%A2%98%E7%9B%AE-62%EF%BC%9A%E7%B1%BB%E5%9E%8B%E7%B3%BB%E7%BB%9F%E5%85%BC%E5%AE%B9%E6%80%A7%E4%B8%8E%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86"
+              ></a
+              >4 题目 6.2：类型系统兼容性与异常处理
+            </h2>
+            <h3
+              id="41-%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0"
+              data-sign="6e300738d493d563ec7f450c890dd1d8"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#41-%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0"
+              ></a
+              >4.1 题目描述
+            </h3>
+            <p
+              data-sign="48ee31a51f3ba3c72e630496b990697c2"
+              data-type="p"
+              data-lines="2"
+            >
+              Union
+              的语义正确性依赖于分支查询间的数据模式兼容性约束。本小题要求在查询分析阶段实现完备的数据模式检验机制：严格保证各分支查询返回的列数量一致，且对应位置列的数据类型满足兼容性判定
+              (类型相同或支持隐式转换)；在执行阶段，Union
+              算子需执行统一的数据类型提升策略，将相应列的数据类型转换为公共超类型，确保各分支查询的异构元组最终遵循统一的数据模式。
+            </p>
+            <h3
+              id="42-%E6%8F%90%E7%A4%BA"
+              data-sign="7d2aa41453eb0371cfe3638a7ed06844"
+              data-lines="2"
+            >
+              <a class="anchor" href="#42-%E6%8F%90%E7%A4%BA"></a>4.2 提示
+            </h3>
+            <p
+              data-sign="12a8144c008eab73ea54528863e85ae92"
+              data-type="p"
+              data-lines="2"
+            >
+              公共超类型是指能够无损容纳所有分支查询对应列数据类型的最通用类型。对于本小题，只需要考虑下面两种情况。
+            </p>
+            <p
+              data-sign="17468ddce4b064b2c84c4db5632b8f1c2"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>数据类型提升与对应的公共超类型：</strong>
+            </p>
+            <ul
+              data-lines="3"
+              data-sign="c0430a8cdda8d4869650434c9f7254ab"
+              class="cherry-list__default"
+            >
+              <li class="cherry-list-item">
+                <p><strong>INT 与 FLOAT</strong> ⇒ <strong>FLOAT</strong></p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  <strong>CHAR(n) 与 CHAR(m)</strong> ⇒
+                  <strong>CHAR(max(n, m))</strong
+                  >，按照字符串实际长度输出即可，无需增添空格。
+                </p>
+              </li>
+            </ul>
+            <h3
+              id="43-%E6%B5%8B%E8%AF%95%E7%A4%BA%E4%BE%8B"
+              data-sign="61f8c0e08ae6841f2c0bcee38af487f6"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#43-%E6%B5%8B%E8%AF%95%E7%A4%BA%E4%BE%8B"
+              ></a
+              >4.3 测试示例
+            </h3>
+            <div
+              data-sign="7dff9471e42a21d30a3bbf81fc4fce2e"
+              data-type="codeBlock"
+              data-lines="47"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="sql"
+            >
+              <pre
+                class="language-sql"
+              ><code class="language-sql wrap"><span class="code-line"><span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> orders1 <span class="token punctuation">(</span></span>
+<span class="code-line">    order_id <span class="token keyword">INT</span><span class="token punctuation">,</span></span>
+<span class="code-line">    amount <span class="token keyword">INT</span><span class="token punctuation">,</span></span>
+<span class="code-line">    region <span class="token keyword">CHAR</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span></span>
+<span class="code-line"><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> orders2 <span class="token punctuation">(</span></span>
+<span class="code-line">    order_id <span class="token keyword">INT</span><span class="token punctuation">,</span></span>
+<span class="code-line">    amount <span class="token keyword">FLOAT</span><span class="token punctuation">,</span></span>
+<span class="code-line">    region <span class="token keyword">CHAR</span><span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span></span>
+<span class="code-line"><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token comment">-- 错误示例 1：列数量不一致</span></span>
+<span class="code-line"><span class="token keyword">SELECT</span> <span class="token operator">*</span> <span class="token keyword">FROM</span></span>
+<span class="code-line">    <span class="token punctuation">(</span><span class="token keyword">SELECT</span> amount <span class="token keyword">FROM</span> orders1</span>
+<span class="code-line">     <span class="token keyword">UNION</span></span>
+<span class="code-line">     <span class="token keyword">SELECT</span> <span class="token operator">*</span> <span class="token keyword">FROM</span> orders2</span>
+<span class="code-line">    <span class="token punctuation">)</span> <span class="token keyword">AS</span> all_orders<span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token comment">-- 错误示例 2：数据类型不兼容</span></span>
+<span class="code-line"><span class="token keyword">SELECT</span> <span class="token operator">*</span> <span class="token keyword">FROM</span></span>
+<span class="code-line">    <span class="token punctuation">(</span><span class="token keyword">SELECT</span> amount <span class="token keyword">FROM</span> orders1</span>
+<span class="code-line">     <span class="token keyword">UNION</span></span>
+<span class="code-line">     <span class="token keyword">SELECT</span> region <span class="token keyword">FROM</span> orders2</span>
+<span class="code-line">    <span class="token punctuation">)</span> <span class="token keyword">AS</span> all_orders<span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token comment">-- 错误示例 3：ORDER BY 出现未知列</span></span>
+<span class="code-line"><span class="token keyword">SELECT</span> <span class="token operator">*</span> <span class="token keyword">FROM</span></span>
+<span class="code-line">    <span class="token punctuation">(</span><span class="token keyword">SELECT</span> amount <span class="token keyword">FROM</span> orders1</span>
+<span class="code-line">     <span class="token keyword">UNION</span></span>
+<span class="code-line">     <span class="token keyword">SELECT</span> amount <span class="token keyword">FROM</span> orders2</span>
+<span class="code-line">    <span class="token punctuation">)</span> <span class="token keyword">AS</span> all_orders</span>
+<span class="code-line"><span class="token keyword">ORDER</span> <span class="token keyword">BY</span> order_id <span class="token keyword">ASC</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token comment">-- 类型提升测试示例</span></span>
+<span class="code-line"><span class="token comment">-- amount 列：INT 与 FLOAT 提升为 FLOAT</span></span>
+<span class="code-line"><span class="token comment">-- region 列：CHAR(10) 与 CHAR(20) 提升为 CHAR(20)</span></span>
+<span class="code-line"><span class="token comment">-- 预期结果的第一行（虚线部分）数据模式无需返回。</span></span>
+<span class="code-line"><span class="token keyword">SELECT</span> <span class="token operator">*</span> <span class="token keyword">FROM</span></span>
+<span class="code-line">    <span class="token punctuation">(</span><span class="token keyword">SELECT</span> <span class="token operator">*</span> <span class="token keyword">FROM</span> orders1</span>
+<span class="code-line">     <span class="token keyword">UNION</span></span>
+<span class="code-line">     <span class="token keyword">SELECT</span> <span class="token operator">*</span> <span class="token keyword">FROM</span> orders2</span>
+<span class="code-line">    <span class="token punctuation">)</span> <span class="token keyword">AS</span> all_orders</span>
+<span class="code-line"><span class="token keyword">ORDER</span> <span class="token keyword">BY</span> amount <span class="token keyword">DESC</span><span class="token punctuation">,</span> order_id <span class="token keyword">ASC</span><span class="token punctuation">;</span></span></code></pre>
+            </div>
+            <p
+              data-sign="1fb39c04abc20a3ae9b0b1c1abc3f10f2"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>错误示例预期结果：</strong>
+            </p>
+            <ul
+              data-lines="4"
+              data-sign="15ed87977ed838aad1150f51f68f5852"
+              class="cherry-list__default"
+            >
+              <li class="cherry-list-item">
+                <p>错误示例 1 → <code>failure</code></p>
+              </li>
+              <li class="cherry-list-item">
+                <p>错误示例 2 → <code>failure</code></p>
+              </li>
+              <li class="cherry-list-item">
+                <p>错误示例 3 → <code>failure</code></p>
+              </li>
+            </ul>
+            <p
+              data-sign="9b51d63ec85d27b9870739a5aca84a942"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>类型提升测试预期结果：</strong>
+            </p>
+            <p
+              data-sign="058347389206f3d15e22a4862cc768052"
+              data-type="p"
+              data-lines="2"
+            >
+              数据模式：<code>INT | FLOAT | CHAR(20)</code>
+            </p>
+            <div
+              data-sign="348adc0c4985a158d17faa33570149dd"
+              data-type="codeBlock"
+              data-lines="8"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="text"
+            >
+              <pre
+                class="language-text"
+              ><code class="language-text wrap"><span class="code-line">| order_id | amount | region |</span>
+<span class="code-line">| ... | ... | ... |</span>
+<span class="code-line">| ... | ... | ... |</span>
+<span class="code-line">| ... | ... | ... |</span>
+<span class="code-line">| ... | ... | ... |</span>
+<span class="code-line">| ... | ... | ... |</span></code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+      <script>
+        cgRenderMarkdown(
+          "assignProContent3187423a86fa499388974883a2061b2c5e9f3f6",
+          false,
+          "cgmdassignProContent3187423",
+        );
+      </script>
+    </div>
+  </div>
+</div>

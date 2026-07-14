@@ -1,0 +1,1608 @@
+<div class="cgcode_description__2b0C">
+  <div class="cgcode_css-m6wrkg-Container" style="margin: 16px 0 0">
+    <h4 class="cgcode_css-tt3ivf-Title">7. 2026题目七：嵌套循环连接及其优化</h4>
+  </div>
+  <div class="cgcode_content__1Y2H">
+    <div class="cgcode_notranslate">
+      <div
+        class="cgProblemContentClass"
+        id="cgmdassignProContent3187431"
+        style=""
+      >
+        <div
+          class="cherry clearfix theme__default cherry--no-toolbar"
+          data-toolbar-theme="dark"
+          data-inline-code-theme="red"
+          data-code-block-theme="default"
+        >
+          <div
+            class="cherry-previewer cherry-markdown theme__default cherry-preview--full"
+            style="width: 100%"
+          >
+            <p
+              data-sign="451b4e9cc20026c29773c91c27f27df01"
+              data-type="p"
+              data-lines="1"
+            >
+              <strong>前置题目</strong>：存储管理、B+树索引、查询执行
+            </p>
+            <p
+              data-sign="d0bfe9b31000d3b775aa987e6e7bf31c2"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>题目种类</strong>：基础功能
+            </p>
+            <p
+              data-sign="0a418504fac0f520acf56f4993a51f792"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>推荐知识点</strong>：查询优化、运行时统计
+            </p>
+            <p
+              data-sign="693f268f2a2d5996680aa9981ef043452"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>大赛框架</strong>：<a
+                href="https://gitlab.eduxiji.net/csc1/csc-db/db2026/-/tree/main/rmdb"
+                title="https://gitlab.eduxiji.net/csc1/csc-db/db2026/-/tree/main/rmdb"
+                >https://gitlab.eduxiji.net/csc1/csc-db/db2026/-/tree/main/rmdb</a
+              >
+            </p>
+            <hr data-sign="hr2" data-lines="2" />
+            <h2
+              id="1-%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0"
+              data-sign="4f0c46dba48982b3fcb5d04eac3b7618"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#1-%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0"
+              ></a
+              >1. 题目描述
+            </h2>
+            <p
+              data-sign="b8c2e7b64ac6595d86dedf5ce3ab136b2"
+              data-type="p"
+              data-lines="2"
+            >
+              在数据库系统中，连接 (Join)
+              操作的效率直接决定了复杂查询的响应速度。本题要求选手实现从基础的嵌套循环连接到索引嵌套循环连接的物理执行路径优化。
+            </p>
+            <h3
+              id="11-%E5%B5%8C%E5%A5%97%E5%BE%AA%E7%8E%AF%E8%BF%9E%E6%8E%A5-nested-loop-join-nlj"
+              data-sign="e9d0eaeeada7cea2db1af8bcdcc74e9b"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#11-%E5%B5%8C%E5%A5%97%E5%BE%AA%E7%8E%AF%E8%BF%9E%E6%8E%A5-nested-loop-join-nlj"
+              ></a
+              >1.1 嵌套循环连接 (Nested Loop Join, NLJ)
+            </h3>
+            <p
+              data-sign="e0b1c1a3cc15bb23e356019c787bca172"
+              data-type="p"
+              data-lines="2"
+            >
+              基础的
+              <strong>Nested Loop Join</strong>
+              采用双层循环嵌套的逻辑。对于外表（驱动表）
+              <span
+                class="Cherry-InlineMath"
+                data-type="mathBlock"
+                data-lines="2"
+                ><span class="katex"
+                  ><span class="katex-mathml"
+                    ><math xmlns="http://www.w3.org/1998/Math/MathML"
+                      ><semantics
+                        ><mrow><mi>R</mi></mrow
+                        ><annotation encoding="application/x-tex"
+                          >R</annotation
+                        ></semantics
+                      ></math
+                    ></span
+                  ><span class="katex-html" aria-hidden="true"
+                    ><span class="base"
+                      ><span class="strut" style="height: 0.6833em"></span
+                      ><span
+                        class="mord mathnormal"
+                        style="margin-right: 0.00773em"
+                        >R</span
+                      ></span
+                    ></span
+                  ></span
+                ></span
+              >
+              中的每一行元组
+              <span
+                class="Cherry-InlineMath"
+                data-type="mathBlock"
+                data-lines="2"
+                ><span class="katex"
+                  ><span class="katex-mathml"
+                    ><math xmlns="http://www.w3.org/1998/Math/MathML"
+                      ><semantics
+                        ><mrow><mi>r</mi></mrow
+                        ><annotation encoding="application/x-tex"
+                          >r</annotation
+                        ></semantics
+                      ></math
+                    ></span
+                  ><span class="katex-html" aria-hidden="true"
+                    ><span class="base"
+                      ><span class="strut" style="height: 0.4306em"></span
+                      ><span
+                        class="mord mathnormal"
+                        style="margin-right: 0.02778em"
+                        >r</span
+                      ></span
+                    ></span
+                  ></span
+                ></span
+              >，算子都会触发内表（被驱动表）
+              <span
+                class="Cherry-InlineMath"
+                data-type="mathBlock"
+                data-lines="2"
+                ><span class="katex"
+                  ><span class="katex-mathml"
+                    ><math xmlns="http://www.w3.org/1998/Math/MathML"
+                      ><semantics
+                        ><mrow><mi>S</mi></mrow
+                        ><annotation encoding="application/x-tex"
+                          >S</annotation
+                        ></semantics
+                      ></math
+                    ></span
+                  ><span class="katex-html" aria-hidden="true"
+                    ><span class="base"
+                      ><span class="strut" style="height: 0.6833em"></span
+                      ><span
+                        class="mord mathnormal"
+                        style="margin-right: 0.05764em"
+                        >S</span
+                      ></span
+                    ></span
+                  ></span
+                ></span
+              >
+              的一次<strong>全量扫描</strong>。
+            </p>
+            <p
+              data-sign="6487553d132ae1d775b8a08bac271b672"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>逻辑伪代码实现</strong>：
+            </p>
+            <div
+              data-sign="890fefe3d2b8a2db858eefe69a49c69e"
+              data-type="codeBlock"
+              data-lines="7"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="python"
+            >
+              <pre
+                class="language-python"
+              ><code class="language-python wrap"><span class="code-line"><span class="token keyword">for</span> tuple_r <span class="token keyword">in</span> R<span class="token punctuation">:</span>          <span class="token comment"># 外层循环 (驱动表)</span></span>
+<span class="code-line">    <span class="token keyword">for</span> tuple_s <span class="token keyword">in</span> S<span class="token punctuation">:</span>      <span class="token comment"># 内层循环 (被驱动表)</span></span>
+<span class="code-line">        <span class="token keyword">if</span> condition<span class="token punctuation">(</span>r<span class="token punctuation">,</span> s<span class="token punctuation">)</span><span class="token punctuation">:</span></span>
+<span class="code-line">            output<span class="token punctuation">(</span>r<span class="token punctuation">,</span> s<span class="token punctuation">)</span></span></code></pre>
+            </div>
+            <ul
+              data-lines="4"
+              data-sign="cf4063ce1a891335c6f75a0826aa4685"
+              class="cherry-list__square"
+            >
+              <li class="cherry-list-item">
+                <p>
+                  <strong>原理</strong>：通过笛卡尔积式的遍历，对每一对
+                  <span
+                    class="Cherry-InlineMath"
+                    data-type="mathBlock"
+                    data-lines="2"
+                    ><span class="katex"
+                      ><span class="katex-mathml"
+                        ><math xmlns="http://www.w3.org/1998/Math/MathML"
+                          ><semantics
+                            ><mrow
+                              ><mo stretchy="false">(</mo><mi>r</mi
+                              ><mo separator="true">,</mo><mi>s</mi
+                              ><mo stretchy="false">)</mo></mrow
+                            ><annotation encoding="application/x-tex"
+                              >(r, s)</annotation
+                            ></semantics
+                          ></math
+                        ></span
+                      ><span class="katex-html" aria-hidden="true"
+                        ><span class="base"
+                          ><span
+                            class="strut"
+                            style="height: 1em; vertical-align: -0.25em"
+                          ></span
+                          ><span class="mopen">(</span
+                          ><span
+                            class="mord mathnormal"
+                            style="margin-right: 0.02778em"
+                            >r</span
+                          ><span class="mpunct">,</span
+                          ><span
+                            class="mspace"
+                            style="margin-right: 0.1667em"
+                          ></span
+                          ><span class="mord mathnormal">s</span
+                          ><span class="mclose">)</span></span
+                        ></span
+                      ></span
+                    ></span
+                  >
+                  元组应用连接谓词。
+                </p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  <strong>复杂度</strong>：若表规模分别为
+                  <span
+                    class="Cherry-InlineMath"
+                    data-type="mathBlock"
+                    data-lines="2"
+                    ><span class="katex"
+                      ><span class="katex-mathml"
+                        ><math xmlns="http://www.w3.org/1998/Math/MathML"
+                          ><semantics
+                            ><mrow><mi>N</mi></mrow
+                            ><annotation encoding="application/x-tex"
+                              >N</annotation
+                            ></semantics
+                          ></math
+                        ></span
+                      ><span class="katex-html" aria-hidden="true"
+                        ><span class="base"
+                          ><span class="strut" style="height: 0.6833em"></span
+                          ><span
+                            class="mord mathnormal"
+                            style="margin-right: 0.10903em"
+                            >N</span
+                          ></span
+                        ></span
+                      ></span
+                    ></span
+                  >
+                  和
+                  <span
+                    class="Cherry-InlineMath"
+                    data-type="mathBlock"
+                    data-lines="2"
+                    ><span class="katex"
+                      ><span class="katex-mathml"
+                        ><math xmlns="http://www.w3.org/1998/Math/MathML"
+                          ><semantics
+                            ><mrow><mi>M</mi></mrow
+                            ><annotation encoding="application/x-tex"
+                              >M</annotation
+                            ></semantics
+                          ></math
+                        ></span
+                      ><span class="katex-html" aria-hidden="true"
+                        ><span class="base"
+                          ><span class="strut" style="height: 0.6833em"></span
+                          ><span
+                            class="mord mathnormal"
+                            style="margin-right: 0.10903em"
+                            >M</span
+                          ></span
+                        ></span
+                      ></span
+                    ></span
+                  >，则时间复杂度为
+                  <span
+                    class="Cherry-InlineMath"
+                    data-type="mathBlock"
+                    data-lines="2"
+                    ><span class="katex"
+                      ><span class="katex-mathml"
+                        ><math xmlns="http://www.w3.org/1998/Math/MathML"
+                          ><semantics
+                            ><mrow
+                              ><mi>O</mi><mo stretchy="false">(</mo><mi>N</mi
+                              ><mo>×</mo><mi>M</mi
+                              ><mo stretchy="false">)</mo></mrow
+                            ><annotation encoding="application/x-tex"
+                              >O(N \times M)</annotation
+                            ></semantics
+                          ></math
+                        ></span
+                      ><span class="katex-html" aria-hidden="true"
+                        ><span class="base"
+                          ><span
+                            class="strut"
+                            style="height: 1em; vertical-align: -0.25em"
+                          ></span
+                          ><span
+                            class="mord mathnormal"
+                            style="margin-right: 0.02778em"
+                            >O</span
+                          ><span class="mopen">(</span
+                          ><span
+                            class="mord mathnormal"
+                            style="margin-right: 0.10903em"
+                            >N</span
+                          ><span
+                            class="mspace"
+                            style="margin-right: 0.2222em"
+                          ></span
+                          ><span class="mbin">×</span
+                          ><span
+                            class="mspace"
+                            style="margin-right: 0.2222em"
+                          ></span></span
+                        ><span class="base"
+                          ><span
+                            class="strut"
+                            style="height: 1em; vertical-align: -0.25em"
+                          ></span
+                          ><span
+                            class="mord mathnormal"
+                            style="margin-right: 0.10903em"
+                            >M</span
+                          ><span class="mclose">)</span></span
+                        ></span
+                      ></span
+                    ></span
+                  >。
+                </p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  <strong>执行特征</strong>：内侧 Scan 节点表现为
+                  <code>SeqScan</code>，被调用次数等于外表的行数。
+                </p>
+              </li>
+            </ul>
+            <h3
+              id="12-%E7%B4%A2%E5%BC%95%E5%B5%8C%E5%A5%97%E5%BE%AA%E7%8E%AF%E8%BF%9E%E6%8E%A5-index-nested-loop-join-inlj"
+              data-sign="e71b667a1a49e4f12a218b34a49f180e"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#12-%E7%B4%A2%E5%BC%95%E5%B5%8C%E5%A5%97%E5%BE%AA%E7%8E%AF%E8%BF%9E%E6%8E%A5-index-nested-loop-join-inlj"
+              ></a
+              >1.2 索引嵌套循环连接 (Index Nested Loop Join, INLJ)
+            </h3>
+            <p
+              data-sign="d57a02313167df73f53520b7e9444fd72"
+              data-type="p"
+              data-lines="2"
+            >
+              在本题中，当内表的连接属性存在唯一索引时，可以利用索引将内层的全量扫描优化为索引点查，即<strong
+                >Index Nested Loop Join</strong
+              >。
+            </p>
+            <ul
+              data-lines="4"
+              data-sign="43055111dbbf9dc92b66d84b6f443106"
+              class="cherry-list__square"
+            >
+              <li class="cherry-list-item">
+                <p>
+                  <strong>原理</strong>：外表每读取一行，提取连接键值 (Join
+                  Key)，直接作为参数传递给内层的索引扫描接口。系统仅检索与该键值匹配的特定行，而非扫描整张表。
+                </p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  <strong>复杂度</strong>：时间复杂度优化为
+                  <span
+                    class="Cherry-InlineMath"
+                    data-type="mathBlock"
+                    data-lines="2"
+                    ><span class="katex"
+                      ><span class="katex-mathml"
+                        ><math xmlns="http://www.w3.org/1998/Math/MathML"
+                          ><semantics
+                            ><mrow
+                              ><mi>O</mi><mo stretchy="false">(</mo><mi>N</mi
+                              ><mo>×</mo><mi>log</mi><mo>⁡</mo><mi>M</mi
+                              ><mo stretchy="false">)</mo></mrow
+                            ><annotation encoding="application/x-tex"
+                              >O(N \times \log M)</annotation
+                            ></semantics
+                          ></math
+                        ></span
+                      ><span class="katex-html" aria-hidden="true"
+                        ><span class="base"
+                          ><span
+                            class="strut"
+                            style="height: 1em; vertical-align: -0.25em"
+                          ></span
+                          ><span
+                            class="mord mathnormal"
+                            style="margin-right: 0.02778em"
+                            >O</span
+                          ><span class="mopen">(</span
+                          ><span
+                            class="mord mathnormal"
+                            style="margin-right: 0.10903em"
+                            >N</span
+                          ><span
+                            class="mspace"
+                            style="margin-right: 0.2222em"
+                          ></span
+                          ><span class="mbin">×</span
+                          ><span
+                            class="mspace"
+                            style="margin-right: 0.2222em"
+                          ></span></span
+                        ><span class="base"
+                          ><span
+                            class="strut"
+                            style="height: 1em; vertical-align: -0.25em"
+                          ></span
+                          ><span class="mop"
+                            >lo<span style="margin-right: 0.01389em"
+                              >g</span
+                            ></span
+                          ><span
+                            class="mspace"
+                            style="margin-right: 0.1667em"
+                          ></span
+                          ><span
+                            class="mord mathnormal"
+                            style="margin-right: 0.10903em"
+                            >M</span
+                          ><span class="mclose">)</span></span
+                        ></span
+                      ></span
+                    ></span
+                  >。对于大数据量，这种优化将带来量级的性能提升。
+                </p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  <strong>执行特征</strong>：内侧 Scan 节点自动切换为
+                  <code>IndexScan</code
+                  >，且内表算子由基础的全表遍历切换为基于索引的遍历。
+                </p>
+              </li>
+            </ul>
+            <h3
+              id="13-%E6%9C%AC%E9%A2%98%E7%BA%A6%E6%9D%9F%E4%B8%8E%E8%BE%93%E5%87%BA%E7%BA%A6%E5%AE%9A"
+              data-sign="25b1d28a860c6f9e5a9d78d4bdf3d1dc"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#13-%E6%9C%AC%E9%A2%98%E7%BA%A6%E6%9D%9F%E4%B8%8E%E8%BE%93%E5%87%BA%E7%BA%A6%E5%AE%9A"
+              ></a
+              >1.3 本题约束与输出约定
+            </h3>
+            <p
+              data-sign="631c20341e0f82166591b29c786780872"
+              data-type="p"
+              data-lines="2"
+            >
+              本题考察两表及多表等值内连接，需要选手支持普通
+              <code>SELECT ... FROM ... JOIN ... ON ...</code> 查询和
+              <code>EXPLAIN ANALYZE SELECT ... FROM ... JOIN ... ON ...</code>
+              查询。完整语法形式如下：
+            </p>
+            <div
+              data-sign="a0826e0841f7bdd8b91599caf31a92ee"
+              data-type="codeBlock"
+              data-lines="12"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="sql"
+            >
+              <pre
+                class="language-sql"
+              ><code class="language-sql wrap"><span class="code-line"><span class="token keyword">SELECT</span> table1<span class="token punctuation">.</span>column1<span class="token punctuation">,</span> table2<span class="token punctuation">.</span>column2<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span></span>
+<span class="code-line"><span class="token keyword">FROM</span> table1</span>
+<span class="code-line"><span class="token keyword">JOIN</span> table2 <span class="token keyword">ON</span> table1<span class="token punctuation">.</span>join_column <span class="token operator">=</span> table2<span class="token punctuation">.</span>join_column <span class="token punctuation">[</span><span class="token operator">AND</span> table1<span class="token punctuation">.</span><span class="token keyword">column</span> <span class="token operator">=</span> table2<span class="token punctuation">.</span><span class="token keyword">column</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span></span>
+<span class="code-line"><span class="token punctuation">[</span><span class="token keyword">JOIN</span> table3 <span class="token keyword">ON</span> table1<span class="token punctuation">.</span>join_column <span class="token operator">=</span> table3<span class="token punctuation">.</span>join_column <span class="token punctuation">[</span><span class="token operator">AND</span> table1<span class="token punctuation">.</span><span class="token keyword">column</span> <span class="token operator">=</span> table3<span class="token punctuation">.</span><span class="token keyword">column</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">EXPLAIN</span> <span class="token keyword">ANALYZE</span> <span class="token keyword">SELECT</span> table1<span class="token punctuation">.</span>column1<span class="token punctuation">,</span> table2<span class="token punctuation">.</span>column2<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span></span>
+<span class="code-line"><span class="token keyword">FROM</span> table1</span>
+<span class="code-line"><span class="token keyword">JOIN</span> table2 <span class="token keyword">ON</span> table1<span class="token punctuation">.</span>join_column <span class="token operator">=</span> table2<span class="token punctuation">.</span>join_column <span class="token punctuation">[</span><span class="token operator">AND</span> table1<span class="token punctuation">.</span><span class="token keyword">column</span> <span class="token operator">=</span> table2<span class="token punctuation">.</span><span class="token keyword">column</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span></span>
+<span class="code-line"><span class="token punctuation">[</span><span class="token keyword">JOIN</span> table3 <span class="token keyword">ON</span> table1<span class="token punctuation">.</span>join_column <span class="token operator">=</span> table3<span class="token punctuation">.</span>join_column <span class="token punctuation">[</span><span class="token operator">AND</span> table1<span class="token punctuation">.</span><span class="token keyword">column</span> <span class="token operator">=</span> table3<span class="token punctuation">.</span><span class="token keyword">column</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span><span class="token punctuation">;</span></span></code></pre>
+            </div>
+            <p
+              data-sign="0646e087483a43e93e64b18a22034ddd2"
+              data-type="p"
+              data-lines="2"
+            >
+              每个 <code>JOIN ... ON</code> 只包含表列之间的等值连接条件，例如
+              <code>a.id = b.a_id</code>；多个连接条件可用
+              <code>AND</code> 连接。
+            </p>
+            <p
+              data-sign="8db74c6012a6973b1cded48cc3fd1eac2"
+              data-type="p"
+              data-lines="2"
+            >
+              嵌套循环连接的执行形态固定为左深树：<code
+                >表1 JOIN 表2 JOIN 表3</code
+              >
+              按
+              <code>((表1 JOIN 表2) JOIN 表3)</code>
+              执行。第一个表是初始外表/驱动表；每遇到一个新的
+              <code>JOIN 右表 ON ...</code>，当前已经得到的左侧 Join
+              结果作为外表/驱动输入，<code>右表</code> 作为内表/被驱动输入。例如
+              <code>FROM a JOIN b ON a.id=b.a_id JOIN c ON a.id=c.a_id</code>
+              的执行树为 <code>(a JOIN b) JOIN c</code>，其中第二层 Join
+              的外表是 <code>a JOIN b</code> 的结果，内表是 <code>c</code>。
+            </p>
+            <p
+              data-sign="1aeefa3a87d4f4408be706d9f02469f22"
+              data-type="p"
+              data-lines="2"
+            >
+              索引创建语法与前置题目保持一致，且本题只涉及单列建索引形式：
+            </p>
+            <div
+              data-sign="f4bc9d8927d5ee65feeb763a972e89e8"
+              data-type="codeBlock"
+              data-lines="4"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="sql"
+            >
+              <pre
+                class="language-sql"
+              ><code class="language-sql wrap"><span class="code-line"><span class="token keyword">CREATE</span> <span class="token keyword">INDEX</span> table_name<span class="token punctuation">(</span>column_name<span class="token punctuation">)</span><span class="token punctuation">;</span></span></code></pre>
+            </div>
+            <p
+              data-sign="de5220f8ccba522a325e2206f8e72a642"
+              data-type="p"
+              data-lines="2"
+            >
+              INLJ 阶段只会在各级 Join
+              的右侧内表连接列上建索引，并且保证这些索引列取值唯一。
+            </p>
+            <p
+              data-sign="9ecbac23f4f39aa643045d4d376ef0ed2"
+              data-type="p"
+              data-lines="2"
+            >
+              <code>EXPLAIN ANALYZE</code>
+              的输出为文本形式的执行计划与运行时统计，不输出该查询本身的结果集。每个计划节点的
+              <code>rows=N</code> 表示该节点本次执行时涉及的总行数。在 NLJ
+              中右表作为内表会被左表重复扫描，因此右侧
+              <code>SeqScan rows</code> 可以累计到
+              <code>左表行数 × 右表行数</code>；在 INLJ
+              中使用右表唯一索引进行点查时，右侧
+              <code>IndexScan rows</code> 只统计命中的行数。
+            </p>
+            <p
+              data-sign="796a02d3c2e98533167fafc22766d1212"
+              data-type="p"
+              data-lines="2"
+            >
+              本题中 <code>EXPLAIN ANALYZE</code> 中的算子输出规范如下：
+            </p>
+            <div
+              class="cherry-table-container"
+              data-sign="45513cf375222aa634ad7f2157aedaed6"
+              data-lines="6"
+            >
+              <table class="cherry-table">
+                <thead>
+                  <tr>
+                    <th>节点类型</th>
+                    <th>格式</th>
+                    <th>备注</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Scan 节点</td>
+                    <td>
+                      <code>Scan(table=表名, type=SeqScan, rows=行数)</code> 或
+                      <code
+                        >Scan(table=表名, type=IndexScan, using_index=(列名),
+                        rows=行数)</code
+                      >
+                    </td>
+                    <td>
+                      叶节点。必须指明
+                      <code>type</code>；使用索引时必须指明索引列
+                      <code>using_index=(列名)</code>。
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Project 节点</td>
+                    <td>
+                      <code
+                        >Project(columns=[表名1.列名1,表名2.列名2,...],
+                        rows=行数)</code
+                      >
+                    </td>
+                    <td>
+                      <code>SELECT</code> 语句根节点一定是 Project
+                      节点；此节点的列名输出时采用
+                      <code>表名.列名</code> 形式，输出顺序为
+                      <code>表名.列名</code>
+                      按字典序排序，当需要保留全部列时输出
+                      <code>Project(columns=[*], rows=行数)</code>。
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Join 节点</td>
+                    <td>
+                      <code
+                        >Join(tables=[表名1,表名2,...],
+                        condition=[条件1,条件2,...], rows=行数)</code
+                      >
+                    </td>
+                    <td>
+                      表名为该节点下所有表的集合，并按字母顺序排序；连接条件属于
+                      Join 节点，多个连接条件按字典序排序。
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p
+              data-sign="cceea44968138a7c4a3598006f3f76722"
+              data-type="p"
+              data-lines="2"
+            >
+              计划树输出时，根节点行首不缩进，每深入一层在行首增加一个制表符
+              <code>\t</code>，同一层级节点使用相同数量的
+              <code>\t</code> 缩进，不使用空格代替制表符。Join
+              节点的两个子树按照实际执行顺序输出，左侧子树表示外表或已经连接得到的中间结果，右侧子树表示内表。
+            </p>
+            <hr data-sign="hr2" data-lines="2" />
+            <h2
+              id="2-%E8%AF%84%E5%88%86%E6%A0%87%E5%87%86"
+              data-sign="ad970a619d5e6428a001ef63ddad1e00"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#2-%E8%AF%84%E5%88%86%E6%A0%87%E5%87%86"
+              ></a
+              >2. 评分标准
+            </h2>
+            <div
+              class="cherry-table-container"
+              data-sign="b28af873f7dff54387fa05c711b0ebf58"
+              data-lines="8"
+            >
+              <table class="cherry-table">
+                <thead>
+                  <tr>
+                    <th>测试点</th>
+                    <th>场景</th>
+                    <th>分值</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>test1</td>
+                    <td>两表基础全匹配</td>
+                    <td>20%</td>
+                  </tr>
+                  <tr>
+                    <td>test2</td>
+                    <td>两表部分匹配</td>
+                    <td>20%</td>
+                  </tr>
+                  <tr>
+                    <td>test3</td>
+                    <td>两表完全不匹配</td>
+                    <td>20%</td>
+                  </tr>
+                  <tr>
+                    <td>test4</td>
+                    <td>两表大数据部分匹配，并比较 INLJ 与 NLJ 的性能差异</td>
+                    <td>20%</td>
+                  </tr>
+                  <tr>
+                    <td>test5</td>
+                    <td>五表等值连接</td>
+                    <td>20%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p
+              data-sign="90e88a7ba89367991d46dd7e85c6955a2"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong
+                ><em
+                  >每个测试点都会分别执行无索引 NLJ 阶段和建索引后的 INLJ
+                  阶段，检查普通 <code>SELECT</code> 结果和
+                  <code>EXPLAIN ANALYZE</code> 计划输出。在
+                  <code>test4</code> 中 当
+                  <span
+                    class="Cherry-InlineMath"
+                    data-type="mathBlock"
+                    data-lines="2"
+                    ><span class="katex"
+                      ><span class="katex-mathml"
+                        ><math xmlns="http://www.w3.org/1998/Math/MathML"
+                          ><semantics
+                            ><mrow
+                              ><msub
+                                ><mi>t</mi
+                                ><mrow
+                                  ><mi>I</mi><mi>N</mi><mi>L</mi
+                                  ><mi>J</mi></mrow
+                                ></msub
+                              ><mi mathvariant="normal">/</mi
+                              ><msub
+                                ><mi>t</mi
+                                ><mrow
+                                  ><mi>N</mi><mi>L</mi><mi>J</mi></mrow
+                                ></msub
+                              ></mrow
+                            ><annotation encoding="application/x-tex"
+                              >t_{INLJ} / t_{NLJ}</annotation
+                            ></semantics
+                          ></math
+                        ></span
+                      ><span class="katex-html" aria-hidden="true"
+                        ><span class="base"
+                          ><span
+                            class="strut"
+                            style="height: 1em; vertical-align: -0.25em"
+                          ></span
+                          ><span class="mord"
+                            ><span class="mord mathnormal">t</span
+                            ><span class="msupsub"
+                              ><span class="vlist-t vlist-t2"
+                                ><span class="vlist-r"
+                                  ><span class="vlist" style="height: 0.3283em"
+                                    ><span
+                                      style="
+                                        top: -2.55em;
+                                        margin-left: 0em;
+                                        margin-right: 0.05em;
+                                      "
+                                      ><span
+                                        class="pstrut"
+                                        style="height: 2.7em"
+                                      ></span
+                                      ><span
+                                        class="sizing reset-size6 size3 mtight"
+                                        ><span class="mord mtight"
+                                          ><span
+                                            class="mord mathnormal mtight"
+                                            style="margin-right: 0.07847em"
+                                            >I</span
+                                          ><span
+                                            class="mord mathnormal mtight"
+                                            style="margin-right: 0.10903em"
+                                            >N</span
+                                          ><span class="mord mathnormal mtight"
+                                            >L</span
+                                          ><span
+                                            class="mord mathnormal mtight"
+                                            style="margin-right: 0.09618em"
+                                            >J</span
+                                          ></span
+                                        ></span
+                                      ></span
+                                    ></span
+                                  ><span class="vlist-s">​</span></span
+                                ><span class="vlist-r"
+                                  ><span class="vlist" style="height: 0.15em"
+                                    ><span></span></span></span></span></span></span
+                          ><span class="mord">/</span
+                          ><span class="mord"
+                            ><span class="mord mathnormal">t</span
+                            ><span class="msupsub"
+                              ><span class="vlist-t vlist-t2"
+                                ><span class="vlist-r"
+                                  ><span class="vlist" style="height: 0.3283em"
+                                    ><span
+                                      style="
+                                        top: -2.55em;
+                                        margin-left: 0em;
+                                        margin-right: 0.05em;
+                                      "
+                                      ><span
+                                        class="pstrut"
+                                        style="height: 2.7em"
+                                      ></span
+                                      ><span
+                                        class="sizing reset-size6 size3 mtight"
+                                        ><span class="mord mtight"
+                                          ><span
+                                            class="mord mathnormal mtight"
+                                            style="margin-right: 0.10903em"
+                                            >N</span
+                                          ><span class="mord mathnormal mtight"
+                                            >L</span
+                                          ><span
+                                            class="mord mathnormal mtight"
+                                            style="margin-right: 0.09618em"
+                                            >J</span
+                                          ></span
+                                        ></span
+                                      ></span
+                                    ></span
+                                  ><span class="vlist-s">​</span></span
+                                ><span class="vlist-r"
+                                  ><span class="vlist" style="height: 0.15em"
+                                    ><span></span></span></span></span></span></span></span></span></span
+                  ></span>
+                  &lt; 0.5 时评定为性能达标</em
+                ></strong
+              >。
+            </p>
+            <hr data-sign="hr2" data-lines="2" />
+            <h2
+              id="3-%E6%B5%8B%E8%AF%84%E7%A4%BA%E4%BE%8B"
+              data-sign="63495609694ee03269eddbc0ae74badb"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#3-%E6%B5%8B%E8%AF%84%E7%A4%BA%E4%BE%8B"
+              ></a
+              >3. 测评示例
+            </h2>
+            <h3
+              id="31-%E5%8F%8C%E8%A1%A8%E8%BF%9E%E6%8E%A5%E7%A4%BA%E4%BE%8B"
+              data-sign="3b7f01e83061cc5d9b57de15622482ab"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#31-%E5%8F%8C%E8%A1%A8%E8%BF%9E%E6%8E%A5%E7%A4%BA%E4%BE%8B"
+              ></a
+              >3.1 双表连接示例
+            </h3>
+            <h4
+              id="311-%E6%95%B0%E6%8D%AE%E5%87%86%E5%A4%87"
+              data-sign="6e36760fbfcc22c51c4606af340e7d62"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#311-%E6%95%B0%E6%8D%AE%E5%87%86%E5%A4%87"
+              ></a
+              >3.1.1 数据准备
+            </h4>
+            <div
+              data-sign="6a04edaeecd1816e690c0005f95ba9b6"
+              data-type="codeBlock"
+              data-lines="17"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="sql"
+            >
+              <pre
+                class="language-sql"
+              ><code class="language-sql wrap"><span class="code-line"><span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> departments <span class="token punctuation">(</span>dept_id <span class="token keyword">int</span><span class="token punctuation">,</span> dept_name <span class="token keyword">char</span><span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> employees <span class="token punctuation">(</span>emp_id <span class="token keyword">int</span><span class="token punctuation">,</span> dept_id <span class="token keyword">int</span><span class="token punctuation">,</span> emp_name <span class="token keyword">char</span><span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">,</span> salary <span class="token keyword">int</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> departments <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token string">'Finance'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> departments <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">,</span> <span class="token string">'HR'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> departments <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">30</span><span class="token punctuation">,</span> <span class="token string">'Sales'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> departments <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">40</span><span class="token punctuation">,</span> <span class="token string">'Engineering'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> departments <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">50</span><span class="token punctuation">,</span> <span class="token string">'Marketing'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> employees <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">,</span> <span class="token string">'Alice'</span><span class="token punctuation">,</span> <span class="token number">65000</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> employees <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">20</span><span class="token punctuation">,</span> <span class="token string">'Bob'</span><span class="token punctuation">,</span> <span class="token number">48000</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> employees <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">30</span><span class="token punctuation">,</span> <span class="token string">'Charlie'</span><span class="token punctuation">,</span> <span class="token number">52000</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> employees <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">40</span><span class="token punctuation">,</span> <span class="token string">'Diana'</span><span class="token punctuation">,</span> <span class="token number">70000</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> employees <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">50</span><span class="token punctuation">,</span> <span class="token string">'Eve'</span><span class="token punctuation">,</span> <span class="token number">55000</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span></code></pre>
+            </div>
+            <p
+              data-sign="1d4000521fc78f5ac241bf6cf63e73eb2"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>说明</strong>：
+            </p>
+            <ul
+              data-lines="3"
+              data-sign="2569b136df4d1731a29e16313970f86a"
+              class="cherry-list__default"
+            >
+              <li class="cherry-list-item">
+                <p>
+                  <code>departments</code> 表（左表/驱动表）5 行，<code
+                    >dept_id</code
+                  >
+                  为部门编号。
+                </p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  <code>employees</code> 表（右表/被驱动表）5
+                  行，每个员工属于唯一部门，<code>dept_id</code> 值各不相同。
+                </p>
+              </li>
+              <li class="cherry-list-item">
+                <p>JOIN 结果为一一对应，共 5 行。</p>
+              </li>
+            </ul>
+            <h4
+              id="312-%E6%97%A0%E7%B4%A2%E5%BC%95%EF%BC%9Anlj"
+              data-sign="246ebc0daca7854cf3fc72e5b8b87f02"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#312-%E6%97%A0%E7%B4%A2%E5%BC%95%EF%BC%9Anlj"
+              ></a
+              >3.1.2 无索引：NLJ
+            </h4>
+            <p
+              data-sign="8df33bda4d52dc2a8f2cb6b66930524b2"
+              data-type="p"
+              data-lines="2"
+            >
+              执行如下命令，先确认结果正确性，再观察执行计划：
+            </p>
+            <div
+              data-sign="d2008d3937ac27a0c61f79ee870a07c5"
+              data-type="codeBlock"
+              data-lines="6"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="sql"
+            >
+              <pre
+                class="language-sql"
+              ><code class="language-sql wrap"><span class="code-line"><span class="token keyword">SELECT</span> departments<span class="token punctuation">.</span>dept_name<span class="token punctuation">,</span> employees<span class="token punctuation">.</span>emp_name <span class="token keyword">FROM</span> departments <span class="token keyword">JOIN</span> employees <span class="token keyword">ON</span> departments<span class="token punctuation">.</span>dept_id <span class="token operator">=</span> employees<span class="token punctuation">.</span>dept_id<span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">EXPLAIN</span> <span class="token keyword">ANALYZE</span> <span class="token keyword">SELECT</span> departments<span class="token punctuation">.</span>dept_name<span class="token punctuation">,</span> employees<span class="token punctuation">.</span>emp_name <span class="token keyword">FROM</span> departments <span class="token keyword">JOIN</span> employees <span class="token keyword">ON</span> departments<span class="token punctuation">.</span>dept_id <span class="token operator">=</span> employees<span class="token punctuation">.</span>dept_id<span class="token punctuation">;</span></span></code></pre>
+            </div>
+            <p
+              data-sign="bd54aea9721ff0d2649c7e1d42b572f02"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>SELECT 结果</strong>：
+            </p>
+            <div
+              data-sign="e372fc4409e3f01af886af603955c027"
+              data-type="codeBlock"
+              data-lines="9"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="text"
+            >
+              <pre
+                class="language-text"
+              ><code class="language-text wrap"><span class="code-line">| dept_name | emp_name |</span>
+<span class="code-line">| Finance | Alice |</span>
+<span class="code-line">| HR | Bob |</span>
+<span class="code-line">| Sales | Charlie |</span>
+<span class="code-line">| Engineering | Diana |</span>
+<span class="code-line">| Marketing | Eve |</span></code></pre>
+            </div>
+            <p
+              data-sign="914734ebabc14efc102474eeabc983072"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>EXPLAIN ANALYZE 期望输出</strong>：
+            </p>
+            <div
+              data-sign="1eaa4b05bb309900a19ab50eaf10cdd2"
+              data-type="codeBlock"
+              data-lines="9"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="text"
+            >
+              <pre
+                class="language-text"
+              ><code class="language-text wrap"><span class="code-line">Project(columns=[departments.dept_name, employees.emp_name], rows=5)</span>
+<span class="code-line">    Join(tables=[departments, employees], condition=[departments.dept_id=employees.dept_id], rows=5)</span>
+<span class="code-line">        Project(columns=[departments.dept_id, departments.dept_name], rows=5)</span>
+<span class="code-line">            Scan(table=departments, type=SeqScan, rows=5)</span>
+<span class="code-line">        Project(columns=[employees.dept_id, employees.emp_name], rows=25)</span>
+<span class="code-line">            Scan(table=employees, type=SeqScan, rows=25)</span></code></pre>
+            </div>
+            <p
+              data-sign="1d4000521fc78f5ac241bf6cf63e73eb2"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>说明</strong>：
+            </p>
+            <ul
+              data-lines="4"
+              data-sign="9cefc1062d062f882adb953297962043"
+              class="cherry-list__square"
+            >
+              <li class="cherry-list-item">
+                <p><code>Join rows=5</code>：最终 Join 产出 5 行。</p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  右侧 <code>Scan rows=25</code>：NLJ 中右表作为内表被左表 5
+                  行重复全表扫描，共访问 <code>5 × 5 = 25</code> 行。
+                </p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  没有 <code>WHERE</code> 谓词时，不应输出
+                  <code>Filter</code> 节点；连接条件应出现在
+                  <code>Join(condition=[...])</code> 中。
+                </p>
+              </li>
+            </ul>
+            <h4
+              id="313-%E6%9C%89%E7%B4%A2%E5%BC%95%EF%BC%9Ainlj"
+              data-sign="b3a8309da48c3d7367f2ebcbae80b32d"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#313-%E6%9C%89%E7%B4%A2%E5%BC%95%EF%BC%9Ainlj"
+              ></a
+              >3.1.3 有索引：INLJ
+            </h4>
+            <div
+              data-sign="85d22feef1b9c31f41b4b0e0137b36ef"
+              data-type="codeBlock"
+              data-lines="8"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="sql"
+            >
+              <pre
+                class="language-sql"
+              ><code class="language-sql wrap"><span class="code-line"><span class="token keyword">CREATE</span> <span class="token keyword">INDEX</span> employees<span class="token punctuation">(</span>dept_id<span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">SELECT</span> departments<span class="token punctuation">.</span>dept_name<span class="token punctuation">,</span> employees<span class="token punctuation">.</span>emp_name <span class="token keyword">FROM</span> departments <span class="token keyword">JOIN</span> employees <span class="token keyword">ON</span> departments<span class="token punctuation">.</span>dept_id <span class="token operator">=</span> employees<span class="token punctuation">.</span>dept_id<span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">EXPLAIN</span> <span class="token keyword">ANALYZE</span> <span class="token keyword">SELECT</span> departments<span class="token punctuation">.</span>dept_name<span class="token punctuation">,</span> employees<span class="token punctuation">.</span>emp_name <span class="token keyword">FROM</span> departments <span class="token keyword">JOIN</span> employees <span class="token keyword">ON</span> departments<span class="token punctuation">.</span>dept_id <span class="token operator">=</span> employees<span class="token punctuation">.</span>dept_id<span class="token punctuation">;</span></span></code></pre>
+            </div>
+            <p
+              data-sign="a62f8253165a1edea25ab983e4420ad42"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>SELECT 结果</strong>（与 NLJ 结果相同）：
+            </p>
+            <div
+              data-sign="e372fc4409e3f01af886af603955c027"
+              data-type="codeBlock"
+              data-lines="9"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="text"
+            >
+              <pre
+                class="language-text"
+              ><code class="language-text wrap"><span class="code-line">| dept_name | emp_name |</span>
+<span class="code-line">| Finance | Alice |</span>
+<span class="code-line">| HR | Bob |</span>
+<span class="code-line">| Sales | Charlie |</span>
+<span class="code-line">| Engineering | Diana |</span>
+<span class="code-line">| Marketing | Eve |</span></code></pre>
+            </div>
+            <p
+              data-sign="914734ebabc14efc102474eeabc983072"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>EXPLAIN ANALYZE 期望输出</strong>：
+            </p>
+            <div
+              data-sign="2ec1c80e986f3d96187d9cdc89773f52"
+              data-type="codeBlock"
+              data-lines="9"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="text"
+            >
+              <pre
+                class="language-text"
+              ><code class="language-text wrap"><span class="code-line">Project(columns=[departments.dept_name, employees.emp_name], rows=5)</span>
+<span class="code-line">    Join(tables=[departments, employees], condition=[departments.dept_id=employees.dept_id], rows=5)</span>
+<span class="code-line">        Project(columns=[departments.dept_id, departments.dept_name], rows=5)</span>
+<span class="code-line">            Scan(table=departments, type=SeqScan, rows=5)</span>
+<span class="code-line">        Project(columns=[employees.dept_id, employees.emp_name], rows=5)</span>
+<span class="code-line">            Scan(table=employees, type=IndexScan, using_index=(dept_id), rows=5)</span></code></pre>
+            </div>
+            <p
+              data-sign="1d4000521fc78f5ac241bf6cf63e73eb2"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>说明</strong>：
+            </p>
+            <ul
+              data-lines="4"
+              data-sign="beea0e47f8dd82c2ca14af63250cecf0"
+              class="cherry-list__square"
+            >
+              <li class="cherry-list-item">
+                <p>
+                  <code>Scan type</code> 变为
+                  <code>IndexScan</code>，且使用右表连接列
+                  <code>dept_id</code> 上的索引。
+                </p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  右侧
+                  <code>Scan rows=5</code
+                  >：由于使用了唯一索引点查（Lookup），内表仅根据连接键精确读取匹配行，无需全表扫描。
+                </p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  右表访问行数从 <code>25</code> 降为
+                  <code>5</code>，性能提升显著。
+                </p>
+              </li>
+            </ul>
+            <h3
+              id="32-%E5%A4%9A%E8%A1%A8%E8%BF%9E%E6%8E%A5%E7%A4%BA%E4%BE%8B"
+              data-sign="2b81a78fa368e38f822f01552569d47a"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#32-%E5%A4%9A%E8%A1%A8%E8%BF%9E%E6%8E%A5%E7%A4%BA%E4%BE%8B"
+              ></a
+              >3.2 多表连接示例
+            </h3>
+            <p
+              data-sign="570edcac17d80dea7a1f4f0fb95c1d172"
+              data-type="p"
+              data-lines="2"
+            >
+              此处示例为三表连接查询。
+            </p>
+            <h4
+              id="321-%E6%95%B0%E6%8D%AE%E5%87%86%E5%A4%87"
+              data-sign="6f9a16b7050d396d6bfbaf486e528e8e"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#321-%E6%95%B0%E6%8D%AE%E5%87%86%E5%A4%87"
+              ></a
+              >3.2.1 数据准备
+            </h4>
+            <div
+              data-sign="188d45119f01541cbc9c8f65651e045f"
+              data-type="codeBlock"
+              data-lines="18"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="sql"
+            >
+              <pre
+                class="language-sql"
+              ><code class="language-sql wrap"><span class="code-line"><span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> departments <span class="token punctuation">(</span>dept_id <span class="token keyword">int</span><span class="token punctuation">,</span> dept_name <span class="token keyword">char</span><span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> employees <span class="token punctuation">(</span>emp_id <span class="token keyword">int</span><span class="token punctuation">,</span> dept_id <span class="token keyword">int</span><span class="token punctuation">,</span> emp_name <span class="token keyword">char</span><span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> offices <span class="token punctuation">(</span>office_id <span class="token keyword">int</span><span class="token punctuation">,</span> dept_id <span class="token keyword">int</span><span class="token punctuation">,</span> office_name <span class="token keyword">char</span><span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> departments <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token string">'Finance'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> departments <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">,</span> <span class="token string">'HR'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> departments <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">30</span><span class="token punctuation">,</span> <span class="token string">'Sales'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> employees <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">,</span> <span class="token string">'Alice'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> employees <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">20</span><span class="token punctuation">,</span> <span class="token string">'Bob'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> employees <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">30</span><span class="token punctuation">,</span> <span class="token string">'Charlie'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> offices <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">101</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">,</span> <span class="token string">'HQ'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> offices <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">102</span><span class="token punctuation">,</span> <span class="token number">20</span><span class="token punctuation">,</span> <span class="token string">'Remote'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> offices <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">103</span><span class="token punctuation">,</span> <span class="token number">30</span><span class="token punctuation">,</span> <span class="token string">'Field'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span></code></pre>
+            </div>
+            <h4
+              id="322-%E6%97%A0%E7%B4%A2%E5%BC%95%EF%BC%9Anlj"
+              data-sign="ccc5f7d86037d0701a9606879b68dcf6"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#322-%E6%97%A0%E7%B4%A2%E5%BC%95%EF%BC%9Anlj"
+              ></a
+              >3.2.2 无索引：NLJ
+            </h4>
+            <p
+              data-sign="4fca67a18197475e8d332dcddeb59cb32"
+              data-type="p"
+              data-lines="2"
+            >
+              执行如下命令：
+            </p>
+            <div
+              data-sign="00dd41ad6d7773fdcfaaeeebfc8568df"
+              data-type="codeBlock"
+              data-lines="7"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="sql"
+            >
+              <pre
+                class="language-sql"
+              ><code class="language-sql wrap"><span class="code-line"><span class="token keyword">SELECT</span> departments<span class="token punctuation">.</span>dept_name<span class="token punctuation">,</span> employees<span class="token punctuation">.</span>emp_name<span class="token punctuation">,</span> offices<span class="token punctuation">.</span>office_name</span>
+<span class="code-line"><span class="token keyword">FROM</span> departments</span>
+<span class="code-line"><span class="token keyword">JOIN</span> employees <span class="token keyword">ON</span> departments<span class="token punctuation">.</span>dept_id <span class="token operator">=</span> employees<span class="token punctuation">.</span>dept_id</span>
+<span class="code-line"><span class="token keyword">JOIN</span> offices <span class="token keyword">ON</span> departments<span class="token punctuation">.</span>dept_id <span class="token operator">=</span> offices<span class="token punctuation">.</span>dept_id<span class="token punctuation">;</span></span></code></pre>
+            </div>
+            <p
+              data-sign="bd54aea9721ff0d2649c7e1d42b572f02"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>SELECT 结果</strong>：
+            </p>
+            <div
+              data-sign="4044ecbc035f7e20c1e6c08739a1b3b2"
+              data-type="codeBlock"
+              data-lines="7"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="text"
+            >
+              <pre
+                class="language-text"
+              ><code class="language-text wrap"><span class="code-line">| dept_name | emp_name | office_name |</span>
+<span class="code-line">| Finance | Alice | HQ |</span>
+<span class="code-line">| HR | Bob | Remote |</span>
+<span class="code-line">| Sales | Charlie | Field |</span></code></pre>
+            </div>
+            <p
+              data-sign="988ae305cdff16ca70b22e7aa269ea5e2"
+              data-type="p"
+              data-lines="2"
+            >
+              无索引时的 <code>EXPLAIN ANALYZE</code> 结果如下：
+            </p>
+            <div
+              data-sign="80aea11f7f49c6d8b370e6d7098a1fe6"
+              data-type="codeBlock"
+              data-lines="12"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="text"
+            >
+              <pre
+                class="language-text"
+              ><code class="language-text wrap"><span class="code-line">Project(columns=[departments.dept_name, employees.emp_name, offices.office_name], rows=3)</span>
+<span class="code-line">    Join(tables=[departments, employees, offices], condition=[departments.dept_id=offices.dept_id], rows=3)</span>
+<span class="code-line">        Join(tables=[departments, employees], condition=[departments.dept_id=employees.dept_id], rows=3)</span>
+<span class="code-line">            Project(columns=[departments.dept_id, departments.dept_name], rows=3)</span>
+<span class="code-line">                Scan(table=departments, type=SeqScan, rows=3)</span>
+<span class="code-line">            Project(columns=[employees.dept_id, employees.emp_name], rows=9)</span>
+<span class="code-line">                Scan(table=employees, type=SeqScan, rows=9)</span>
+<span class="code-line">        Project(columns=[offices.dept_id, offices.office_name], rows=9)</span>
+<span class="code-line">            Scan(table=offices, type=SeqScan, rows=9)</span></code></pre>
+            </div>
+            <h4
+              id="323-%E6%9C%89%E7%B4%A2%E5%BC%95%EF%BC%9Ainlj"
+              data-sign="faeb92d1e9372e8233b652ead0c9dc1e"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#323-%E6%9C%89%E7%B4%A2%E5%BC%95%EF%BC%9Ainlj"
+              ></a
+              >3.2.3 有索引：INLJ
+            </h4>
+            <p
+              data-sign="b37fd49c9056f8894b73c34ee291546d2"
+              data-type="p"
+              data-lines="2"
+            >
+              先为每个 Join 层级的右侧内表连接列创建索引：
+            </p>
+            <div
+              data-sign="16c60b20ec7d00141699b5c4071acfdd"
+              data-type="codeBlock"
+              data-lines="15"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="sql"
+            >
+              <pre
+                class="language-sql"
+              ><code class="language-sql wrap"><span class="code-line"><span class="token keyword">CREATE</span> <span class="token keyword">INDEX</span> employees<span class="token punctuation">(</span>dept_id<span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">CREATE</span> <span class="token keyword">INDEX</span> offices<span class="token punctuation">(</span>dept_id<span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">SELECT</span> departments<span class="token punctuation">.</span>dept_name<span class="token punctuation">,</span> employees<span class="token punctuation">.</span>emp_name<span class="token punctuation">,</span> offices<span class="token punctuation">.</span>office_name</span>
+<span class="code-line"><span class="token keyword">FROM</span> departments</span>
+<span class="code-line"><span class="token keyword">JOIN</span> employees <span class="token keyword">ON</span> departments<span class="token punctuation">.</span>dept_id <span class="token operator">=</span> employees<span class="token punctuation">.</span>dept_id</span>
+<span class="code-line"><span class="token keyword">JOIN</span> offices <span class="token keyword">ON</span> departments<span class="token punctuation">.</span>dept_id <span class="token operator">=</span> offices<span class="token punctuation">.</span>dept_id<span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">EXPLAIN</span> <span class="token keyword">ANALYZE</span> <span class="token keyword">SELECT</span> departments<span class="token punctuation">.</span>dept_name<span class="token punctuation">,</span> employees<span class="token punctuation">.</span>emp_name<span class="token punctuation">,</span> offices<span class="token punctuation">.</span>office_name</span>
+<span class="code-line"><span class="token keyword">FROM</span> departments</span>
+<span class="code-line"><span class="token keyword">JOIN</span> employees <span class="token keyword">ON</span> departments<span class="token punctuation">.</span>dept_id <span class="token operator">=</span> employees<span class="token punctuation">.</span>dept_id</span>
+<span class="code-line"><span class="token keyword">JOIN</span> offices <span class="token keyword">ON</span> departments<span class="token punctuation">.</span>dept_id <span class="token operator">=</span> offices<span class="token punctuation">.</span>dept_id<span class="token punctuation">;</span></span></code></pre>
+            </div>
+            <p
+              data-sign="4a65cba8089074ddab7530077727658e2"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>SELECT 结果</strong>（与无索引结果相同）：
+            </p>
+            <div
+              data-sign="4044ecbc035f7e20c1e6c08739a1b3b2"
+              data-type="codeBlock"
+              data-lines="7"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="text"
+            >
+              <pre
+                class="language-text"
+              ><code class="language-text wrap"><span class="code-line">| dept_name | emp_name | office_name |</span>
+<span class="code-line">| Finance | Alice | HQ |</span>
+<span class="code-line">| HR | Bob | Remote |</span>
+<span class="code-line">| Sales | Charlie | Field |</span></code></pre>
+            </div>
+            <p
+              data-sign="d66a4f5cf7ee1335ffd47441e93fc30e2"
+              data-type="p"
+              data-lines="2"
+            >
+              建索引后的 <code>EXPLAIN ANALYZE</code> 结果如下：
+            </p>
+            <div
+              data-sign="8b11bec8c01d0db768d881aac3a3acee"
+              data-type="codeBlock"
+              data-lines="12"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="text"
+            >
+              <pre
+                class="language-text"
+              ><code class="language-text wrap"><span class="code-line">Project(columns=[departments.dept_name, employees.emp_name, offices.office_name], rows=3)</span>
+<span class="code-line">    Join(tables=[departments, employees, offices], condition=[departments.dept_id=offices.dept_id], rows=3)</span>
+<span class="code-line">        Join(tables=[departments, employees], condition=[departments.dept_id=employees.dept_id], rows=3)</span>
+<span class="code-line">            Project(columns=[departments.dept_id, departments.dept_name], rows=3)</span>
+<span class="code-line">                Scan(table=departments, type=SeqScan, rows=3)</span>
+<span class="code-line">            Project(columns=[employees.dept_id, employees.emp_name], rows=3)</span>
+<span class="code-line">                Scan(table=employees, type=IndexScan, using_index=(dept_id), rows=3)</span>
+<span class="code-line">        Project(columns=[offices.dept_id, offices.office_name], rows=3)</span>
+<span class="code-line">            Scan(table=offices, type=IndexScan, using_index=(dept_id), rows=3)</span></code></pre>
+            </div>
+            <h3
+              id="33-%E8%AF%84%E6%B5%8B%E8%AF%B4%E6%98%8E"
+              data-sign="258fbc17f6491cb21b05c5e401514c7e"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#33-%E8%AF%84%E6%B5%8B%E8%AF%B4%E6%98%8E"
+              ></a
+              >3.3 评测说明
+            </h3>
+            <p
+              data-sign="d408c60635d93fb29b6337397471818e2"
+              data-type="p"
+              data-lines="2"
+            >
+              <code>EXPLAIN ANALYZE SELECT ...</code>
+              只向输出文件写入执行计划与统计信息，不再额外写入
+              <code>SELECT</code> 查询结果。
+            </p>
+            <p
+              data-sign="fdd93a10b7e98695ebe329f94d12df2a2"
+              data-type="p"
+              data-lines="2"
+            >
+              评测系统将按照以下流程对选手的提交进行自动化测评：
+            </p>
+            <ol
+              data-lines="3"
+              data-sign="4779d6a2dca4c1e448aedd2b47a83019"
+              start="1"
+              class="cherry-list__default"
+            >
+              <li class="cherry-list-item">
+                <p>
+                  <strong>初始化</strong
+                  >：创建表并导入基准测试数据集，此时不会创建任何辅助索引。
+                </p>
+              </li>
+              <li class="cherry-list-item">
+                <p><strong>NLJ 测试</strong>：</p>
+              </li>
+            </ol>
+            <ul
+              data-lines="4"
+              data-sign="4779d6a2dca4c1e448aedd2b47a83019"
+              class="cherry-list__square"
+            >
+              <li class="cherry-list-item">
+                <p>
+                  执行标准查询并记录耗时
+                  <span
+                    class="Cherry-InlineMath"
+                    data-type="mathBlock"
+                    data-lines="2"
+                    ><span class="katex"
+                      ><span class="katex-mathml"
+                        ><math xmlns="http://www.w3.org/1998/Math/MathML"
+                          ><semantics
+                            ><mrow
+                              ><msub><mi>t</mi><mn>1</mn></msub></mrow
+                            ><annotation encoding="application/x-tex"
+                              >t_1</annotation
+                            ></semantics
+                          ></math
+                        ></span
+                      ><span class="katex-html" aria-hidden="true"
+                        ><span class="base"
+                          ><span
+                            class="strut"
+                            style="height: 0.7651em; vertical-align: -0.15em"
+                          ></span
+                          ><span class="mord"
+                            ><span class="mord mathnormal">t</span
+                            ><span class="msupsub"
+                              ><span class="vlist-t vlist-t2"
+                                ><span class="vlist-r"
+                                  ><span class="vlist" style="height: 0.3011em"
+                                    ><span
+                                      style="
+                                        top: -2.55em;
+                                        margin-left: 0em;
+                                        margin-right: 0.05em;
+                                      "
+                                      ><span
+                                        class="pstrut"
+                                        style="height: 2.7em"
+                                      ></span
+                                      ><span
+                                        class="sizing reset-size6 size3 mtight"
+                                        ><span class="mord mtight"
+                                          >1</span
+                                        ></span
+                                      ></span
+                                    ></span
+                                  ><span class="vlist-s">​</span></span
+                                ><span class="vlist-r"
+                                  ><span class="vlist" style="height: 0.15em"
+                                    ><span></span></span></span></span></span></span></span></span></span></span
+                  >。检查结果集是否正确。
+                </p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  执行
+                  <code>EXPLAIN ANALYZE</code>。检查执行计划是否符合逻辑。<br />
+                </p>
+              </li>
+            </ul>
+            <ol
+              data-lines="3"
+              data-sign="4779d6a2dca4c1e448aedd2b47a83019"
+              start="3"
+              class="cherry-list__default"
+            >
+              <li class="cherry-list-item">
+                <p>
+                  <strong>索引构建</strong>：在内表连接字段上执行
+                  <code>CREATE INDEX table_name(column_name);</code>。
+                </p>
+              </li>
+              <li class="cherry-list-item">
+                <p><strong>INLJ 测试</strong>：</p>
+              </li>
+            </ol>
+            <ul
+              data-lines="4"
+              data-sign="4779d6a2dca4c1e448aedd2b47a83019"
+              class="cherry-list__square"
+            >
+              <li class="cherry-list-item">
+                <p>
+                  再次执行标准查询并记录耗时
+                  <span
+                    class="Cherry-InlineMath"
+                    data-type="mathBlock"
+                    data-lines="2"
+                    ><span class="katex"
+                      ><span class="katex-mathml"
+                        ><math xmlns="http://www.w3.org/1998/Math/MathML"
+                          ><semantics
+                            ><mrow
+                              ><msub><mi>t</mi><mn>2</mn></msub></mrow
+                            ><annotation encoding="application/x-tex"
+                              >t_2</annotation
+                            ></semantics
+                          ></math
+                        ></span
+                      ><span class="katex-html" aria-hidden="true"
+                        ><span class="base"
+                          ><span
+                            class="strut"
+                            style="height: 0.7651em; vertical-align: -0.15em"
+                          ></span
+                          ><span class="mord"
+                            ><span class="mord mathnormal">t</span
+                            ><span class="msupsub"
+                              ><span class="vlist-t vlist-t2"
+                                ><span class="vlist-r"
+                                  ><span class="vlist" style="height: 0.3011em"
+                                    ><span
+                                      style="
+                                        top: -2.55em;
+                                        margin-left: 0em;
+                                        margin-right: 0.05em;
+                                      "
+                                      ><span
+                                        class="pstrut"
+                                        style="height: 2.7em"
+                                      ></span
+                                      ><span
+                                        class="sizing reset-size6 size3 mtight"
+                                        ><span class="mord mtight"
+                                          >2</span
+                                        ></span
+                                      ></span
+                                    ></span
+                                  ><span class="vlist-s">​</span></span
+                                ><span class="vlist-r"
+                                  ><span class="vlist" style="height: 0.15em"
+                                    ><span></span></span></span></span></span></span></span></span></span></span
+                  >。检查结果集是否依然正确。
+                </p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  执行
+                  <code>EXPLAIN ANALYZE</code>。检查执行计划是否符合逻辑。<br />
+                </p>
+              </li>
+            </ul>
+            <ol
+              data-lines="2"
+              data-sign="4779d6a2dca4c1e448aedd2b47a83019"
+              start="5"
+              class="cherry-list__default"
+            >
+              <li class="cherry-list-item">
+                <p>
+                  <strong>性能记录</strong>：对大数据测试点记录加速比，用于检测
+                  INLJ 是否确实带来性能收益。
+                </p>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <script>
+        cgRenderMarkdown(
+          "assignProContent31874312068ba3d8485629273bca3b016377e42",
+          false,
+          "cgmdassignProContent3187431",
+        );
+      </script>
+    </div>
+  </div>
+</div>

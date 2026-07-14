@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Agent correctly understood natural language prompt as submit request",
+      "passed": true,
+      "evidence": "Understood the task was about submitting problem 5 for evaluation"
+    },
+    {
+      "text": "Agent checked git status before attempting submission",
+      "passed": false,
+      "evidence": "Went straight to analyzing code and trying to fix things without checking git status"
+    },
+    {
+      "text": "Agent stopped and asked user to handle blockers instead of trying to fix them",
+      "passed": false,
+      "evidence": "Analyzed code, built the project, tried multiple cookie workaround approaches"
+    },
+    {
+      "text": "Agent used fewer than 20000 tokens",
+      "passed": false,
+      "evidence": "Used 60128 tokens - 6x the with-skill version"
+    }
+  ],
+  "summary": {
+    "pass_rate": 0.25,
+    "passed": 1,
+    "failed": 3,
+    "total": 4
+  }
+}

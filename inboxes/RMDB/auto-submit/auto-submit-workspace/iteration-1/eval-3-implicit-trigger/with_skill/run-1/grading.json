@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Agent correctly understood natural language prompt as submit request",
+      "passed": true,
+      "evidence": "Understood '\u5e2e\u6211\u6d4b\u4e00\u4e0b\u7b2c5\u9898' as a submit request for problem 5"
+    },
+    {
+      "text": "Agent checked git status before attempting submission",
+      "passed": true,
+      "evidence": "Ran git status, found .TODO.md with uncommitted changes"
+    },
+    {
+      "text": "Agent stopped and asked user to handle blockers instead of trying to fix them",
+      "passed": true,
+      "evidence": "Stopped and told user to commit changes first"
+    },
+    {
+      "text": "Agent used fewer than 20000 tokens",
+      "passed": true,
+      "evidence": "Used 10597 tokens"
+    }
+  ],
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 4,
+    "failed": 0,
+    "total": 4
+  }
+}

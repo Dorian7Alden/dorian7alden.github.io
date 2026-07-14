@@ -1,0 +1,12 @@
+bench/table_data/
+bench/tpcc_driver
+concurrency_test/concurrency_test_runner
+generate_data/generate_data
+
+precheck_*/
+manual_abs_*/
+logs/
+
+__pycache__/
+*.pyc
+*.o

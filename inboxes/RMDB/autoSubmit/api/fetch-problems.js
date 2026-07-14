@@ -1,0 +1,126 @@
+const cheerio = require("cheerio");
+const fs = require("fs");
+
+const config = JSON.parse(fs.readFileSync(__dirname + "/../config/config.json", "utf-8"));
+
+const headers = {
+    "accept": "text/html, */*; q=0.01",
+    "accept-language": "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
+    "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+    "origin": "https://course.educg.net",
+    "sec-ch-ua": "\"Microsoft Edge\";v=\"149\", \"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"",
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": "\"Linux\"",
+    "sec-fetch-dest": "empty",
+    "sec-fetch-mode": "cors",
+    "sec-fetch-site": "same-origin",
+    "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0",
+    "x-requested-with": "XMLHttpRequest"
+};
+
+headers["cookie"] = Object.entries(config.cookies).map(([k, v]) => `${k}=${v}`).join("; ");
+
+const url = "https://course.educg.net/assignment/contestindex.jsp";
+
+const tasks = [
+    { assignID: "NXDdXWsaTO0", contestID: "6gutcJNDUrw", taskID: "2295989" },
+    { assignID: "B5UryNe7HzA",  contestID: "6gutcJNDUrw", taskID: "13352925" },
+];
+
+function decodeEntities(str) {
+    return cheerio.load("<div>" + str + "</div>")("div").text().replace(/&nbsp;/g, " ");
+}
+
+function parseHtml(html) {
+    const $ = cheerio.load(html);
+    const problems = [];
+
+    $("tbody tr").each((_, tr) => {
+        const $tr = $(tr);
+        const $numCell = $tr.find("th").first();
+        if (!$numCell.length) return;
+
+        const num = parseInt($numCell.text().replace(".", ""));
+        if (isNaN(num)) return;
+
+        const $tds = $tr.find("td");
+
+        const $titleLink = $tds.eq(0).find("a").first();
+        const title = $titleLink.text().trim();
+
+        const maxScore = parseFloat($tds.eq(1).text()) || 0;
+
+        const $infoTd = $tds.eq(2);
+
+        let lastSubmitTime = "";
+        let obtainedScore = 0;
+        const testResultParts = [];
+
+        $infoTd.find("> div > p").each((_, p) => {
+            const text = decodeEntities($(p).html() || "").trim();
+            if (!text) return;
+
+            if (text.startsWith("最后一次提交时间：")) {
+                lastSubmitTime = text.replace("最后一次提交时间：", "");
+            } else if (text.startsWith("得分：")) {
+                obtainedScore = parseFloat(text.replace("得分：", "")) || 0;
+            } else if (text === "AC") {
+                obtainedScore = maxScore;
+            } else {
+                testResultParts.push(text);
+            }
+        });
+
+        const $collapse = $infoTd.find(".collapse small");
+        const compileDetail = $collapse.length ? decodeEntities($collapse.html() || "") : "";
+
+        let reviewInfo = "";
+        $infoTd.find("> div > small").each((_, el) => {
+            reviewInfo += decodeEntities($(el).html() || "") + "\n";
+        });
+
+        problems.push({
+            number: num,
+            title,
+            maxScore,
+            obtainedScore,
+            lastSubmitTime,
+            testResult: testResultParts.join("\n"),
+            reviewInfo: reviewInfo.trim(),
+            compileDetail,
+        });
+    });
+
+    problems.sort((a, b) => a.number - b.number);
+    return problems;
+}
+
+async function fetchProblems() {
+    const allProblems = [];
+    let nextNum = 1;
+
+    for (const task of tasks) {
+        const response = await fetch(url, {
+            method: "POST",
+            headers,
+            body: new URLSearchParams(task).toString(),
+        });
+
+        if (!response.ok) continue;
+
+        const html = await response.text();
+        const problems = parseHtml(html);
+
+        problems.forEach(p => { p.number = nextNum++; });
+        allProblems.push(...problems);
+    }
+
+    fs.writeFileSync(__dirname + "/../data/problems.json", JSON.stringify(allProblems, null, 2));
+    return allProblems;
+}
+
+module.exports = fetchProblems;
+
+if (require.main === module) {
+    fetchProblems();
+}

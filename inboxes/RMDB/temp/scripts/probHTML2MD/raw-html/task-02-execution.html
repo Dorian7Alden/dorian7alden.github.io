@@ -1,0 +1,828 @@
+<div class="cgcode_description__2b0C">
+  <div class="cgcode_css-m6wrkg-Container" style="margin: 16px 0 0">
+    <h4 class="cgcode_css-tt3ivf-Title">2. 2026题目二：查询执行</h4>
+  </div>
+  <div class="cgcode_content__1Y2H">
+    <div class="cgcode_notranslate">
+      <div class="cgProblemContentClass">
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong><span style="font-family: 宋体">前置题目：</span></strong
+            ><span style="font-family: 宋体">存储管理</span></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong
+              ><span style="font-family: 宋体; font-size: 16px"
+                >题目种类</span
+              ></strong
+            ><span style="font-family: 宋体; font-size: 16px"
+              >：基础功能</span
+            ></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong
+              ><span style="font-family: 宋体; font-size: 16px"
+                >推荐知识点：</span
+              ></strong
+            ><span style="font-family: 宋体; font-size: 16px"
+              >逻辑查询优化、查询解析、基本算子实现、查询执行框架、元数据存储组织</span
+            ></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong
+              ><span style="font-family: 宋体; font-size: 16px"
+                >代码框架：</span
+              ></strong
+            ><span style="font-family: 宋体; font-size: 16px"
+              >https://gitlab.eduxiji.net/csc1/csc-db/db2026/-/tree/main/rmdb
+            </span></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"><br /></span>
+        </p>
+        <h2
+          style="
+            margin: 17px 0 13px;
+            break-after: avoid;
+            text-align: justify;
+            font-family: Arial;
+            font-size: 21px;
+          "
+        >
+          <span style="font-size: 20px"
+            ><strong
+              ><span style="font-family: 宋体">题目描述：</span></strong
+            ></span
+          >
+        </h2>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >在实现题目一功能的基础上增加查询执行模块，使得系统支持通过测试需要的元数据管理、DDL语句、DQL语句、DML语句。</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong
+              ><span style="font-family: 宋体; font-size: 16px"
+                >提示：</span
+              ></strong
+            ></span
+          >
+        </p>
+        <p
+          style="
+            margin: 0 0 0 28px;
+            text-align: justify;
+            font-family: Arial;
+            font-size: 14px;
+          "
+        >
+          <span style="font-size: 16px"
+            ><span style="font-family: Wingdings; font-size: 16px">l&nbsp;</span
+            ><span style="font-family: 宋体; font-size: 16px"
+              >本题目提供了空缺的样例代码，参赛队伍可以选择进行补全，也可以选择自行构建。如果选择补全空缺的样例代码，需要实现“元数据管理与DDL语句”和“DQL语句和DML语句”。</span
+            ></span
+          >
+        </p>
+        <p
+          style="
+            margin: 0 0 0 28px;
+            text-align: justify;
+            font-family: Arial;
+            font-size: 14px;
+          "
+        >
+          <span style="font-size: 16px"
+            ><span style="font-family: Wingdings; font-size: 16px">l&nbsp;</span
+            ><span style="font-family: 宋体; font-size: 16px"
+              ><span style="font-family: 宋体; font-size: 16px">本题目通过</span
+              >sql进行测试，分为五个测试点，它们依次是“尝试建表”、“单表插入与条件查询”、“单表更新与条件查询”、“单表删除与条件查询”、“连接查询”。</span
+            ></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong
+              ><span style="font-family: 宋体; font-size: 16px"
+                >&nbsp;</span
+              ></strong
+            ></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong
+              ><span style="font-family: 宋体; font-size: 16px"
+                >1、元数据管理与DDL语句</span
+              ></strong
+            ></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >本任务要求参赛队伍对数据库的元数据进行管理，并实现基本的DDL语句，包括create
+            table和drop
+            table两种语句。大赛提供的框架中，与元数据管理和DDL语句相关的代码文件位于src/system文件夹下，代码框架中提供了create
+            table语句的实现方式。</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong
+              ><span style="font-family: 宋体; font-size: 16px"
+                >&nbsp;</span
+              ></strong
+            ></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><span style="font-family: 宋体; font-weight: bold; font-size: 16px"
+              >2、</span
+            ><strong
+              ><span style="font-family: 宋体; font-size: 16px"
+                >DQL语句和DML语句</span
+              ></strong
+            ></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >DML语句要求实现基本的增删改，即insert、delete、update语句。DQL语句要求实现select语句。在完成本任务之前，参赛队伍需要首先阅读项目结构文档中查询解析、查询优化、查询执行的相关说明，以及代码框架中src/analyze、src/optimizer、src/execution文件夹下的代码文件，参赛队伍需要实现代码框架中未提供的功能，包括语义检查、查询执行计划的生成、执行算子等。</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px">&nbsp;</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >本题目通过SQL来进行测试，因此参赛队伍可以对代码进行重构。</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <br />
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 20px"
+            ><strong
+              ><span style="font-family: 宋体">测试示例：</span></strong
+            ></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong
+              ><span style="font-family: 宋体; font-size: 16px"
+                >测试点</span
+              ></strong
+            ><strong
+              ><span style="font-family: Calibri; font-size: 16px"
+                >1</span
+              ></strong
+            ><strong
+              ><span style="font-family: Calibri; font-size: 16px"
+                >:
+              </span></strong
+            ><strong
+              ><span style="font-family: Calibri; font-size: 16px"
+                ><span style="font-family: 宋体; font-size: 16px"
+                  >尝试建表</span
+                ></span
+              ></strong
+            ></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px">测试示例：</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >create table t1(id int,name char(4));</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >show tables;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >create table t2(id int);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >show tables;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >drop table t1;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >show tables;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >drop table t2;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >show tables;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px">期待输出：</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px">| Tables |</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px">| t1 |</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px">| Tables |</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px">| t1 |</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px">| t2 |</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px">| Tables |</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px">| t2 |</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px">| Tables |</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px">&nbsp;</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong
+              ><span style="font-family: 宋体; font-size: 16px"
+                >测试点</span
+              ></strong
+            ><strong
+              ><span style="font-family: Calibri; font-size: 16px"
+                >2</span
+              ></strong
+            ><strong
+              ><span style="font-family: Calibri; font-size: 16px"
+                >:
+              </span></strong
+            ><strong
+              ><span style="font-family: Calibri; font-size: 16px"
+                ><span style="font-family: 宋体; font-size: 16px"
+                  >单表插入与条件查询</span
+                ></span
+              ></strong
+            ></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px">测试示例：</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >create table grade (name char(20),id int,score float);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >insert into grade values ('Data Structure', 1, 90.5);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >insert into grade values ('Data Structure', 2, 95.0);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >insert into grade values ('Calculus', 2, 92.0);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >insert into grade values ('Calculus', 1, 88.5);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >select * from grade;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >select score,name,id from grade where score &gt; 90;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >select id from grade where name = 'Data Structure';</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >select name from grade where id = 2 and score &gt; 90; &nbsp;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px">期待输出：</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| name | id | score |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| Data Structure | 1 | 90.500000 |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| Data Structure | 2 | 95.000000 |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| Calculus | 2 | 92.000000 |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| Calculus | 1 | 88.500000 |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| score | name | id |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| 90.500000 | Data Structure | 1 |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| 95.000000 | Data Structure | 2 |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| 92.000000 | Calculus | 2 |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px">| id |</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px">| 1 |</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px">| 2 |</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px">| name |</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| Data Structure |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| Calculus |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px">&nbsp;</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong
+              ><span style="font-family: Calibri; font-size: 16px"
+                ><span style="font-family: 宋体; font-size: 16px">测试点</span
+                >3<span style="font-family: 宋体; font-size: 16px"
+                  >：单表更新与条件查询</span
+                ></span
+              ></strong
+            ></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px">测试示例：</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >create table grade (name char(20),id int,score float);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >insert into grade values ('Data Structure', 1, 90.5);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >insert into grade values ('Data Structure', 2, 95.0);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >insert into grade values ('Calculus', 2, 92.0);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >insert into grade values ('Calculus', 1, 88.5);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >select * from grade;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >update grade set score =&nbsp; 90 where name = 'Calculus' ;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >select * from grade;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >update grade set name = 'Error name' where name &gt; 'A';</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >select * from grade;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >update grade set name = 'Error' ,id = -1,score = 0 where name =
+            'Error name' and score &gt;= 90;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >select * from grade;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px">期待输出：</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| name | id | score |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| Data Structure | 1 | 90.500000 |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| Data Structure | 2 | 95.000000 |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| Calculus | 2 | 92.000000 |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| Calculus | 1 | 88.500000 |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| name | id | score |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| Data Structure | 1 | 90.500000 |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| Data Structure | 2 | 95.000000 |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| Calculus | 2 | 90.000000 |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| Calculus | 1 | 90.000000 |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| name | id | score |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| Error name | 1 | 90.500000 |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| Error name | 2 | 95.000000 |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| Error name | 2 | 90.000000 |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| Error name | 1 | 90.000000 |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| name | id | score |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| Error | -1 | 0.000000 |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| Error | -1 | 0.000000 |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| Error | -1 | 0.000000 |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| Error | -1 | 0.000000 |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px">&nbsp;</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong
+              ><span style="font-family: Calibri; font-size: 16px"
+                ><span style="font-family: 宋体; font-size: 16px">测试点</span
+                >4<span style="font-family: 宋体; font-size: 16px"
+                  >：单表删除与条件查询</span
+                ></span
+              ></strong
+            ></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px">测试示例：</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >create table grade (name char(20),id int,score float);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >insert into grade values ('Data Structure', 1, 90.5);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >select * from grade;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >delete from grade where score &gt; 90;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >select * from grade;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px">期待输出：</span>
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| name | id | score|</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| Data Structure | 1 | 90.500000 |</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| name | id | score|</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px">&nbsp;</span>
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong
+              ><span style="font-family: Calibri; font-size: 16px"
+                ><span style="font-family: 宋体; font-size: 16px">测试点</span
+                >5<span style="font-family: 宋体; font-size: 16px"
+                  >：连接查询</span
+                ></span
+              ></strong
+            ></span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px">测试示例：</span>
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >create table t ( id int , t_name char (3));</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >create table d (d_name char(5),id int);</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >insert into t values (1,'aaa');</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >insert into t values (2,'baa');</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >insert into t values (3,'bba');</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >insert into d values ('12345',1);</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >insert into d values ('23456',2);</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >select * from t, d;</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >select t.id,t_name,d_name from t,d where t.id = d.id;</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >select t.id,t_name,d_name from t join d where t.id = d.id;</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px">期待输出：</span>
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| id | t_name | d_name | id |</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| 1 | aaa | 23456 | 2 |</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| 1 | aaa | 12345 | 1 |</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| 2 | baa | 23456 | 2 |</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| 2 | baa | 12345 | 1 |</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| 3 | bba | 23456 | 2 |</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| 3 | bba | 12345 | 1 |</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| id | t_name | d_name |</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| 1 | aaa | 12345 |</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| 2 | baa | 23456 |</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| id | t_name | d_name |</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| 1 | aaa | 12345 |</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            >| 2 | baa | 23456 |</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px">&nbsp;</span>
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong
+              ><span style="font-family: 宋体; font-size: 16px"
+                >测试输出要求</span
+              ></strong
+            ><span style="font-family: 宋体; font-size: 16px">：</span></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            ><span style="font-family: 宋体; font-size: 16px"
+              >本题目的输出要求写入数据库文件夹下的</span
+            >output.txt<span style="font-family: 宋体; font-size: 16px"
+              >文件中，例如测试数据库名称为</span
+            >execution_test_db<span style="font-family: 宋体; font-size: 16px"
+              >，则在测试时使用</span
+            >./bin/rmdb execution_test_db<span
+              style="font-family: 宋体; font-size: 16px"
+              >命令来启动服务端，对应输出应写入</span
+            >buid/execution_test_db/output.txt<span
+              style="font-family: 宋体; font-size: 16px"
+              >文件中。</span
+            ></span
+          >
+        </p>
+        <p><br /></p>
+      </div>
+    </div>
+  </div>
+</div>

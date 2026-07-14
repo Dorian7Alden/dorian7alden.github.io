@@ -1,0 +1,736 @@
+<div class="cgcode_description__2b0C">
+  <div class="cgcode_css-m6wrkg-Container" style="margin: 16px 0 0">
+    <h4 class="cgcode_css-tt3ivf-Title">3. 2026题目三：唯一索引</h4>
+  </div>
+  <div class="cgcode_content__1Y2H">
+    <div class="cgcode_notranslate">
+      <div class="cgProblemContentClass">
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong><span style="font-family: 宋体">前置题目：</span></strong
+            ><span style="font-family: 宋体">查询执行</span></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong><span style="font-family: 宋体">题目种类</span></strong
+            ><span style="font-family: 宋体">：基础功能</span></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong
+              ><span style="font-family: 宋体; font-size: 16px"
+                >推荐知识点：</span
+              ></strong
+            ><span style="font-family: 宋体; font-size: 16px"
+              >B+树索引</span
+            ></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong
+              ><span style="font-family: 宋体; font-size: 16px"
+                >代码框架：https://gitlab.eduxiji.net/csc1/csc-db/db2026/-/tree/main/rmdb
+              </span></strong
+            ></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong><br /></strong
+          ></span>
+        </p>
+        <h2
+          style="
+            margin: 17px 0 13px;
+            break-after: avoid;
+            text-align: justify;
+            font-family: Arial;
+            font-size: 21px;
+          "
+        >
+          <span style="font-size: 20px"
+            ><strong
+              ><span style="font-family: 宋体">题目描述：</span></strong
+            ></span
+          >
+        </h2>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 14px"
+            >在现有系统的基础上增添索引功能，该索引为唯一索引，要求系统能够支持创建索引、删除索引、展示某个表上的索引、单点查询和范围查询，实现索引与基表的同步。</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 14px; font-family: 宋体"
+            >如果一个表上的某个字段建有唯一索引，则该表中任意两个记录中该字段的值不相同。</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px">&nbsp;</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <strong
+            ><span style="font-family: 宋体; font-size: 14px"
+              >提示</span
+            ></strong
+          ><span style="font-family: 宋体; font-size: 14px">：</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 14px"
+            >（1）功能题目对代码框架没有限制，参赛队伍可以修改、增添、删除数据结构及接口，也可以对框架进行重构。</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 14px"
+            >（2）<span style="font-family: 宋体">磁盘数据库中常用的索引为</span
+            >B+树索引，推荐使用B+树来实现索引功能，参赛队伍也可以使用其他类型的索引，但需要能够支持题目中要求的功能。</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 14px"
+            >（3）<span style="font-family: 宋体">对于测试点</span
+            >2、3，即“索引的查询”和“维护索引的插入、删除、更新”，会进行单独的是否真正使用了索引的测试——对于数千条查询语句，建立索引后的执行时间应该小于建立索引前的执行时间的70%，才可以视为真正使用了索引的测试。</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 14px"
+            >（4）<span style="font-family: 宋体">改题目不要求使用</span
+            >B+树作为索引，所以对于参赛队伍测试点2、3的输出结果不要求行的顺序与期待输出的行的顺序完全一致，但列的顺序要求完全一致。</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px">&nbsp;</span>
+        </p>
+        <p
+          style="
+            text-align: justify;
+            font-family: Arial;
+            font-size: 14px;
+            text-indent: 0;
+          "
+        >
+          <span
+            style="
+              font-family: &quot;Times New Roman&quot;;
+              font-weight: bold;
+              font-size: 14px;
+            "
+            >1、</span
+          ><strong
+            ><span style="font-family: 宋体; font-size: 14px"
+              >创建、删除、展示索引</span
+            ></strong
+          >
+        </p>
+        <p
+          style="
+            text-align: justify;
+            font-family: Arial;
+            font-size: 14px;
+            text-indent: 0;
+          "
+        >
+          <span
+            style="font-family: &quot;Times New Roman&quot;; font-size: 14px"
+            >（1）</span
+          ><span style="font-family: 宋体; font-size: 14px"
+            >支持单个字段索引的创建和删除；</span
+          >
+        </p>
+        <p
+          style="
+            text-align: justify;
+            font-family: Arial;
+            font-size: 14px;
+            text-indent: 0;
+          "
+        >
+          <span
+            style="font-family: &quot;Times New Roman&quot;; font-size: 14px"
+            >（2）</span
+          ><span style="font-family: 宋体; font-size: 14px"
+            >支持多个字段索引的创建和删除；</span
+          >
+        </p>
+        <p
+          style="
+            text-align: justify;
+            font-family: Arial;
+            font-size: 14px;
+            text-indent: 0;
+          "
+        >
+          <span
+            style="font-family: &quot;Times New Roman&quot;; font-size: 14px"
+            >（3）</span
+          ><span style="font-family: 宋体; font-size: 14px"
+            >查看某个表上的索引信息；</span
+          >
+        </p>
+        <p
+          style="
+            text-align: justify;
+            font-family: Arial;
+            font-size: 14px;
+            text-indent: 0;
+          "
+        >
+          <span
+            style="font-family: &quot;Times New Roman&quot;; font-size: 14px"
+            >（4）</span
+          ><span style="font-family: 宋体; font-size: 14px"
+            >show index from table_name的输出格式为</span
+          ><span style="font-family: Calibri; font-size: 14px"
+            >&nbsp;| table_name | unique | (column_name, column_name) |<span
+              style="font-family: 宋体"
+              >。参考下方测试用例和期待输出</span
+            ></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 14px">&nbsp;</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 20px">测试示例：</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >create table warehouse (id int, name char(8));</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >create&nbsp;index&nbsp;warehouse&nbsp;(id);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >show index from&nbsp;warehouse;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >create index warehouse (id,name);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >show index from warehouse;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >drop index warehouse (id);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >drop index warehouse (id,name);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >show index from warehouse;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            ><span style="font-family: 宋体">期望输出：</span>&nbsp;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| warehouse | unique | (id) |</span
+          >
+          <span style="font-family: Calibri; font-size: 14px"
+            >// <span style="font-family: 宋体">第一个</span
+            ><span style="font-family: Calibri">show index</span
+            ><span style="font-family: 宋体">的输出</span></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| warehouse | unique | (id) |</span
+          >
+          <span style="font-family: Calibri; font-size: 14px"
+            >// <span style="font-family: 宋体">第二个</span
+            ><span style="font-family: Calibri">show index</span
+            ><span style="font-family: 宋体">的输出</span></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| warehouse | unique | (id,name) |</span
+          >
+          <span style="font-family: Calibri; font-size: 14px"
+            >// <span style="font-family: 宋体">第二个</span
+            ><span style="font-family: Calibri">show index</span
+            ><span style="font-family: 宋体">的输出</span></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >// <span style="font-family: 宋体">第三个</span
+            ><span style="font-family: Calibri">show index</span
+            ><span style="font-family: 宋体">没有输出</span></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px">&nbsp;</span>
+        </p>
+        <p
+          style="
+            text-align: justify;
+            font-family: Arial;
+            font-size: 14px;
+            text-indent: 0;
+          "
+        >
+          <span
+            style="
+              font-family: &quot;Times New Roman&quot;;
+              font-weight: bold;
+              font-size: 14px;
+            "
+            >2、</span
+          ><strong
+            ><span style="font-family: 宋体; font-size: 14px"
+              >索引查询</span
+            ></strong
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 14px"
+            >在创建索引后，能够使用索引进行单点查询和范围查询。</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 14px">&nbsp;</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 14px">提示：</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 14px"
+            ><span style="font-family: 宋体"
+              >在大赛提供的框架中，只有查询条件与索引完全一致，并且是单点查询时，才使用索引来进行查询，你需要对索引匹配规则进行修改，要求使用最左匹配原则。例如，表</span
+            >A的(id, name,
+            score)三个属性上有一个联合索引，对于以下几种查询，都需要使用索引来进行查询：</span
+          >
+        </p>
+        <p
+          style="
+            margin: 0 0 0 28px;
+            text-align: justify;
+            font-family: Arial;
+            font-size: 14px;
+          "
+        >
+          <span style="font-family: Wingdings; font-size: 14px">l&nbsp;</span
+          ><span style="font-family: 宋体; font-size: 14px"
+            >select * from A where id = 1 and name = 'abcd' and score =
+            99.0;</span
+          >
+        </p>
+        <p
+          style="
+            margin: 0 0 0 28px;
+            text-align: justify;
+            font-family: Arial;
+            font-size: 14px;
+          "
+        >
+          <span style="font-family: Wingdings; font-size: 14px">l&nbsp;</span
+          ><span style="font-family: 宋体; font-size: 14px"
+            >select * from A where id = 1 and name = 'abcd' and score &gt;
+            90.0;</span
+          >
+        </p>
+        <p
+          style="
+            margin: 0 0 0 28px;
+            text-align: justify;
+            font-family: Arial;
+            font-size: 14px;
+          "
+        >
+          <span style="font-family: Wingdings; font-size: 14px">l&nbsp;</span
+          ><span style="font-family: 宋体; font-size: 14px"
+            >select * from A where id = 1 and name = 'abcd';</span
+          >
+        </p>
+        <p
+          style="
+            margin: 0 0 0 28px;
+            text-align: justify;
+            font-family: Arial;
+            font-size: 14px;
+          "
+        >
+          <span style="font-family: Wingdings; font-size: 14px">l&nbsp;</span
+          ><span style="font-family: 宋体; font-size: 14px"
+            >select * from A where name = 'abcd' and id = 1; &nbsp;//
+            在进行查询计划生成时，应能够自动对顺序进行调整</span
+          >
+        </p>
+        <p
+          style="
+            margin: 0 0 0 28px;
+            text-align: justify;
+            font-family: Arial;
+            font-size: 14px;
+          "
+        >
+          <span style="font-family: Wingdings; font-size: 14px">l&nbsp;</span
+          ><span style="font-family: 宋体; font-size: 14px"
+            >select * from A where id = 1;</span
+          >
+        </p>
+        <p
+          style="
+            margin: 0 0 0 28px;
+            text-align: justify;
+            font-family: Arial;
+            font-size: 14px;
+          "
+        >
+          <span style="font-family: Wingdings; font-size: 14px">l&nbsp;</span
+          ><span style="font-family: 宋体; font-size: 14px"
+            >select * from A where id &gt; 1;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 14px">&nbsp;</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 20px"
+            ><strong
+              ><span style="font-family: 宋体">测试示例：</span></strong
+            ></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >create table warehouse (w_id int, name char(8));</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >insert into warehouse values (10 , 'qweruiop');</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >insert into warehouse values (534, 'asdfhjkl');</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >insert into warehouse values (100,'qwerghjk');</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >insert into warehouse values (500,'bgtyhnmj');</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >create&nbsp;index warehouse(w_id);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >select * from warehouse where w_id = 10;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >select * from warehouse where w_id &lt; 534 and w_id &gt;
+            100;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >drop index warehouse(w_id);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >create index warehouse(name);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >select * from warehouse where name = 'qweruiop';</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >select * from warehouse where name &gt; 'qwerghjk';</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >select * from warehouse where name &gt; 'aszdefgh' and name &lt;
+            'qweraaaa';</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >drop index warehouse(name);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >create index warehouse(w_id,name);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >select * from warehouse where w_id = 100 and name =
+            'qwerghjk';</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >select * from warehouse where w_id &lt; 600 and name &gt;
+            'bztyhnmj';</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 14px; font-family: 宋体">期待输出：</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| w_id | name |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| 10 | qweruiop |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| w_id | name |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| 500 | bgtyhnmj |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| w_id | name |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| 10 | qweruiop |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| w_id | name |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| 10 | qweruiop |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| w_id | name |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| 500 | bgtyhnmj |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| w_id | name |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| 100 | qwerghjk |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| w_id | name |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| 10 | qweruiop |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| 100 | qwerghjk |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px">&nbsp;</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px">&nbsp;</span>
+        </p>
+        <p
+          style="
+            text-align: justify;
+            font-family: Arial;
+            font-size: 14px;
+            text-indent: 0;
+          "
+        >
+          <span
+            style="font-family: &quot;Times New Roman&quot;; font-size: 14px"
+            >3、</span
+          ><span style="font-family: 宋体; font-size: 14px">索引维护</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 14px; font-family: 宋体"
+            >在建有索引的表中插入、删除、更新数据时，能够根据表数据的变化同步对表上对索引进行更新，保证索引的正确性。同时，在索引被更新时，需要检查唯一性约束。</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px">&nbsp;</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 20px">测试示例：</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >create table warehouse (w_id int, name char(8));</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >insert into warehouse values (10 , 'qweruiop');</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >insert into warehouse values (534, 'asdfhjkl');</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >select * from warehouse where w_id = 10;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >select * from warehouse where w_id &lt; 534 and w_id &gt;
+            100;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >create&nbsp;index warehouse(w_id);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >insert into warehouse values (500, 'lastdanc');</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >update warehouse set w_id = 507 where w_id = 534;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >select * from warehouse where w_id = 10;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >select * from warehouse where w_id &lt; 534 and w_id &gt;
+            100;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 14px; font-family: 宋体">期待输出：</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| w_id | name |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| 10 | qweruiop |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| w_id | name |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| w_id | name |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| 10 | qweruiop |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| w_id | name |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| 500 | lastdanc |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            >| 507 | asdfhjkl |</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px">&nbsp;</span>
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <strong
+            ><span style="font-size: 14px; font-family: 宋体"
+              >测试输出要求</span
+            ></strong
+          ><span style="font-size: 14px; font-family: 宋体">：</span>
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 14px"
+            ><span style="font-family: 宋体"
+              >本题目的输出要求写入数据库文件夹下的</span
+            >output.txt<span style="font-family: 宋体"
+              >文件中，例如测试数据库名称为</span
+            ><span style="font-family: Calibri">index_test_db</span
+            ><span style="font-family: 宋体">，则在测试时使用</span
+            ><span style="font-family: Calibri">./bin/rmdb index_test_db</span
+            ><span style="font-family: 宋体"
+              >命令来启动服务端，对应输出应写入</span
+            ><span style="font-family: Calibri"
+              >buid/index_test_db/output.txt</span
+            ><span style="font-family: 宋体">文件中。</span></span
+          >
+        </p>
+        <p><br /></p>
+      </div>
+    </div>
+  </div>
+</div>

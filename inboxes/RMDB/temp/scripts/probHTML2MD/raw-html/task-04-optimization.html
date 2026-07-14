@@ -1,0 +1,863 @@
+<div class="cgcode_description__2b0C">
+  <div class="cgcode_css-m6wrkg-Container" style="margin: 16px 0 0">
+    <h4 class="cgcode_css-tt3ivf-Title">4. 2026题目四：查询优化与执行</h4>
+  </div>
+  <div class="cgcode_content__1Y2H">
+    <div class="cgcode_notranslate">
+      <div
+        class="cgProblemContentClass"
+        id="cgmdassignProContent3187430"
+        style=""
+      >
+        <div
+          class="cherry clearfix theme__default cherry--no-toolbar"
+          data-toolbar-theme="dark"
+          data-inline-code-theme="red"
+          data-code-block-theme="default"
+        >
+          <div
+            class="cherry-previewer cherry-markdown theme__default cherry-preview--full"
+            style="width: 100%"
+          >
+            <p
+              data-sign="c97c2b5268f4f2dc46e29f65464bc65f1"
+              data-type="p"
+              data-lines="1"
+            >
+              <strong>前置题目</strong>：查询执行
+            </p>
+            <p
+              data-sign="d0bfe9b31000d3b775aa987e6e7bf31c2"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>题目种类</strong>：基础功能
+            </p>
+            <p
+              data-sign="693f268f2a2d5996680aa9981ef043452"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>大赛框架</strong>：<a
+                href="https://gitlab.eduxiji.net/csc1/csc-db/db2026/-/tree/main/rmdb"
+                title="https://gitlab.eduxiji.net/csc1/csc-db/db2026/-/tree/main/rmdb"
+                >https://gitlab.eduxiji.net/csc1/csc-db/db2026/-/tree/main/rmdb</a
+              >
+            </p>
+            <h2
+              id="1-%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0"
+              data-sign="4f0c46dba48982b3fcb5d04eac3b7618"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#1-%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0"
+              ></a
+              >1. 题目描述
+            </h2>
+            <p
+              data-sign="7715c64d5dffa76ce4d2b32bb92b74142"
+              data-type="p"
+              data-lines="2"
+            >
+              查询优化是数据库系统中的重要组成部分，其目标是在保证查询结果正确性的前提下，通过改写
+              SQL
+              语句或调整执行计划，减少中间数据量、降低计算开销，从而提高查询执行效率。本题要求实现一个简化版的查询优化器，能够生成规范的查询计划树，并在<strong>执行后</strong>输出计划节点的运行时统计信息。
+            </p>
+            <p
+              data-sign="e67261fab504a0f37cfdc18beee57dd42"
+              data-type="p"
+              data-lines="2"
+            >
+              具体来说，我们要求实现以下两种优化：
+            </p>
+            <ol
+              data-lines="3"
+              data-sign="67e1063c47b456495daa8a3cddc6c94a"
+              start="1"
+              class="cherry-list__default"
+            >
+              <li class="cherry-list-item">
+                <p>
+                  基于规则的选择运算下推（谓词下推）。选择运算下推要求在查询计划树中，利用选择运算与投影运算，以及选择运算与笛卡尔积的交换律等，通过交换节点在树中的位置，尽可能将选择运算对应的节点放到查询计划树的底层。其目的是：尽可能早地过滤掉与后续操作无关的行，避免中间结果生成后再进行过滤所带来的额外开销。选择运算下推有助于减少中间数据中不必要的行，降低中间数据的传递和处理量，从而提高查询效率。
+                </p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  基于规则的投影运算下推。同上，投影运算下推要求在查询计划树中，利用投影运算与笛卡尔积的分配率，以及投影的串接定律等，通过交换节点在树中的位置，尽可能地先执行查询中的投影操作。其目的是：尽可能早地去除与后续操作无关的列，避免中间结果生成后再进行投影所带来的额外开销。投影运算下推有助于减少中间数据中不必要的列，可以显著降低数据传输和处理的开销。
+                </p>
+              </li>
+            </ol>
+            <p
+              data-sign="c1aed9851648c8663fc904590c8fad6d2"
+              data-type="p"
+              data-lines="2"
+            >
+              本题要求在现有 SQL 查询语句的基础上，增加对
+              <code>EXPLAIN ANALYZE</code> 关键字的支持。<code
+                >EXPLAIN ANALYZE</code
+              >
+              的输入形式为
+              <code>EXPLAIN ANALYZE + SQL查询语句</code
+              >，系统需要先生成优化后的查询计划，再执行该计划并统计每个计划节点的运行时行数。<code
+                >EXPLAIN ANALYZE</code
+              >
+              只输出优化后的查询计划树与运行时统计信息，不输出该查询本身的结果集。
+            </p>
+            <p
+              data-sign="c4510c4730d185ba04bdc52327a5e75e2"
+              data-type="p"
+              data-lines="2"
+            >
+              每个计划节点的
+              <code>rows=N</code> 表示该节点本次执行时涉及的总行数。<code
+                >Scan</code
+              >
+              节点的 <code>rows</code> 表示本次执行中扫描到的总行数；<code
+                >Filter</code
+              >
+              节点的 <code>rows</code> 表示过滤后输出的总行数；<code
+                >Project</code
+              >
+              节点的 <code>rows</code> 表示投影后输出的总行数；<code>Join</code>
+              节点的 <code>rows</code> 表示连接后输出的总行数。在 NLJ
+              中右侧子树作为内表会被左侧输入重复执行，因此右侧子树的
+              <code>rows</code> 可以累计到
+              <code>左侧输入行数 × 右侧单次执行行数</code>。
+            </p>
+            <p
+              data-sign="9efa5fa9a08900867a9bd8f11c36e4072"
+              data-type="p"
+              data-lines="2"
+            >
+              本题目共需实现四种查询计划节点：
+            </p>
+            <ul
+              data-lines="5"
+              data-sign="0f4bdef263d467e1ba83e6e223b26a3b"
+              class="cherry-list__square"
+            >
+              <li class="cherry-list-item"><p>Scan：表扫描节点；</p></li>
+              <li class="cherry-list-item">
+                <p>Filter：过滤节点（对应选择运算）；</p>
+              </li>
+              <li class="cherry-list-item"><p>Project：投影节点；</p></li>
+              <li class="cherry-list-item"><p>Join：连接节点。</p></li>
+            </ul>
+            <h3
+              id="11-%E5%85%B7%E4%BD%93%E7%AE%97%E5%AD%90%E8%A7%84%E8%8C%83"
+              data-sign="546678f4b52f408537b3800fa191f89f"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#11-%E5%85%B7%E4%BD%93%E7%AE%97%E5%AD%90%E8%A7%84%E8%8C%83"
+              ></a
+              >1.1 具体算子规范
+            </h3>
+            <div
+              class="cherry-table-container"
+              data-sign="5d564487739c313f194fafc678898f197"
+              data-lines="7"
+            >
+              <table class="cherry-table">
+                <thead>
+                  <tr>
+                    <th>节点类型</th>
+                    <th>格式</th>
+                    <th>备注</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Scan节点</td>
+                    <td>
+                      <code>Scan(table=表名, type=SeqScan, rows=行数)</code>
+                    </td>
+                    <td>
+                      即叶节点。本题只要求顺序扫描，<code>type</code> 固定为
+                      <code>SeqScan</code>。
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Filter节点</td>
+                    <td>
+                      <code
+                        >Filter(condition=[条件1,条件2,...], rows=行数)</code
+                      >
+                    </td>
+                    <td>
+                      1.确保谓词的左值是表的列，多个条件按字典序排序。<br />2.条件中的列名必须包含表名前缀（多表查询时）。
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Project节点</td>
+                    <td>
+                      <code
+                        >Project(columns=[表名1.列名1,表名2.列名2,...],
+                        rows=行数)</code
+                      >
+                    </td>
+                    <td>
+                      1.列名按字母顺序排序。<br />2.多表查询时使用表名前缀。<br />3.需要保留全部的列则输出
+                      <code>Project(columns=[*], rows=行数)</code>。<br />4.对于
+                      select 语句根节点一定是 Project 节点。
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Join节点</td>
+                    <td>
+                      <code
+                        >Join(tables=[表名1,表名2,...],
+                        condition=[条件1,条件2,...], rows=行数)</code
+                      >
+                    </td>
+                    <td>
+                      1.表名按字母顺序排序，表名为此节点下所有表的集合。<br />2.连接条件按字典序排序。
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p
+              data-sign="12b9e765ac4cd07c41d2cf6acac216fa2"
+              data-type="p"
+              data-lines="2"
+            >
+              计划树输出时，根节点行首不缩进，每深入一层在行首增加一个制表符
+              <code>\t</code>，同一层级节点使用相同数量的
+              <code>\t</code> 缩进，不使用空格代替制表符。Join
+              节点的两个子树按照实际执行顺序输出，左侧子树表示外表或已经连接得到的中间结果，右侧子树表示内表。除此之外，同一层级下的多个节点，按照字典升序输出，即先按照
+              Filter Join Project Scan 的顺序输出。同类型的节点，Scan 节点和
+              Join 节点按照 table 升序输出，Filter
+              按照条件的字典序升序输出，Project
+              节点按照“表名.列名”升序输出。所有的列输出时均要先输出各自的表名，如果表有别名，则使用别名。Condition
+              的输出格式和原始的 SQL 语句保持一致。
+            </p>
+            <hr data-sign="hr2" data-lines="2" />
+            <h2
+              id="2-%E8%AF%84%E5%88%86%E6%A0%87%E5%87%86"
+              data-sign="ad970a619d5e6428a001ef63ddad1e00"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#2-%E8%AF%84%E5%88%86%E6%A0%87%E5%87%86"
+              ></a
+              >2. 评分标准
+            </h2>
+            <p
+              data-sign="613687a2b0bc140527dbfaaaec831ef92"
+              data-type="p"
+              data-lines="2"
+            >
+              测评会综合检查
+              <code>EXPLAIN ANALYZE</code> 输出的优化计划树结构和各节点
+              <code>rows</code>
+              运行时统计是否符合规范，测试场景包括但不限于以下类型：
+            </p>
+            <div
+              class="cherry-table-container"
+              data-sign="70eaf4500fc94c0cd48c15f37b19b62a7"
+              data-lines="7"
+            >
+              <table class="cherry-table">
+                <thead>
+                  <tr>
+                    <th>测试类型</th>
+                    <th>场景</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>单表查询</td>
+                    <td>单表选择运算下推与运行时统计</td>
+                  </tr>
+                  <tr>
+                    <td>两表连接查询</td>
+                    <td>两表连接中的选择运算下推</td>
+                  </tr>
+                  <tr>
+                    <td>投影优化查询</td>
+                    <td>两表连接中的投影运算下推</td>
+                  </tr>
+                  <tr>
+                    <td>多表连接查询</td>
+                    <td>多表连接顺序优化，并支持选择运算下推和投影下推</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <hr data-sign="hr2" data-lines="2" />
+            <h2
+              id="3-%E6%B5%8B%E8%AF%84%E7%A4%BA%E4%BE%8B"
+              data-sign="63495609694ee03269eddbc0ae74badb"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#3-%E6%B5%8B%E8%AF%84%E7%A4%BA%E4%BE%8B"
+              ></a
+              >3. 测评示例
+            </h2>
+            <h3
+              id="31-%E5%8D%95%E8%A1%A8%E6%9F%A5%E8%AF%A2%E7%A4%BA%E4%BE%8B"
+              data-sign="4929acc6621033544c18ecaff92e4559"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#31-%E5%8D%95%E8%A1%A8%E6%9F%A5%E8%AF%A2%E7%A4%BA%E4%BE%8B"
+              ></a
+              >3.1 单表查询示例
+            </h3>
+            <h4
+              id="311-%E6%95%B0%E6%8D%AE%E5%87%86%E5%A4%87"
+              data-sign="6e36760fbfcc22c51c4606af340e7d62"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#311-%E6%95%B0%E6%8D%AE%E5%87%86%E5%A4%87"
+              ></a
+              >3.1.1 数据准备
+            </h4>
+            <div
+              data-sign="8c6dc9da73e5996ec8489379f85432f5"
+              data-type="codeBlock"
+              data-lines="10"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="sql"
+            >
+              <pre
+                class="language-sql"
+              ><code class="language-sql wrap"><span class="code-line"><span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> t <span class="token punctuation">(</span>a <span class="token keyword">int</span><span class="token punctuation">,</span> b <span class="token keyword">int</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> t <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> t <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> t <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">12</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> t <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> t <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span></code></pre>
+            </div>
+            <h4
+              id="312-%E6%89%A7%E8%A1%8C%E6%9F%A5%E8%AF%A2"
+              data-sign="cc9e4c345a8d8d72d789b03fab1099ba"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#312-%E6%89%A7%E8%A1%8C%E6%9F%A5%E8%AF%A2"
+              ></a
+              >3.1.2 执行查询
+            </h4>
+            <p
+              data-sign="ad4fd9822fdedf7e3f06233db966ea7c2"
+              data-type="p"
+              data-lines="2"
+            >
+              执行如下命令，先确认结果正确性，再观察优化后的执行计划：
+            </p>
+            <div
+              data-sign="036287eb25940a84c30b185476f23196"
+              data-type="codeBlock"
+              data-lines="6"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="sql"
+            >
+              <pre
+                class="language-sql"
+              ><code class="language-sql wrap"><span class="code-line"><span class="token keyword">SELECT</span> a<span class="token punctuation">,</span> b <span class="token keyword">FROM</span> t <span class="token keyword">WHERE</span> a <span class="token operator">&gt;</span> <span class="token number">1</span> <span class="token operator">AND</span> b <span class="token operator">&lt;</span> <span class="token number">10</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">EXPLAIN</span> <span class="token keyword">ANALYZE</span> <span class="token keyword">SELECT</span> a<span class="token punctuation">,</span> b <span class="token keyword">FROM</span> t <span class="token keyword">WHERE</span> a <span class="token operator">&gt;</span> <span class="token number">1</span> <span class="token operator">AND</span> b <span class="token operator">&lt;</span> <span class="token number">10</span><span class="token punctuation">;</span></span></code></pre>
+            </div>
+            <p
+              data-sign="bd54aea9721ff0d2649c7e1d42b572f02"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>SELECT 结果</strong>：
+            </p>
+            <div
+              data-sign="44df431fec5e6ba2555e797fe54fcd89"
+              data-type="codeBlock"
+              data-lines="6"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="text"
+            >
+              <pre
+                class="language-text"
+              ><code class="language-text wrap"><span class="code-line">| a | b |</span>
+<span class="code-line">| 2 | 8 |</span>
+<span class="code-line">| 4 | 6 |</span></code></pre>
+            </div>
+            <p
+              data-sign="914734ebabc14efc102474eeabc983072"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>EXPLAIN ANALYZE 期望输出</strong>：
+            </p>
+            <div
+              data-sign="e4338494e9affe1f513c16f2fe57f8ea"
+              data-type="codeBlock"
+              data-lines="6"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="text"
+            >
+              <pre
+                class="language-text"
+              ><code class="language-text wrap"><span class="code-line">Project(columns=[t.a, t.b], rows=2)</span>
+<span class="code-line">    Filter(condition=[t.a&gt;1, t.b&lt;10], rows=2)</span>
+<span class="code-line">        Scan(table=t, type=SeqScan, rows=5)</span></code></pre>
+            </div>
+            <p
+              data-sign="1d4000521fc78f5ac241bf6cf63e73eb2"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>说明</strong>：
+            </p>
+            <ul
+              data-lines="4"
+              data-sign="39bd522735c312b3f8691578e7288c50"
+              class="cherry-list__square"
+            >
+              <li class="cherry-list-item">
+                <p><code>Scan rows=5</code>：扫描 t 表全部 5 行。</p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  <code>Filter rows=2</code>：满足
+                  <code>a &gt; 1 AND b &lt; 10</code> 的记录共 2 行。
+                </p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  <code>Project rows=2</code>：投影不改变行数，最终输出 2 行。
+                </p>
+              </li>
+            </ul>
+            <h3
+              id="32-%E7%A4%BA%E4%BE%8B%EF%BC%9A%E9%80%89%E6%8B%A9%E8%BF%90%E7%AE%97%E4%B8%8B%E6%8E%A8"
+              data-sign="ba3dc4ba11c402ea89f194b46007b5b1"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#32-%E7%A4%BA%E4%BE%8B%EF%BC%9A%E9%80%89%E6%8B%A9%E8%BF%90%E7%AE%97%E4%B8%8B%E6%8E%A8"
+              ></a
+              >3.2 示例：选择运算下推
+            </h3>
+            <h4
+              id="321-%E6%95%B0%E6%8D%AE%E5%87%86%E5%A4%87"
+              data-sign="6f9a16b7050d396d6bfbaf486e528e8e"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#321-%E6%95%B0%E6%8D%AE%E5%87%86%E5%A4%87"
+              ></a
+              >3.2.1 数据准备
+            </h4>
+            <div
+              data-sign="f0c37e5c917340bb5b932e3a3bac8a4c"
+              data-type="codeBlock"
+              data-lines="26"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="sql"
+            >
+              <pre
+                class="language-sql"
+              ><code class="language-sql wrap"><span class="code-line"><span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> orders <span class="token punctuation">(</span></span>
+<span class="code-line">	order_id <span class="token keyword">int</span><span class="token punctuation">,</span></span>
+<span class="code-line">	customer_id <span class="token keyword">int</span><span class="token punctuation">,</span></span>
+<span class="code-line">	order_date <span class="token keyword">char</span><span class="token punctuation">(</span><span class="token number">40</span><span class="token punctuation">)</span><span class="token punctuation">,</span></span>
+<span class="code-line">	total_amount <span class="token keyword">float</span></span>
+<span class="code-line"><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> customers <span class="token punctuation">(</span></span>
+<span class="code-line">	customer_id <span class="token keyword">int</span><span class="token punctuation">,</span></span>
+<span class="code-line">	name <span class="token keyword">char</span><span class="token punctuation">(</span><span class="token number">50</span><span class="token punctuation">)</span><span class="token punctuation">,</span></span>
+<span class="code-line">	email <span class="token keyword">char</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">,</span></span>
+<span class="code-line">	address <span class="token keyword">char</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">)</span></span>
+<span class="code-line"><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> customers <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token string">'Alice'</span><span class="token punctuation">,</span> <span class="token string">'alice@example.com'</span><span class="token punctuation">,</span> <span class="token string">'A Street'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> customers <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token string">'Bob'</span><span class="token punctuation">,</span> <span class="token string">'bob@example.com'</span><span class="token punctuation">,</span> <span class="token string">'B Street'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> customers <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">,</span> <span class="token string">'Carol'</span><span class="token punctuation">,</span> <span class="token string">'carol@example.com'</span><span class="token punctuation">,</span> <span class="token string">'C Street'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> orders <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">101</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token string">'2025-01-01'</span><span class="token punctuation">,</span> <span class="token number">500.0</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> orders <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">102</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token string">'2025-01-02'</span><span class="token punctuation">,</span> <span class="token number">1200.0</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> orders <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">103</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token string">'2025-01-03'</span><span class="token punctuation">,</span> <span class="token number">900.0</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> orders <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">104</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token string">'2025-01-04'</span><span class="token punctuation">,</span> <span class="token number">1500.0</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> orders <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">105</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token string">'2025-01-05'</span><span class="token punctuation">,</span> <span class="token number">700.0</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span></code></pre>
+            </div>
+            <h4
+              id="322-%E6%89%A7%E8%A1%8C%E6%9F%A5%E8%AF%A2"
+              data-sign="c63a988f476f35f6205468b321fe450d"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#322-%E6%89%A7%E8%A1%8C%E6%9F%A5%E8%AF%A2"
+              ></a
+              >3.2.2 执行查询
+            </h4>
+            <div
+              data-sign="b9c6f5e8894674069bbc7863dccbc014"
+              data-type="codeBlock"
+              data-lines="10"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="sql"
+            >
+              <pre
+                class="language-sql"
+              ><code class="language-sql wrap"><span class="code-line"><span class="token keyword">SELECT</span> <span class="token operator">*</span> <span class="token keyword">FROM</span> customers c</span>
+<span class="code-line"><span class="token keyword">JOIN</span> orders o <span class="token keyword">ON</span> c<span class="token punctuation">.</span>customer_id <span class="token operator">=</span> o<span class="token punctuation">.</span>customer_id</span>
+<span class="code-line"><span class="token keyword">WHERE</span> o<span class="token punctuation">.</span>total_amount <span class="token operator">&gt;</span> <span class="token number">1000</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">EXPLAIN</span> <span class="token keyword">ANALYZE</span> <span class="token keyword">SELECT</span> <span class="token operator">*</span> <span class="token keyword">FROM</span> customers c</span>
+<span class="code-line"><span class="token keyword">JOIN</span> orders o <span class="token keyword">ON</span> c<span class="token punctuation">.</span>customer_id <span class="token operator">=</span> o<span class="token punctuation">.</span>customer_id</span>
+<span class="code-line"><span class="token keyword">WHERE</span> o<span class="token punctuation">.</span>total_amount <span class="token operator">&gt;</span> <span class="token number">1000</span><span class="token punctuation">;</span></span></code></pre>
+            </div>
+            <p
+              data-sign="bd54aea9721ff0d2649c7e1d42b572f02"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>SELECT 结果</strong>：
+            </p>
+            <div
+              data-sign="c2c7c321f3f79445397db87bb27501fa"
+              data-type="codeBlock"
+              data-lines="6"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="text"
+            >
+              <pre
+                class="language-text"
+              ><code class="language-text wrap"><span class="code-line">| customer_id | name | email | address | order_id | customer_id | order_date | total_amount |</span>
+<span class="code-line">| 1 | Alice | alice@example.com | A Street | 102 | 1 | 2025-01-02 | 1200.000000 |</span>
+<span class="code-line">| 2 | Bob | bob@example.com | B Street | 104 | 2 | 2025-01-04 | 1500.000000 |</span></code></pre>
+            </div>
+            <p
+              data-sign="914734ebabc14efc102474eeabc983072"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>EXPLAIN ANALYZE 期望输出</strong>：
+            </p>
+            <div
+              data-sign="3bf414a12b44f1f42826df5d02946067"
+              data-type="codeBlock"
+              data-lines="8"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="text"
+            >
+              <pre
+                class="language-text"
+              ><code class="language-text wrap"><span class="code-line">Project(columns=[*], rows=2)</span>
+<span class="code-line">    Join(tables=[customers, orders], condition=[c.customer_id=o.customer_id], rows=2)</span>
+<span class="code-line">        Scan(table=customers, type=SeqScan, rows=3)</span>
+<span class="code-line">        Filter(condition=[o.total_amount&gt;1000], rows=6)</span>
+<span class="code-line">            Scan(table=orders, type=SeqScan, rows=15)</span></code></pre>
+            </div>
+            <p
+              data-sign="1d4000521fc78f5ac241bf6cf63e73eb2"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>说明</strong>：
+            </p>
+            <ul
+              data-lines="6"
+              data-sign="97ffe6bb36f909dda2351a6af5ad1d25"
+              class="cherry-list__square"
+            >
+              <li class="cherry-list-item">
+                <p>
+                  <code>Scan(table=customers) rows=3</code>：customers
+                  表作为左侧外表，单次扫描 3 行。
+                </p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  <code>Filter</code> 节点被下推到 orders 表扫描之上，但 orders
+                  仍是 <code>customers c JOIN orders o</code> 中的右侧内表。
+                </p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  <code>Scan(table=orders) rows=15</code>：orders
+                  表作为右侧内表，被 customers 的 3 行重复扫描，共访问
+                  <code>3 × 5 = 15</code> 行。
+                </p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  <code>Filter rows=6</code>：每次扫描 orders 时都有 2
+                  条订单满足 <code>o.total_amount &gt; 1000</code>，累计输出
+                  <code>3 × 2 = 6</code> 行。
+                </p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  <code>Join rows=2</code
+                  >：过滤后的订单与当前外表客户匹配后，共输出 2 行。
+                </p>
+              </li>
+            </ul>
+            <h3
+              id="33-%E7%A4%BA%E4%BE%8B%EF%BC%9A%E6%8A%95%E5%BD%B1%E4%B8%8B%E6%8E%A8"
+              data-sign="c1c583a9b4c205a5f3c1534ac6e36d47"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#33-%E7%A4%BA%E4%BE%8B%EF%BC%9A%E6%8A%95%E5%BD%B1%E4%B8%8B%E6%8E%A8"
+              ></a
+              >3.3 示例：投影下推
+            </h3>
+            <h4
+              id="331-%E6%95%B0%E6%8D%AE%E5%87%86%E5%A4%87"
+              data-sign="68e1b77dea944bffede197b32910cf6b"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#331-%E6%95%B0%E6%8D%AE%E5%87%86%E5%A4%87"
+              ></a
+              >3.3.1 数据准备
+            </h4>
+            <div
+              data-sign="f0c37e5c917340bb5b932e3a3bac8a4c"
+              data-type="codeBlock"
+              data-lines="26"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="sql"
+            >
+              <pre
+                class="language-sql"
+              ><code class="language-sql wrap"><span class="code-line"><span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> orders <span class="token punctuation">(</span></span>
+<span class="code-line">	order_id <span class="token keyword">int</span><span class="token punctuation">,</span></span>
+<span class="code-line">	customer_id <span class="token keyword">int</span><span class="token punctuation">,</span></span>
+<span class="code-line">	order_date <span class="token keyword">char</span><span class="token punctuation">(</span><span class="token number">40</span><span class="token punctuation">)</span><span class="token punctuation">,</span></span>
+<span class="code-line">	total_amount <span class="token keyword">float</span></span>
+<span class="code-line"><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> customers <span class="token punctuation">(</span></span>
+<span class="code-line">	customer_id <span class="token keyword">int</span><span class="token punctuation">,</span></span>
+<span class="code-line">	name <span class="token keyword">char</span><span class="token punctuation">(</span><span class="token number">50</span><span class="token punctuation">)</span><span class="token punctuation">,</span></span>
+<span class="code-line">	email <span class="token keyword">char</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">,</span></span>
+<span class="code-line">	address <span class="token keyword">char</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">)</span></span>
+<span class="code-line"><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> customers <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token string">'Alice'</span><span class="token punctuation">,</span> <span class="token string">'alice@example.com'</span><span class="token punctuation">,</span> <span class="token string">'A Street'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> customers <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token string">'Bob'</span><span class="token punctuation">,</span> <span class="token string">'bob@example.com'</span><span class="token punctuation">,</span> <span class="token string">'B Street'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> customers <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">,</span> <span class="token string">'Carol'</span><span class="token punctuation">,</span> <span class="token string">'carol@example.com'</span><span class="token punctuation">,</span> <span class="token string">'C Street'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> orders <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">101</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token string">'2025-01-01'</span><span class="token punctuation">,</span> <span class="token number">500.0</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> orders <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">102</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token string">'2025-01-02'</span><span class="token punctuation">,</span> <span class="token number">1200.0</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> orders <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">103</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token string">'2025-01-03'</span><span class="token punctuation">,</span> <span class="token number">900.0</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> orders <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">104</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token string">'2025-01-04'</span><span class="token punctuation">,</span> <span class="token number">1500.0</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span>
+<span class="code-line"><span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> orders <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">105</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token string">'2025-01-05'</span><span class="token punctuation">,</span> <span class="token number">700.0</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span></code></pre>
+            </div>
+            <h4
+              id="332-%E6%89%A7%E8%A1%8C%E6%9F%A5%E8%AF%A2"
+              data-sign="07ba4bfceb9d0bd62dd9627e391efbcf"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#332-%E6%89%A7%E8%A1%8C%E6%9F%A5%E8%AF%A2"
+              ></a
+              >3.3.2 执行查询
+            </h4>
+            <div
+              data-sign="b429abc58f9d476fe6cc4cb80bc9bf15"
+              data-type="codeBlock"
+              data-lines="10"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="sql"
+            >
+              <pre
+                class="language-sql"
+              ><code class="language-sql wrap"><span class="code-line"><span class="token keyword">SELECT</span> c<span class="token punctuation">.</span>name<span class="token punctuation">,</span> o<span class="token punctuation">.</span>order_id</span>
+<span class="code-line"><span class="token keyword">FROM</span> customers c</span>
+<span class="code-line"><span class="token keyword">JOIN</span> orders o <span class="token keyword">ON</span> c<span class="token punctuation">.</span>customer_id <span class="token operator">=</span> o<span class="token punctuation">.</span>customer_id<span class="token punctuation">;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="token keyword">EXPLAIN</span> <span class="token keyword">ANALYZE</span> <span class="token keyword">SELECT</span> c<span class="token punctuation">.</span>name<span class="token punctuation">,</span> o<span class="token punctuation">.</span>order_id</span>
+<span class="code-line"><span class="token keyword">FROM</span> customers c</span>
+<span class="code-line"><span class="token keyword">JOIN</span> orders o <span class="token keyword">ON</span> c<span class="token punctuation">.</span>customer_id <span class="token operator">=</span> o<span class="token punctuation">.</span>customer_id<span class="token punctuation">;</span></span></code></pre>
+            </div>
+            <p
+              data-sign="bd54aea9721ff0d2649c7e1d42b572f02"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>SELECT 结果</strong>：
+            </p>
+            <div
+              data-sign="b3e1ee577438b64cce43d9d11cec0c8d"
+              data-type="codeBlock"
+              data-lines="9"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="text"
+            >
+              <pre
+                class="language-text"
+              ><code class="language-text wrap"><span class="code-line">| name | order_id |</span>
+<span class="code-line">| Alice | 101 |</span>
+<span class="code-line">| Alice | 102 |</span>
+<span class="code-line">| Bob | 103 |</span>
+<span class="code-line">| Bob | 104 |</span>
+<span class="code-line">| Carol | 105 |</span></code></pre>
+            </div>
+            <p
+              data-sign="914734ebabc14efc102474eeabc983072"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>EXPLAIN ANALYZE 期望输出</strong>：
+            </p>
+            <div
+              data-sign="edb58f5ac14a6db8285d0a86058ee3e8"
+              data-type="codeBlock"
+              data-lines="9"
+              data-edit-code="true"
+              data-copy-code="true"
+              data-change-lang="true"
+              data-lang="text"
+            >
+              <pre
+                class="language-text"
+              ><code class="language-text wrap"><span class="code-line">Project(columns=[c.name, o.order_id], rows=5)</span>
+<span class="code-line">    Join(tables=[customers, orders], condition=[c.customer_id=o.customer_id], rows=5)</span>
+<span class="code-line">        Project(columns=[c.customer_id, c.name], rows=3)</span>
+<span class="code-line">            Scan(table=customers, type=SeqScan, rows=3)</span>
+<span class="code-line">        Project(columns=[o.customer_id, o.order_id], rows=15)</span>
+<span class="code-line">            Scan(table=orders, type=SeqScan, rows=15)</span></code></pre>
+            </div>
+            <p
+              data-sign="1d4000521fc78f5ac241bf6cf63e73eb2"
+              data-type="p"
+              data-lines="2"
+            >
+              <strong>说明</strong>：
+            </p>
+            <ul
+              data-lines="5"
+              data-sign="1399bdc2ed5b9c7abe9bbdfe1c595064"
+              class="cherry-list__square"
+            >
+              <li class="cherry-list-item">
+                <p>customers 作为 NLJ 的左侧外表，单次扫描 3 行。</p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  orders 表作为右侧内表，被 customers 的 3 行重复扫描，共访问
+                  <code>3 × 5 = 15</code> 行，因此右侧
+                  <code>Project rows=15</code>、<code>Scan rows=15</code>。
+                </p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  投影下推后，customers 侧仅保留
+                  <code>c.customer_id,c.name</code>，orders 侧仅保留
+                  <code>o.customer_id,o.order_id</code>。
+                </p>
+              </li>
+              <li class="cherry-list-item">
+                <p><code>Join rows=5</code>：最终连接结果为 5 行。</p>
+              </li>
+            </ul>
+            <h3
+              id="34-%E8%AF%84%E6%B5%8B%E8%AF%B4%E6%98%8E"
+              data-sign="c3404e18279813fe1793d1a484e5f266"
+              data-lines="2"
+            >
+              <a
+                class="anchor"
+                href="#34-%E8%AF%84%E6%B5%8B%E8%AF%B4%E6%98%8E"
+              ></a
+              >3.4 评测说明
+            </h3>
+            <p
+              data-sign="d408c60635d93fb29b6337397471818e2"
+              data-type="p"
+              data-lines="2"
+            >
+              <code>EXPLAIN ANALYZE SELECT ...</code>
+              只向输出文件写入执行计划与统计信息，不再额外写入
+              <code>SELECT</code> 查询结果。
+            </p>
+            <p
+              data-sign="fdd93a10b7e98695ebe329f94d12df2a2"
+              data-type="p"
+              data-lines="2"
+            >
+              评测系统将按照以下流程对选手的提交进行自动化测评：
+            </p>
+            <ol
+              data-lines="5"
+              data-sign="7d266d77cfddc708bc01267a4b1cd572"
+              start="1"
+              class="cherry-list__default"
+            >
+              <li class="cherry-list-item">
+                <p>初始化：创建表并导入基准测试数据集。</p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  执行标准查询：检查普通 <code>SELECT</code> 查询结果是否正确。
+                </p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  执行
+                  <code>EXPLAIN ANALYZE</code
+                  >：检查优化后的计划树结构是否符合选择下推、投影下推和连接顺序优化规则。
+                </p>
+              </li>
+              <li class="cherry-list-item">
+                <p>
+                  检查运行时统计：检查每个计划节点的
+                  <code>rows</code> 是否与本次执行时涉及的总行数一致。
+                </p>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <script>
+        cgRenderMarkdown(
+          "assignProContent3187430ff09c0ca92c92db4473abba3ccfce3d2",
+          false,
+          "cgmdassignProContent3187430",
+        );
+      </script>
+    </div>
+  </div>
+</div>

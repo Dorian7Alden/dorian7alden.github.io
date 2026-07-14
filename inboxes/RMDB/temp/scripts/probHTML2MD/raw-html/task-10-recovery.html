@@ -1,0 +1,481 @@
+<div class="cgcode_description__2b0C">
+  <div class="cgcode_css-m6wrkg-Container" style="margin: 16px 0 0">
+    <h4 class="cgcode_css-tt3ivf-Title">
+      10. 2026题目十：基于静态检查点的故障恢复
+    </h4>
+  </div>
+  <div class="cgcode_content__1Y2H">
+    <div class="cgcode_notranslate">
+      <div class="cgProblemContentClass">
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong>前置题目</strong>：可配置的快照与可串行化隔离级别</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong>题目种类</strong>：基础功能</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong>推荐知识点</strong
+            >：故障恢复概述、基于REDO/UNDO日志的恢复算法、恢复算法ARIES</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"><strong>代码框架</strong></span
+          ><span style="font-size: 16px"
+            ><strong
+              ><strong
+                style="
+                  color: rgb(51, 51, 51);
+                  text-align: justify;
+                  text-wrap: wrap;
+                  background-color: rgb(255, 255, 255);
+                  font-family: Calibri;
+                "
+                >：</strong
+              ></strong
+            ></span
+          ><span style="font-size: 16px"
+            ><a
+              href="https://gitlab.eduxiji.net/csc1/csc-db/db2025/-/tree/main/rmdb"
+              _src="https://gitlab.eduxiji.net/csc1/csc-db/db2025/-/tree/main/rmdb"
+              >https://gitlab.eduxiji.net/csc1/csc-db/db2026/-/tree/main/rmdb</a
+            >
+          </span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <br />
+        </p>
+        <h2
+          style="
+            margin-top: 17px;
+            margin-bottom: 13px;
+            break-after: avoid;
+            font-family: Arial;
+            font-size: 21px;
+          "
+        >
+          <strong><span style="font-size: 21px"></span></strong>
+        </h2>
+        <h2
+          style="
+            margin-top: 17px;
+            margin-bottom: 13px;
+            break-after: avoid;
+            font-family: Arial;
+            font-size: 21px;
+          "
+        >
+          <span style="font-size: 20px"><strong>题</strong></span
+          ><span style="font-size: 20px"><strong>目描述</strong></span
+          ><strong><span style="font-size: 21px">：</span></strong>
+        </h2>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            >本题目要求实现基于静态检查点的系统故障恢复。包含以下功能：</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">1.&nbsp;日志管理器</span>
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">2.&nbsp;WAL机制</span>
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">3.&nbsp;基础故障恢复</span>
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            >4.&nbsp;语法功能：create&nbsp;static_checkpoint;命令创建静态检查点</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            >5.&nbsp;基于静态检查点的系统故障恢复</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">&nbsp;</span>
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            >基础故障恢复功能需要实现日志管理器，在系统运行过程中把写操作的日志通过日志缓冲区写入磁盘中，参赛队伍需要实现WAL机制（Wirte-Ahead
+            Log，即先写日志后写数据）和REDO/UNDO日志。在系统发生故障并重启之后，系统可以通过REDO/UNDO日志对系统进行故障恢复，让数据库系统恢复到一致性状态，基础故障恢复在系统重启恢复时从磁盘中的第一条日志开始扫描。</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 14px">&nbsp;</span>
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            >基于检查点的故障恢复是在基础故障恢复的一个优化，在创建检查点之后，系统故障恢复时从最新的一个检查点开始扫描日志。</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">&nbsp;</span>
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            >具体的说，检查点技术是将数据库中的脏数据（即缓冲区中已经被修改但还没有写入磁盘的数据）写入磁盘，同时更新数据库的控制文件和日志文件，以便在数据库恢复时能够正确地恢复数据。检查点有多种实现方法，在本题目中，要求参赛队伍实现静态检查点。创建静态检查点时，系统需要停止接收新事务、停止正在运行的事务，并将当前数据库缓冲区中的脏页和日志刷入磁盘。当系统崩溃重启后，能够找到最近的检查点，并从该检查点开始将数据库恢复到一致性状态。</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">&nbsp;</span>
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">创建静态检查点的具体步骤如下：</span>
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">（1）停止接收新事务和正在运行事务</span>
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            >（2）将仍保留在日志缓冲区中的内容写到日志文件中；</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            >（3）在日志文件中写入一个“检查点记录”；</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            >（4）将当前数据库缓冲区中的内容写到数据库中；</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            >（5）把日志文件中检查点记录的地址写到“重新启动文件”中。</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">&nbsp;</span>
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            >使用静态检查点做故障恢复的步骤如下：</span
+          >
+        </p>
+        <p
+          style="
+            text-align: justify;
+            font-family: Arial;
+            font-size: 16px;
+            text-indent: 0px;
+          "
+        >
+          <span style="font-size: 16px"
+            >（1）在重新开始文件中找到最后一个检查点在日志文件中的地址。将创建检查点时刻的所有事务加入undo
+            list，而redo list暂时为空</span
+          >
+        </p>
+        <p
+          style="
+            text-align: justify;
+            font-family: Arial;
+            font-size: 16px;
+            text-indent: 0px;
+          "
+        >
+          <span style="font-size: 16px"
+            >（2）从检查点开始扫描各个日志，如果有新开始的事务则加入undo
+            list，如果有事务提交，则从undo list删除，并加入redo list</span
+          >
+        </p>
+        <p
+          style="
+            text-align: justify;
+            font-family: Arial;
+            font-size: 16px;
+            text-indent: 0px;
+          "
+        >
+          <span style="font-size: 16px"
+            >（3）对于undo list中的所有事务做undo操作，对于redo
+            list中的事务做redo操作</span
+          >
+        </p>
+        <p
+          style="
+            text-align: justify;
+            font-family: Arial;
+            font-size: 16px;
+            text-indent: 0px;
+          "
+        >
+          <span style="font-size: 16px"
+            >关于静态检查点的详细内容可以参考教材《数据库管理系统原理与实现》第12章故障恢复</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">&nbsp;</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 20px"><strong>测试示例</strong></span
+          ><span style="font-size: 20px"><strong>：</strong></span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">不带检查点的系统故障恢复：</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            >create table t1 (id int, num int);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">begin;</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">insert into t1 values(1, 1);</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">commit;</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">begin;</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">insert into t1 values(2, 2);</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">crash // 系统接收到终止信号</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">...</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">重启系统</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">select * from t1;</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">&nbsp;</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">带检查点的系统故障恢复：</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            >create table t1 (id int, num int);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">begin;</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">insert into t1 values(1, 1);</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">commit;</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            >create&nbsp;static_checkpoint; // 创建静态检查点</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">begin;</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">insert into t1 values(2, 2);</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">crash // 系统接收到终止信号</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">...</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">重启系统</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">select * from t1;</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"><br /></span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 20px"><strong>测试点说明：</strong></span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 20px"></span>
+        </p>
+        <table width="-726">
+          <tbody>
+            <tr class="firstRow">
+              <td width="221" valign="top" style="word-break: break-all">
+                测试点
+              </td>
+              <td width="221" valign="top" style="word-break: break-all">
+                详细说明
+              </td>
+            </tr>
+            <tr>
+              <td width="221" valign="top" style="word-break: break-all">
+                crash_recovery_single_thread_test
+              </td>
+              <td width="221" valign="top" style="word-break: break-all">
+                单线程发送事务，数据量较小，不包括建立检查点
+              </td>
+            </tr>
+            <tr>
+              <td width="221" valign="top" style="word-break: break-all">
+                crash_recovery_multi_thread_test
+              </td>
+              <td width="221" valign="top" style="word-break: break-all">
+                多线程发送事务，数据量较小，不包括建立检查点
+              </td>
+            </tr>
+            <tr>
+              <td width="221" valign="top" style="word-break: break-all">
+                crash_recovery_index_test
+              </td>
+              <td width="221" valign="top" style="word-break: break-all">
+                单线程发送事务，包含建立索引，数据量较大，不包括建立检查点
+              </td>
+            </tr>
+            <tr>
+              <td width="221" valign="top" style="word-break: break-all">
+                crash_recovery_large_data_test
+              </td>
+              <td width="221" valign="top" style="word-break: break-all">
+                多线程发送事务，数据量较大，不包括建立检查点
+              </td>
+            </tr>
+            <tr>
+              <td
+                valign="top"
+                colspan="1"
+                rowspan="1"
+                style="word-break: break-all"
+              >
+                crash_recovery_without_checkpoint
+              </td>
+              <td
+                valign="top"
+                colspan="1"
+                rowspan="1"
+                style="word-break: break-all"
+              >
+                单线程发送事务，数据量巨大，不包括建立检查点，会记录系统故障恢复时间t1（注：恢复时间指从server重启开始，到server能够提供服务为止所需的时间）
+              </td>
+            </tr>
+            <tr>
+              <td
+                valign="top"
+                colspan="1"
+                rowspan="1"
+                style="word-break: break-all"
+              >
+                crash_recovery_with_checkpoint
+              </td>
+              <td
+                valign="top"
+                colspan="1"
+                rowspan="1"
+                style="word-break: break-all"
+              >
+                单线程发送事务，数据量同crash_recovery_without_checkpoint测试，在执行过程中，会不定时发送create
+                static_checkpoint建立检查点，在系统crash之后会记录系统恢复时间t2，其中t2不超过t1的70%并且通过本题目的一致性检测，可认为通过本测试点
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 20px"></span><br />
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 20px"><strong>测试过程说明：</strong></span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">2.1 创建表，并插入一定量的数据</span>
+        </p>
+        <pre class="brush:cpp;toolbar:false">
+create&nbsp;table&nbsp;warehouse&nbsp;(w_id&nbsp;int,&nbsp;w_name&nbsp;char(10),&nbsp;w_street_1&nbsp;char(20),w_street_2&nbsp;char(20),&nbsp;w_city&nbsp;char(20),&nbsp;w_state&nbsp;char(2),
+&nbsp;w_zip&nbsp;char(9),&nbsp;w_tax&nbsp;float,&nbsp;w_ytd&nbsp;float);
+create&nbsp;table&nbsp;district&nbsp;(d_id&nbsp;int,&nbsp;d_w_id&nbsp;int,&nbsp;d_name&nbsp;char(10),&nbsp;d_street_1&nbsp;char(20),&nbsp;d_street_2&nbsp;char(20),
+&nbsp;d_city&nbsp;char(20),&nbsp;d_state&nbsp;char(2),&nbsp;d_zip&nbsp;char(9),d_tax&nbsp;float,&nbsp;d_ytd&nbsp;float,&nbsp;d_next_o_id&nbsp;int);
+create&nbsp;table&nbsp;customer&nbsp;(c_id&nbsp;int,&nbsp;c_d_id&nbsp;int,&nbsp;c_w_id&nbsp;int,&nbsp;c_first&nbsp;char(16),c_middle&nbsp;char(2),
+&nbsp;c_last&nbsp;char(16),&nbsp;c_street_1&nbsp;char(20),&nbsp;c_street_2&nbsp;char(20),c_city&nbsp;char(20),&nbsp;c_state&nbsp;char(2),&nbsp;
+&nbsp;c_zip&nbsp;char(9),&nbsp;c_phone&nbsp;char(16),&nbsp;c_since&nbsp;char(30),&nbsp;c_credit&nbsp;char(2),&nbsp;
+&nbsp;c_credit_lim&nbsp;int,&nbsp;c_discount&nbsp;float,&nbsp;c_balance&nbsp;float,c_ytd_payment&nbsp;float,&nbsp;
+&nbsp;c_payment_cnt&nbsp;int,&nbsp;c_delivery_cnt&nbsp;int,&nbsp;c_data&nbsp;char(50));
+create&nbsp;table&nbsp;history&nbsp;(h_c_id&nbsp;int,&nbsp;h_c_d_id&nbsp;int,&nbsp;h_c_w_id&nbsp;int,&nbsp;h_d_id&nbsp;int,
+&nbsp;h_w_id&nbsp;int,&nbsp;h_date&nbsp;char(19),&nbsp;h_amount&nbsp;float,&nbsp;h_data&nbsp;char(24));
+create&nbsp;table&nbsp;new_orders&nbsp;(no_o_id&nbsp;int,&nbsp;no_d_id&nbsp;int,&nbsp;no_w_id&nbsp;int);
+create&nbsp;table&nbsp;orders&nbsp;(o_id&nbsp;int,&nbsp;o_d_id&nbsp;int,&nbsp;o_w_id&nbsp;int,&nbsp;o_c_id&nbsp;int,&nbsp;o_entry_d&nbsp;char(19),
+&nbsp;o_carrier_id&nbsp;int,&nbsp;o_ol_cnt&nbsp;int,&nbsp;o_all_local&nbsp;int);
+create&nbsp;table&nbsp;order_line&nbsp;(&nbsp;ol_o_id&nbsp;int,&nbsp;ol_d_id&nbsp;int,&nbsp;ol_w_id&nbsp;int,&nbsp;ol_number&nbsp;int,
+ol_i_id&nbsp;int,&nbsp;ol_supply_w_id&nbsp;int,&nbsp;ol_delivery_d&nbsp;char(30),&nbsp;ol_quantity&nbsp;int,&nbsp;ol_amount&nbsp;float,&nbsp;ol_dist_info&nbsp;char(24));
+create&nbsp;table&nbsp;item&nbsp;(i_id&nbsp;int,&nbsp;i_im_id&nbsp;int,&nbsp;i_name&nbsp;char(24),&nbsp;i_price&nbsp;float,&nbsp;i_data&nbsp;char(50));
+create&nbsp;table&nbsp;stock&nbsp;(s_i_id&nbsp;int,&nbsp;s_w_id&nbsp;int,&nbsp;s_quantity&nbsp;int,&nbsp;s_dist_01&nbsp;char(24),s_dist_02&nbsp;char(24),
+&nbsp;s_dist_03&nbsp;char(24),&nbsp;s_dist_04&nbsp;char(24),&nbsp;s_dist_05&nbsp;char(24),s_dist_06&nbsp;char(24),&nbsp;s_dist_07&nbsp;char(24),
+&nbsp;s_dist_08&nbsp;char(24),&nbsp;s_dist_09&nbsp;char(24),s_dist_10&nbsp;char(24),&nbsp;s_ytd&nbsp;float,&nbsp;s_order_cnt&nbsp;int,&nbsp;s_remote_cnt&nbsp;int,&nbsp;s_data&nbsp;char(50));
+insert&nbsp;...
+insert&nbsp;...
+insert&nbsp;...</pre
+        >
+        <p><span style="font-size: 16px">2.2 执行事务</span></p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"></span>
+        </p>
+        <pre class="brush:cpp;toolbar:false">
+begin;
+select&nbsp;c_discount,&nbsp;c_last,&nbsp;c_credit,&nbsp;w_tax&nbsp;from&nbsp;customer,&nbsp;warehouse&nbsp;where&nbsp;w_id=1&nbsp;and&nbsp;c_w_id=w_id&nbsp;and&nbsp;c_d_id=1&nbsp;and&nbsp;c_id=2;
+select&nbsp;d_next_o_id,&nbsp;d_tax&nbsp;from&nbsp;district&nbsp;where&nbsp;d_id=1&nbsp;and&nbsp;d_w_id=1;
+update&nbsp;district&nbsp;set&nbsp;d_next_o_id=5&nbsp;where&nbsp;d_id=1&nbsp;and&nbsp;d_w_id=1;
+insert&nbsp;into&nbsp;orders&nbsp;values&nbsp;(4,&nbsp;1,&nbsp;1,&nbsp;2,&nbsp;'2023-06-03&nbsp;19:25:47',&nbsp;26,&nbsp;5,&nbsp;1);
+insert&nbsp;into&nbsp;new_orders&nbsp;values&nbsp;(4,&nbsp;1,&nbsp;1);
+select&nbsp;i_price,&nbsp;i_name,&nbsp;i_data&nbsp;from&nbsp;item&nbsp;where&nbsp;i_id=10;
+select&nbsp;s_quantity,&nbsp;s_data,&nbsp;s_dist_01,&nbsp;s_dist_02,&nbsp;s_dist_03,&nbsp;s_dist_04,&nbsp;s_dist_05,s_dist_06,&nbsp;s_dist_07,&nbsp;s_dist_08,&nbsp;s_dist_09,&nbsp;s_dist_10&nbsp;from&nbsp;stock&nbsp;where&nbsp;s_i_id=10&nbsp;and&nbsp;s_w_id=1;
+update&nbsp;stock&nbsp;set&nbsp;s_quantity=7&nbsp;where&nbsp;s_i_id=10&nbsp;and&nbsp;s_w_id=1;
+insert&nbsp;into&nbsp;order_line&nbsp;values&nbsp;(4,&nbsp;1,&nbsp;1,&nbsp;1,&nbsp;10,&nbsp;1,&nbsp;'2023-06-03&nbsp;19:25:47',&nbsp;7,286.625000,&nbsp;'VF2uQHlDhtxa5dKhPwWyCqgY');
+select&nbsp;i_price,&nbsp;i_name,&nbsp;i_data&nbsp;from&nbsp;item&nbsp;where&nbsp;i_id=10;</pre
+        >
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">测试点6会随机创建checkpoint</span><br />
+        </p>
+        <pre class="brush:cpp;toolbar:false">create&nbsp;static_checkpoint</pre>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px">2.3 发生 crash</span><br />
+        </p>
+        <pre class="brush:cpp;toolbar:false">crash</pre>
+        <p><span style="font-size: 16px">2.4 重启server</span></p>
+        <pre class="brush:cpp;toolbar:false">
+./bin/rmdb&nbsp;checkpoint_test</pre
+        >
+        <p>
+          <span style="font-size: 16px"
+            >2.5
+            由另外一个线程一直尝试重连，统计恢复时间（仅最后两个测试点需要）</span
+          >
+        </p>
+        <p><br /></p>
+        <pre class="brush:cpp;toolbar:false">
+std::string&nbsp;query&nbsp;=&nbsp;"select&nbsp;*&nbsp;from&nbsp;district;";
+time_t&nbsp;start_time&nbsp;=&nbsp;now();
+while(true)&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;ret&nbsp;=&nbsp;connect_database("rmdb");&nbsp;//&nbsp;尝试重连
+&nbsp;&nbsp;&nbsp;&nbsp;if(ret&nbsp;==&nbsp;0)&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(run_query(query))&nbsp;{&nbsp;//&nbsp;如果重连成功并且执行事务成功，视为系统已经恢复完成
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;sleep(0.05);&nbsp;//&nbsp;否则等待0.05s之后再次尝试
+}
+time_t&nbsp;end_time&nbsp;=&nbsp;now()
+time_t&nbsp;recovery_time&nbsp;=&nbsp;end_time&nbsp;-&nbsp;start_time&nbsp;//&nbsp;统计恢复时间</pre
+        >
+        <p>
+          <span style="font-size: 16px"
+            >2.6
+            一致性检测（详见一致性检测文档），前五个测试点通过一致性测试即可拿到分数，最后一个测试点除了通过一致性测试之外，还需要故障恢复时间t2小于测试点5的故障恢复时间t1的70%</span
+          ><br />
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

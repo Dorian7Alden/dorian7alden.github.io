@@ -1,0 +1,8 @@
+node_modules/
+data/auth.json
+data/status-cache.json
+data/rank-cache.json
+data/submit-history.json
+exploration/
+screenshots/
+

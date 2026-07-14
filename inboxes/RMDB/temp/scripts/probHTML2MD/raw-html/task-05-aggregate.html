@@ -1,0 +1,1193 @@
+<div class="cgcode_description__2b0C">
+  <div class="cgcode_css-m6wrkg-Container" style="margin: 16px 0 0">
+    <h4 class="cgcode_css-tt3ivf-Title">5. 2026题目五：聚合函数与分组统计</h4>
+  </div>
+  <div class="cgcode_content__1Y2H">
+    <div class="cgcode_notranslate">
+      <div class="cgProblemContentClass">
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><span style="font-family: 宋体; font-size: 16px"
+              ><strong
+                style="
+                  font-family: Arial;
+                  font-size: 16px;
+                  text-align: justify;
+                  white-space: normal;
+                "
+                >前置题目：</strong
+              ></span
+            ><span style="font-family: 宋体">查询执行</span></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            ><strong
+              style="
+                font-family: Arial;
+                font-size: 16px;
+                text-align: justify;
+                white-space: normal;
+              "
+              >题目种类：</strong
+            >基础功能</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><span style="font-family: 宋体; font-size: 16px"
+              ><strong
+                style="
+                  font-family: Arial;
+                  font-size: 16px;
+                  text-align: justify;
+                  white-space: normal;
+                "
+                >代码框架：</strong
+              ></span
+            ><strong
+              ><span style="font-family: 宋体; font-size: 16px"
+                >https://gitlab.eduxiji.net/csc1/csc-db/db2026/-/tree/main/rmdb
+              </span></strong
+            ></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong><br /></strong
+          ></span>
+        </p>
+        <p
+          style="
+            margin-top: 17px;
+            margin-bottom: 13px;
+            break-after: avoid;
+            font-family: Arial;
+            font-size: 21px;
+          "
+        >
+          <span style="font-size: 20px"
+            ><strong
+              ><span style="font-family: 宋体">题目描述</span></strong
+            ></span
+          ><strong
+            ><span style="font-family: 宋体; font-size: 21px">:</span></strong
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 16px; text-indent: 32px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >本题目要求实现聚合函数与分组统计。聚合函数：对一组值<span
+              style="font-family: 宋体"
+              >进行计算并返回单一的值，通过使用SQL聚合函数，可以确定数值集合的各种统计值。分组统计：将查询结果按照</span
+            >1个或者多个字段进行分组，字段值相同的为同一组。</span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px">&nbsp;</span>
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px">要求：</span>
+        </p>
+        <p style="margin: 0 0 0 28px; font-family: Arial; font-size: 14px">
+          <span style="font-family: Wingdings; font-size: 16px"></span>
+        </p>
+        <p style="margin: 0 0 0 28px; font-family: Arial; font-size: 14px">
+          <span style="font-family: Wingdings; font-size: 16px">l&nbsp;</span
+          ><span style="font-family: 宋体; font-size: 16px"
+            ><span style="font-family: 宋体">聚合函数</span
+            >COUNT(expr)：其中expr可以是列名、"*"。count(*)统计元组个数，count(列名)统计一列中值的个数。该函数仅需支持int、float、char类型的字段。</span
+          >
+        </p>
+        <p style="margin: 0 0 0 28px; font-family: Arial; font-size: 14px">
+          <span style="font-family: Wingdings; font-size: 16px">l&nbsp;</span
+          ><span style="font-family: 宋体; font-size: 16px"
+            ><span style="font-family: 宋体">聚合函数</span
+            >MAX(expr)：返回一列中的最大值。该函数仅需支持int、float类型的字段。</span
+          >
+        </p>
+        <p style="margin: 0 0 0 28px; font-family: Arial; font-size: 14px">
+          <span style="font-family: Wingdings; font-size: 16px">l&nbsp;</span
+          ><span style="font-family: 宋体; font-size: 16px"
+            ><span style="font-family: 宋体">聚合函数</span
+            >MIN(expr)：返回一列中的最小值。该函数仅需支持int、float类型的字段。</span
+          >
+        </p>
+        <p style="margin: 0 0 0 28px; font-family: Arial; font-size: 14px">
+          <span style="font-family: Wingdings; font-size: 16px">l&nbsp;</span
+          ><span style="font-family: 宋体; font-size: 16px"
+            ><span style="font-family: 宋体">聚合函数</span
+            >SUM(expr)：返回数值列的总数。该函数仅需支持int、float类型的字段。</span
+          >
+        </p>
+        <p style="margin: 0 0 0 28px; font-family: Arial; font-size: 14px">
+          <span style="font-family: Wingdings; font-size: 16px">l&nbsp;</span
+          ><span style="font-size: 16px; font-family: 宋体"
+            >聚合函数AVG(expr):
+            返回一列中的平均值。该函数仅需支持int、float类型的字段。</span
+          >
+        </p>
+        <p style="margin: 0 0 0 28px; font-family: Arial; font-size: 14px">
+          <span style="font-family: Wingdings; font-size: 16px">l&nbsp;</span
+          ><span style="font-family: 宋体; font-size: 16px"
+            ><span style="font-family: 宋体">分组统计</span>(group by<span
+              style="font-family: 宋体"
+              >、</span
+            >having)：group by<span style="font-family: 宋体"
+              >子句根据一个或多个列对结果集进行分组，可以使用having子句对每一个分组按条件进行过滤。分组属性</span
+            >仅需支持int、float、char类型的字段。</span
+          >
+        </p>
+        <p style="margin: 0 0 0 28px; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"></span>
+        </p>
+        <h1
+          style="
+            margin: 0 0 0 28px;
+            break-after: avoid;
+            font-family: Arial;
+            font-size: 24px;
+            padding: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span
+            style="font-family: Wingdings; font-weight: normal; font-size: 16px"
+            >l&nbsp;</span
+          ><span style="font-family: 宋体; font-weight: normal; font-size: 16px"
+            ><span style="font-family: 宋体">排序统计：order by子句</span
+            >对最终结果按照一个或多个列进行排序，并可指定升序ASC或降序DESC，默认采用ASC。可以使用limit关键字限制查询结果的数量。</span
+          >
+        </h1>
+        <p style="margin: 0 0 0 28px; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"></span><br />
+        </p>
+        <p style="margin: 0 0 0 28px; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"></span><br />
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 20px"
+            ><strong
+              ><span style="font-size: 20px; font-family: 宋体"
+                >测试示例：</span
+              ></strong
+            ><strong
+              ><span style="font-size: 20px; font-family: 宋体"></span></strong
+          ></span>
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong
+              ><span style="font-family: 宋体; font-size: 16px"
+                ><span style="font-family: 宋体; font-size: 16px">测试点</span
+                >1：单独使用聚合函数</span
+              ></strong
+            ></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"></span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px">测试示例:</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >create table grade (course char(20),id int,score float);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >insert into grade values('DataStructure',1,95);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >insert into grade values('DataStructure',2,93.5);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >insert into grade values('DataStructure',4,87);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >insert into grade values('DataStructure',3,85);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >insert into grade values('DB',1,94);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >insert into grade values('DB',2,74.5);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >insert into grade values('DB',4,83);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >insert into grade values('DB',3,87);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >select MAX(id) as&nbsp;<span
+              style="font-family: 宋体; font-size: 16px"
+              >max_id from grade;</span
+            ></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >select MIN(score) as min_score from grade&nbsp;<span
+              style="font-family: 宋体; font-size: 16px"
+              >where course = 'DB'</span
+            >;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >select AVG(score) as avg_score from grade where course =
+            'DataStructure';</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >select COUNT(course) as course_num from grade;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >select COUNT(*) as row_num from grade;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >select COUNT(*) as row_num from grade where score &lt; 60;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >select SUM(score) as sum_score from grade&nbsp;<span
+              style="font-family: 宋体; font-size: 16px"
+              >where id = 1</span
+            >;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >drop table grade;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px">期待输出：</span>
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px">| max_id |</span>
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px">| 4&nbsp;|</span>
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| min_score |</span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| 74.500000&nbsp;<span style="font-family: 宋体; font-size: 16px"
+              >|</span
+            ></span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| avg_score |</span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| 90.125000 |</span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| course_num |</span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px">| 8 |</span>
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px">| row_num |</span>
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px">| 8 |</span>
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px">| row_num |</span>
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| 0&nbsp;<span style="font-family: 宋体; font-size: 16px"
+              >|</span
+            ></span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| sum_score |</span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| 189.000000&nbsp;<span style="font-family: 宋体; font-size: 16px"
+              >|</span
+            ></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px">&nbsp;</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong
+              ><span style="font-family: 宋体; font-size: 16px"
+                >测试点</span
+              ></strong
+            ><strong
+              ><span style="font-family: 宋体; font-size: 16px">2</span></strong
+            ><strong
+              ><span style="font-family: 宋体; font-size: 16px"
+                >：聚合函数</span
+              ></strong
+            ><strong
+              ><span style="font-family: 宋体; font-size: 16px"
+                >加分组统计</span
+              ></strong
+            ></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"></span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px">测试示例:</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >create table grade (course char(20),id int,score float);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >insert into grade values('DataStructure',1,95);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >insert into grade values('DataStructure',2,93.5);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >insert into grade values('DataStructure',3,94.5);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >insert into grade values('ComputerNetworks',1,99);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >insert into grade values('ComputerNetworks',2,88.5);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >insert into grade values('ComputerNetworks',3,92.5);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >insert into grade values('C++',1,92);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >insert into grade values('C++',2,89);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >insert into grade values('C++',3,89.5);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >select id,MAX(score) as max_score,MIN(score) as
+            min_score,SUM(score) as sum_score from grade group by id;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >select id,MAX(score) as max_score from grade group by id having
+            COUNT(*) &gt; &nbsp;3;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >insert into grade values ('ParallelCompute',1,100);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >select id,MAX(score) as max_score from grade group by id having
+            COUNT(*) &gt; &nbsp;3;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >select id,MAX(score) as max_score,MIN(score) as min_score from
+            grade group by id having COUNT(*) &gt; 1 and MIN(score) &gt;
+            88;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >select course&nbsp;<span style="font-family: 宋体; font-size: 16px"
+              >,COUNT(*) as row_num , COUNT(id) as student_num , MAX(score) as
+              top_score, MIN(score) as lowest_score from grade group by </span
+            >course;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >select course, id, score from grade order by score desc;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >drop table grade;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px">期待输出：</span>
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| id | max_score | min_score | sum_score |</span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| 1 | &nbsp;99.000000&nbsp;<span
+              style="font-family: 宋体; font-size: 16px"
+              >|</span
+            >&nbsp;92.000000&nbsp;<span
+              style="font-family: 宋体; font-size: 16px"
+              >|</span
+            >&nbsp;286.000000&nbsp;<span
+              style="font-family: 宋体; font-size: 16px"
+              >|</span
+            ></span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| 2 | &nbsp;93.500000&nbsp;<span
+              style="font-family: 宋体; font-size: 16px"
+              >| 88.5</span
+            >00000&nbsp;<span style="font-family: 宋体; font-size: 16px">|</span
+            >&nbsp;271.000000&nbsp;<span
+              style="font-family: 宋体; font-size: 16px"
+              >|</span
+            ></span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| 3 | &nbsp;94.500000&nbsp;<span
+              style="font-family: 宋体; font-size: 16px"
+              >| 89.5</span
+            >00000&nbsp;<span style="font-family: 宋体; font-size: 16px">|</span
+            >&nbsp;276.500000&nbsp;<span
+              style="font-family: 宋体; font-size: 16px"
+              >|</span
+            ></span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| id&nbsp;| max_score |</span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| id&nbsp;| max_score |</span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| 1 | 100.000000&nbsp;<span
+              style="font-family: 宋体; font-size: 16px"
+              >|</span
+            ></span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| id | max_score | min_score |</span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| 1 | 100.000000&nbsp;<span
+              style="font-family: 宋体; font-size: 16px"
+              >| 92</span
+            >.000000&nbsp;<span style="font-family: 宋体; font-size: 16px"
+              >|</span
+            ></span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| 2 | 93.500000&nbsp;<span
+              style="font-family: 宋体; font-size: 16px"
+              >| 88.5</span
+            >00000&nbsp;<span style="font-family: 宋体; font-size: 16px"
+              >|</span
+            ></span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| 3 | 94.500000&nbsp;<span
+              style="font-family: 宋体; font-size: 16px"
+              >| 89.5</span
+            >00000&nbsp;<span style="font-family: 宋体; font-size: 16px"
+              >|</span
+            ></span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| course&nbsp;| row_num | student_num | top_score | lowest_score
+            |</span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| DataStructure | 3 | 3 | 95.000000&nbsp;<span
+              style="font-family: 宋体; font-size: 16px"
+              >| 93.5</span
+            >00000&nbsp;<span style="font-family: 宋体; font-size: 16px"
+              >|</span
+            ></span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| ComputerNetworks | 3 | 3 |&nbsp;99.000000&nbsp;<span
+              style="font-family: 宋体; font-size: 16px"
+              >| 88.5</span
+            >00000&nbsp;<span style="font-family: 宋体; font-size: 16px"
+              >|</span
+            ></span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| C++ | 3 | 3 | 92.000000&nbsp;<span
+              style="font-family: 宋体; font-size: 16px"
+              >| 89</span
+            >.000000&nbsp;<span style="font-family: 宋体; font-size: 16px"
+              >|</span
+            ></span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| ParallelCompute | 1 | 1 | 100.000000&nbsp;<span
+              style="font-family: 宋体; font-size: 16px"
+              >|</span
+            >&nbsp;100.000000&nbsp;<span
+              style="font-family: 宋体; font-size: 16px"
+              >|</span
+            ></span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| course | id | score |</span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| ParallelCompute | 1 | 100.<span
+              style="
+                font-family: 宋体;
+                font-size: 16px;
+                text-wrap-mode: wrap;
+                background-color: #ffffff;
+              "
+              >000000</span
+            >
+            |</span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| ComputerNetworks | 1 | 99.<span
+              style="
+                font-family: 宋体;
+                font-size: 16px;
+                text-wrap-mode: wrap;
+                background-color: #ffffff;
+              "
+              >000000</span
+            >
+            |</span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| DataStructure | 1 | 95.<span
+              style="
+                font-family: 宋体;
+                font-size: 16px;
+                text-wrap-mode: wrap;
+                background-color: #ffffff;
+              "
+              >000000</span
+            >
+            |</span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| DataStructure | 3 | 94.5<span
+              style="
+                font-family: 宋体;
+                font-size: 16px;
+                text-wrap-mode: wrap;
+                background-color: #ffffff;
+              "
+              >00000</span
+            >
+            |</span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| DataStructure | 2 | 93.5<span
+              style="
+                font-family: 宋体;
+                font-size: 16px;
+                text-wrap-mode: wrap;
+                background-color: #ffffff;
+              "
+              >00000</span
+            >
+            |</span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| ComputerNetworks | 3 | 92.5<span
+              style="
+                font-family: 宋体;
+                font-size: 16px;
+                text-wrap-mode: wrap;
+                background-color: #ffffff;
+              "
+              >00000</span
+            >
+            |</span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| C++ | 1 | 92.0<span
+              style="
+                font-family: 宋体;
+                font-size: 16px;
+                text-wrap-mode: wrap;
+                background-color: #ffffff;
+              "
+              >00000</span
+            >
+            |</span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| C++ | 3 | 89.5<span
+              style="
+                font-family: 宋体;
+                font-size: 16px;
+                text-wrap-mode: wrap;
+                background-color: #ffffff;
+              "
+              >00000</span
+            >
+            |</span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| C++ | 2 | 89.0<span
+              style="
+                font-family: 宋体;
+                font-size: 16px;
+                text-wrap-mode: wrap;
+                background-color: #ffffff;
+              "
+              >00000</span
+            >
+            |</span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"
+            >| ComputerNetworks | 2 | 88.5<span
+              style="
+                font-family: 宋体;
+                font-size: 16px;
+                text-wrap-mode: wrap;
+                background-color: #ffffff;
+              "
+              >00000</span
+            >
+            |</span
+          >
+        </p>
+        <p
+          style="
+            font-family: 宋体;
+            font-size: 16px;
+            text-indent: 0;
+            background: rgb(255, 255, 255);
+          "
+        >
+          <span style="letter-spacing: 0px; font-size: 16px"><br /></span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong
+              ><span style="font-family: 宋体; font-size: 16px"
+                >测试点</span
+              ></strong
+            ><strong
+              ><span style="font-family: 宋体; font-size: 16px">3</span></strong
+            ><strong
+              ><span style="font-family: 宋体; font-size: 16px"
+                >：健壮性测试</span
+              ></strong
+            ></span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px">测试示例:</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >create table grade (course char(20),id int,score float);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >insert into grade values('DataStructure',1,95);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >insert into grade values('DataStructure',2,93.5);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >insert into grade values('DataStructure',3,94.5);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >insert into grade values('ComputerNetworks',1,99);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >insert into grade values('ComputerNetworks',2,88.5);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >insert into grade values('ComputerNetworks',3,92.5);</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >-- SELECT 列表中不能出现没有在 GROUP BY 子句中的非聚集列</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >select id , score from grade group by course;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >-- WHERE 子句中不能用聚集函数作为条件表达式</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px"
+            >select id, MAX(score) as max_score&nbsp;from grade&nbsp;<span
+              style="
+                font-family: 宋体;
+                text-align: justify;
+                text-wrap: wrap;
+                font-size: 16px;
+              "
+              >where MAX(score) &gt; 90</span
+            >
+            group by id;</span
+          >
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px">期待输出：</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px">failure</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px">failure</span>
+        </p>
+        <p style="text-align: justify; font-family: Arial; font-size: 14px">
+          <span style="font-family: 宋体; font-size: 16px">&nbsp;</span>
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-size: 16px"
+            ><strong
+              ><span style="font-family: 宋体; font-size: 16px"
+                >测试输出要求</span
+              ></strong
+            ><span style="font-family: 宋体; font-size: 16px">：</span></span
+          >
+        </p>
+        <p style="font-family: Arial; font-size: 14px">
+          <span style="font-family: Calibri; font-size: 16px"
+            ><span style="font-family: 宋体; font-size: 16px"
+              >本题目的输出要求写入数据库文件夹下的</span
+            >output.txt<span style="font-family: 宋体; font-size: 16px"
+              >文件中，例如测试数据库名称为</span
+            >execution_test_db<span style="font-family: 宋体; font-size: 16px"
+              >，则在测试时使用</span
+            >./bin/rmdb execution_test_db<span
+              style="font-family: 宋体; font-size: 16px"
+              >命令来启动服务端，对应输出应写入</span
+            >buid/execution_test_db/output.txt<span
+              style="font-family: 宋体; font-size: 16px"
+              >文件中。</span
+            ></span
+          >
+        </p>
+        <p><br /></p>
+      </div>
+    </div>
+  </div>
+</div>
