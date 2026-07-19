@@ -11,6 +11,10 @@ update-time: 2026-06-17
 
 
 
+大部分的笔记软件都只是提供笔记记录的工具，不会帮助管理笔记，专注的是笔记的<u>呈现形式</u>，我要做的是，笔记的<u>辅助整理</u>。更像是一个工作流。
+
+
+
 
 
 ---
@@ -243,7 +247,7 @@ gleanote
 
 mardown 的块用 div 标签隔开，然后用 br 进行换行
 
-竞品Blossom
+
 
 Gleanote 支持手动隐藏文件/文件夹
 
@@ -832,14 +836,3 @@ glint-note 的笔记渲染要聚合 typora + yuque + notion + obsidian 的各家
 
 
 
-## 竞品
-
-
-
-rebirth
-
-Noteey
-
-竞品logseq，flexnote，Heptabase
-
-素记笔记
