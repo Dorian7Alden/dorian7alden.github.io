@@ -1,0 +1,1 @@
+import{_ as t,a as e,c as s}from"./chunks/framework.b9WMfGr4.js";const m=JSON.parse('{"title":"数维杯","description":"","frontmatter":{"title":"数维杯"},"headers":[],"relativePath":"posts/1-实战经验/数维杯.md","filePath":"posts/1-实战经验/数维杯.md"}'),a={name:"posts/1-实战经验/数维杯.md"};function o(r,c,n,p,_,i){return e(),s("div")}const f=t(a,[["render",o]]);export{m as __pageData,f as default};

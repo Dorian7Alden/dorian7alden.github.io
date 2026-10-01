@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- 背景渐变：深邃极客夜 -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+
+    <!-- 主线条渐变：冷峻青蓝 -> 纯净天蓝 (理智与思考) -->
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#06B6D4"/>
+    </linearGradient>
+
+    <!-- 点睛色：终端生机绿 (知识与演化) -->
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#34D399"/>
+      <stop offset="100%" stop-color="#10B981"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 1. 外底：抗裁切圆角矩形 -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
+  
+  <!-- 外边框微光感，增加质感 -->
+  <rect width="508" height="508" x="2" y="2" rx="110" fill="none" stroke="#1E293B" stroke-width="4"/>
+
+  <!-- 2. 核心架构：融合了字母 D、代码注释 // 与 模块结构的复合符号 -->
+  <g transform="translate(64, 64)">
+    <!-- 左侧立柱：代表严密底层架构、代码管道符 "|" -->
+    <rect x="76" y="80" width="32" height="224" rx="16" fill="url(#cyanGrad)"/>
+
+    <!-- 右侧 D 字圆弧：用类似代码块的几何轮廓包裹，带有一个向外延展的出口 -->
+    <path d="M 124 96 
+             H 210 
+             C 278 96, 310 138, 310 192 
+             C 310 246, 278 288, 210 288 
+             H 124" 
+          fill="none" 
+          stroke="url(#cyanGrad)" 
+          stroke-width="32" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"/>
+
+    <!-- 内部核心：一个代码注释斜杠 "/" 或 知识分享的聚焦点 -->
+    <!-- 既是思维切入点，也是 Alden 的 A 字中央横杠/斜杠 -->
+    <line x1="172" y1="228" x2="228" y2="156" 
+          stroke="url(#accentGrad)" 
+          stroke-width="26" 
+          stroke-linecap="round"/>
+          
+    <!-- 极客终结点：右上角微型代码状态点（Live/在线/输出状态） -->
+    <circle cx="270" cy="120" r="10" fill="#38BDF8" opacity="0.6"/>
+  </g>
+</svg>

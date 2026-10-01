@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" width="400" height="120">
+  <rect width="400" height="120" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2"/>
+  <circle cx="60" cy="60" r="28" fill="#18181b"/>
+  <text x="60" y="68" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="24" font-weight="700" text-anchor="middle">D</text>
+  <text x="110" y="55" fill="#18181b" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="20" font-weight="700">道林学长 · Dorian</text>
+  <text x="110" y="80" fill="#64748b" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14">系统全局架构与语法演示示例图</text>
+</svg>
